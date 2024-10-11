@@ -6,5 +6,7 @@ import { RecoverPasswordComponent } from "./recover-password/recover-password.co
 export const AUTH_ROUTES: Routes = [
   { path: 'register', component: RegisterComponent },
   { path: 'login', component: LoginComponent },
-  { path: 'recovery', component: RecoverPasswordComponent }
+  { path: 'recovery', component: RecoverPasswordComponent },
+  { path: '**', redirectTo: 'login' }
+
 ];
