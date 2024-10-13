@@ -11,7 +11,7 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
       [(visible)]="show"
       [style]="{ width: '250px' }"
       [baseZIndex]="10000"
-      [closable]="true"
+      [closable]="false"
       [draggable]="false"
       [resizable]="false"
       [modal]="true"

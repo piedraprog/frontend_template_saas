@@ -5,6 +5,7 @@ import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { AuthCardComponent } from '../../../../shared/components/auth-card/auth-card.component';
 import { LoaderDialogComponent } from '../../../../shared/components/loader-dialog/loader-dialog.component';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-login',
@@ -16,6 +17,7 @@ import { LoaderDialogComponent } from '../../../../shared/components/loader-dial
     NgIf,
     AuthCardComponent,
     LoaderDialogComponent,
+    RouterModule,
   ],
   templateUrl: './login.component.html',
 })
