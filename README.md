@@ -21,3 +21,8 @@ Asegúrate de tener las siguientes herramientas instaladas en tu entorno de desa
 - [Node.js](https://nodejs.org/) (v18 o superior)
 - [Angular CLI](https://angular.io/cli) (v17 o superior)
 - [Git](https://git-scm.com/)
+
+
+## Por hacer
+
+- TODO: Hacer un componente de input en el que le pases las props y sea repicable

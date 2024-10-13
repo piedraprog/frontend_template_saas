@@ -7,5 +7,5 @@
   "quoteProps": "preserve",
   "bracketSpacing": true,
   "htmlWhitespaceSensitivity": "ignore",
-  "endOfLine": "lf"
+  "endOfLine": "auto"
 }

@@ -1,18 +1,27 @@
-// import { JsonPipe } from '@angular/common';
 import { NgIf } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
-import { CardModule } from 'primeng/card';
 import { InputTextModule } from 'primeng/inputtext';
+import { AuthCardComponent } from '../../../../shared/components/auth-card/auth-card.component';
+import { LoaderDialogComponent } from '../../../../shared/components/loader-dialog/loader-dialog.component';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [ButtonModule, CardModule, InputTextModule, ReactiveFormsModule, NgIf],
+  imports: [
+    ButtonModule,
+    InputTextModule,
+    ReactiveFormsModule,
+    NgIf,
+    AuthCardComponent,
+    LoaderDialogComponent,
+  ],
   templateUrl: './login.component.html',
 })
 export class LoginComponent {
+  showLoader: boolean = false;
+
   public loginForm = new FormGroup(
     {
       email: new FormControl('', [Validators.required, Validators.email]),
@@ -23,10 +32,10 @@ export class LoginComponent {
     },
   );
 
-  constructor() {}
-
   login() {
+    console.log(this.showLoader);
     if (this.loginForm.valid) {
+      this.showLoader = true;
       console.log(this.loginForm.value);
     }
   }
