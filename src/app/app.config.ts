@@ -6,9 +6,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(routes),
-    provideZoneChangeDetection({ eventCoalescing: true}),
-
-    // Primer NG
+    provideZoneChangeDetection({ eventCoalescing: true }),
     BrowserAnimationsModule,
-  ]
+    // importProvidersFrom(BrowserModule)
+  ],
 };

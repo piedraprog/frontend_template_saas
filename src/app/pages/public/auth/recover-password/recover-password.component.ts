@@ -5,8 +5,6 @@ import { Component } from '@angular/core';
   standalone: true,
   imports: [],
   templateUrl: './recover-password.component.html',
-  styleUrl: './recover-password.component.scss'
+  styleUrl: './recover-password.component.scss',
 })
-export class RecoverPasswordComponent {
-
-}
+export class RecoverPasswordComponent {}

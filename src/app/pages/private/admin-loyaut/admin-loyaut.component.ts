@@ -5,8 +5,6 @@ import { Component } from '@angular/core';
   standalone: true,
   imports: [],
   templateUrl: './admin-loyaut.component.html',
-  styleUrl: './admin-loyaut.component.scss'
+  styleUrl: './admin-loyaut.component.scss',
 })
-export class AdminLoyautComponent {
-
-}
+export class AdminLoyautComponent {}
