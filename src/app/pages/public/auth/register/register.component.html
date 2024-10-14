@@ -1,1 +1,166 @@
-<p>register works!</p>
+<app-auth-card
+  [title]="'Registrarme'"
+  [subheader]="'Ingresa tus datos para registrarte en la plataforma'"
+>
+  <form
+    [formGroup]="registerForm"
+    (ngSubmit)="register()"
+    class="flex flex-column gap-4"
+    #form="ngForm"
+  >
+    <!-- Nombre de usuario -->
+    <div class="flex flex-column gap-2">
+      <label for="email" class="flex flex-column align-items-right gap-2 md:flex-row">
+        Nombre de usuario
+        <div
+          *ngIf="(usernameFormField?.invalid && usernameFormField?.touched) || form.submitted"
+          class="text-red-500"
+        >
+          {{ usernameFormField?.errors | json }}
+          <small *ngIf="usernameFormField?.errors?.['required']">
+            *El nombre de usuario es obligatorio.
+          </small>
+          <small *ngIf="usernameFormField?.errors?.['maxlength']">
+            *El nombre de usuario no debe superar los
+            {{ usernameFormField?.errors?.['maxlength']['requiredLength'] | json }} caracteres.
+          </small>
+          <small *ngIf="usernameFormField?.errors?.['minlength']">
+            *El nombre de usuario debe tener al menos
+            {{ usernameFormField?.errors?.['minlength']['requiredLength'] | json }} caracteres.
+          </small>
+          <small *ngIf="usernameFormField?.errors?.['pattern']">
+            *El nombre de usuario debe ser alfanumérico.
+          </small>
+        </div>
+      </label>
+      <input
+        pInputText
+        id="email"
+        aria-describedby="email-help"
+        formControlName="username"
+        placeholder="username"
+      />
+    </div>
+
+    <!-- Correo electrónico -->
+    <div class="flex flex-column gap-2">
+      <label for="email" class="flex flex-column align-items-right gap-2 md:flex-row">
+        Correo Electrónico
+        <div
+          *ngIf="(emailFormField?.invalid && emailFormField?.touched) || form.submitted"
+          class="text-red-500"
+        >
+          <small *ngIf="emailFormField?.errors?.['required']">
+            *El correo electrónico es obligatorio.
+          </small>
+          <small *ngIf="emailFormField?.errors?.['email']">
+            *Ingresa un correo electrónico válido.
+          </small>
+        </div>
+      </label>
+      <input
+        pInputText
+        id="email"
+        aria-describedby="email-help"
+        formControlName="email"
+        placeholder="example@example.com"
+      />
+    </div>
+
+    <!-- Contraseña -->
+    <div class="flex flex-column gap-2">
+      <label for="password" class="flex align-items-center gap-2">
+        Contraseña
+        <div
+          *ngIf="(passwordFormField?.invalid && passwordFormField?.touched) || form.submitted"
+          class="text-danger"
+        >
+          <small *ngIf="passwordFormField?.errors?.['required']" class="text-red-500">
+            *La contraseña es obligatoria.
+          </small>
+        </div>
+      </label>
+      <input
+        pInputText
+        id="password"
+        aria-describedby="password-help"
+        formControlName="password"
+        type="text"
+        placeholder="Ingresa tu contraseña"
+      />
+
+      <div class="text-red-400 text-sm" *ngIf="passwordFormField?.dirty">
+        <span class="block" *ngIf="!passwordErrors.hasMinLength">
+          *Debe contener al menos 8 caracteres.
+        </span>
+
+        <span class="block" *ngIf="!passwordErrors.hasUpperCase">
+          *Debe contener al menos una letra mayúscula.
+        </span>
+
+        <span class="block" *ngIf="!passwordErrors.hasLowerCase">
+          *Debe contener al menos una letra minúscula.
+        </span>
+
+        <span class="block" *ngIf="!passwordErrors.hasNumber">
+          *Debe contener al menos un número.
+        </span>
+
+        <span class="block" *ngIf="!passwordErrors.hasSpecialCharacter">
+          *Al menos un caracter especial.
+        </span>
+      </div>
+    </div>
+
+    <!-- Confirmar Contraseña -->
+    <div class="flex flex-column gap-2">
+      <label for="password" class="flex align-items-center gap-2">
+        Confirmar Contraseña
+        <div
+          *ngIf="
+            (confirmPasswordFormField?.dirty && confirmPasswordFormField?.touched) || form.submitted
+          "
+          class="text-danger"
+        >
+          <small *ngIf="confirmPasswordFormField?.errors?.['required']" class="text-red-500">
+            *La contraseña es obligatoria.
+          </small>
+
+          <small *ngIf="registerForm.errors?.['misMatch']" class="text-red-500">
+            *Las contrasenias deben coincidir.
+          </small>
+        </div>
+      </label>
+      <input
+        [className]="
+          registerForm.errors?.['misMatch'] ? 'p-inputtext border-red-400' : 'p-inputtext'
+        "
+        pInputText
+        id="confirmPassword"
+        aria-describedby="password-help"
+        formControlName="confirmPassword"
+        placeholder="Ingresa tu contraseña"
+      />
+    </div>
+
+    <!-- Ir al inicio -->
+    <div class="flex flex-column gap-2">
+      <small>¿Ya tienes una cuenta?</small>
+      <small>
+        <a routerLink="/login" class="p-0 text-sm text-gray-900 font-bold">Iniciar Sesión</a>
+      </small>
+    </div>
+
+    <!-- Botón de inicio de sesión -->
+    <div class="w-full flex flex-row gap-2 justify-content-center">
+      <p-button
+        type="submit"
+        label="Registrarme"
+        styleClass="w-full bg-indigo-900 border-indigo-900 text-white hover:bg-indigo-800"
+        class="w-full"
+      />
+    </div>
+  </form>
+</app-auth-card>
+
+<app-loader-dialog [show]="showLoader" />
