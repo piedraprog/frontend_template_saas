@@ -10,6 +10,8 @@ import { passwordMatcherValidator } from '../../../../shared/validators/password
 import { RegexUtils } from '../../../../shared/utils/regex.utils';
 import { passwordValidator } from '../../../../shared/validators/password-validator';
 import { CaptchaService } from '../../../../shared/services/captcha.service';
+import { NgxTurnstileModule } from 'ngx-turnstile';
+import { environment } from '../../../../../environments/environment.development';
 
 @Component({
   selector: 'app-register',
@@ -23,11 +25,17 @@ import { CaptchaService } from '../../../../shared/services/captcha.service';
     LoaderDialogComponent,
     RouterModule,
     JsonPipe,
+    NgxTurnstileModule,
   ],
+  providers: [],
   templateUrl: './register.component.html',
 })
 export class RegisterComponent {
   showLoader = false;
+  disableButton = true;
+
+  public siteKey = environment.captcha_key;
+
   public registerForm = new FormGroup(
     {
       username: new FormControl<string>('', [
@@ -76,8 +84,25 @@ export class RegisterComponent {
     return passwordControl?.errors?.['passwordStrength'] || null;
   }
 
-  confirmCaptcha() {
-    this.captchaService.confirmCaptcha();
+  confirmCaptcha(captchaResponse: string | null) {
+    this.captchaService.confirmCaptcha(captchaResponse).subscribe({
+      next: (isCaptchaValid: boolean | undefined) => {
+        if (isCaptchaValid === true) {
+          console.log('Captcha verified successfully');
+          this.disableButton = false;
+        } else if (isCaptchaValid === false) {
+          console.error('Captcha verification failed');
+          this.disableButton = true;
+        } else {
+          console.error('Captcha verification result is undefined');
+          this.disableButton = true;
+        }
+      },
+      error: (error: Error) => {
+        console.error(error);
+        this.disableButton = true;
+      },
+    });
   }
 
   register() {

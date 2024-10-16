@@ -151,6 +151,15 @@
       </small>
     </div>
 
+    <div class="w-full flex flex-row gap-2 justify-content-center">
+      <ngx-turnstile
+        [siteKey]="siteKey"
+        (resolved)="confirmCaptcha($event)"
+        theme="auto"
+        [tabIndex]="0"
+      ></ngx-turnstile>
+    </div>
+
     <!-- Botón de inicio de sesión -->
     <div class="w-full flex flex-row gap-2 justify-content-center">
       <p-button
@@ -158,6 +167,7 @@
         label="Registrarme"
         styleClass="w-full bg-indigo-900 border-indigo-900 text-white hover:bg-indigo-800"
         class="w-full"
+        [disabled]="disableButton"
       />
     </div>
   </form>
