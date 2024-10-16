@@ -1,13 +1,14 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { LoaderDialogComponent } from './shared/components/loader-dialog/loader-dialog.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet],
-  templateUrl: './app.component.html',
-  styleUrl: './app.component.scss',
+  imports: [RouterOutlet, LoaderDialogComponent],
+  template: `
+    <app-loader-dialog />
+    <router-outlet />
+  `,
 })
-export class AppComponent {
-  title = 'frontend_template';
-}
+export class AppComponent {}

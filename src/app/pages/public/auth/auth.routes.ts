@@ -7,5 +7,4 @@ export const AUTH_ROUTES: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'recovery', component: RecoverPasswordComponent },
   { path: 'register', component: RegisterComponent },
-  { path: '**', redirectTo: 'register' },
 ];

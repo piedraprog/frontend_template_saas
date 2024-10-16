@@ -31,7 +31,6 @@ import { environment } from '../../../../../environments/environment.development
   templateUrl: './register.component.html',
 })
 export class RegisterComponent {
-  showLoader = false;
   disableButton = true;
 
   public siteKey = environment.captcha_key;
@@ -106,7 +105,6 @@ export class RegisterComponent {
   }
 
   register() {
-    this.showLoader = true;
     if (this.registerForm.valid) {
       console.log(this.registerForm.value);
     }

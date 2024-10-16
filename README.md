@@ -25,4 +25,5 @@ Asegúrate de tener las siguientes herramientas instaladas en tu entorno de desa
 
 ## Por hacer
 
-- TODO: Hacer un componente de input en el que le pases las props y sea repicable
+- TODO: Hacer un componente de input en el que le pases las props y sea repicable.
+- TODO: Hacer prueba con interceptores [DI-based_interceptors](https://angular.dev/guide/http/interceptors#di-based-interceptors)

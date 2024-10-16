@@ -28,7 +28,6 @@ import { ToastModule } from 'primeng/toast';
   providers: [ConfirmationService, MessageService],
 })
 export class RecoverPasswordComponent {
-  showLoader: boolean = false;
   public recoveryForm = new FormGroup({
     email: new FormControl('', [Validators.required, Validators.email]),
   });
@@ -41,9 +40,6 @@ export class RecoverPasswordComponent {
 
   recoveryPassword() {
     if (this.recoveryForm.valid) {
-      // this.showLoader = true;
-      console.log(this.recoveryForm.value);
-
       this.confirmationService.confirm({
         message: 'Are you sure that you want to proceed?',
         header: 'Confirmation',

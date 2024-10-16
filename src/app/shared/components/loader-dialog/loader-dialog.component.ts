@@ -1,11 +1,13 @@
-import { Component, Input } from '@angular/core';
+import { Component } from '@angular/core';
 import { DialogModule } from 'primeng/dialog';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { LoaderService } from '../../../core/services/loading.service';
+import { AsyncPipe } from '@angular/common';
 
 @Component({
   selector: 'app-loader-dialog',
   standalone: true,
-  imports: [DialogModule, ProgressSpinnerModule],
+  imports: [DialogModule, ProgressSpinnerModule, AsyncPipe],
   template: `
     <p-dialog
       [(visible)]="show"
@@ -23,14 +25,12 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
     </p-dialog>
   `,
 })
-
-// TODO: Cambiar a signals
 export class LoaderDialogComponent {
-  @Input() show: boolean = false;
+  show = false;
 
-  constructor() {
-    // setTimeout(() => {
-    //   this.show = false;
-    // }, 13000);
+  constructor(private loaderService: LoaderService) {
+    this.loaderService.showLoader$.subscribe((show) => {
+      this.show = show;
+    });
   }
 }
