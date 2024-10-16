@@ -16,7 +16,6 @@
           *ngIf="(usernameFormField?.invalid && usernameFormField?.touched) || form.submitted"
           class="text-red-500"
         >
-          {{ usernameFormField?.errors | json }}
           <small *ngIf="usernameFormField?.errors?.['required']">
             *El nombre de usuario es obligatorio.
           </small>
@@ -85,11 +84,10 @@
         id="password"
         aria-describedby="password-help"
         formControlName="password"
-        type="text"
+        type="password"
         placeholder="Ingresa tu contraseña"
       />
-
-      <div class="text-red-400 text-sm" *ngIf="passwordFormField?.dirty">
+      <div class="text-red-400 text-sm" *ngIf="passwordFormField?.dirty && passwordErrors">
         <span class="block" *ngIf="!passwordErrors.hasMinLength">
           *Debe contener al menos 8 caracteres.
         </span>
@@ -102,7 +100,7 @@
           *Debe contener al menos una letra minúscula.
         </span>
 
-        <span class="block" *ngIf="!passwordErrors.hasNumber">
+        <span class="block" *ngIf="!passwordErrors.hasNumeric">
           *Debe contener al menos un número.
         </span>
 
@@ -140,6 +138,7 @@
         aria-describedby="password-help"
         formControlName="confirmPassword"
         placeholder="Ingresa tu contraseña"
+        type="password"
       />
     </div>
 

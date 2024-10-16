@@ -4,6 +4,10 @@ import { ApiResponse } from '../../shared/interfaces/response.interface';
 import { environment } from '../../../environments/environment.development';
 import { map, Observable } from 'rxjs';
 import { LoginInterface, LoginResponseInterface } from '../../shared/interfaces/login.interface';
+import {
+  RegisterInterface,
+  RegisterResponseInterface,
+} from '../../shared/interfaces/register.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -31,11 +35,26 @@ export class AuthService {
       );
   }
 
-  // register(data: any): Observable<ApiResponse<any>> {
-  //   const url = `${this.baseUrl}/auth/register`;
+  register({ email, username, password, captchaToken }: RegisterInterface): Observable<unknown> {
+    const url = `${this.baseUrl}/auth/register`;
 
-  //   return this.http.post<any>(url, data);
-  // }
+    return this.http
+      .post<ApiResponse<RegisterResponseInterface>>(url, {
+        username,
+        email,
+        password,
+        captchaToken,
+      })
+      .pipe(
+        map((response: ApiResponse<unknown>) => {
+          if (response.status && response.data) {
+            return response.data;
+          } else {
+            throw new Error(response.message || 'Error desconocido en el login');
+          }
+        }),
+      );
+  }
 
   // refreshToken(refreshToken: string): Observable<any> {
 

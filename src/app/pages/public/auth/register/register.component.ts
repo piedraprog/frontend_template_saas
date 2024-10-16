@@ -1,7 +1,7 @@
 import { JsonPipe, NgIf } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { AuthCardComponent } from '../../../../shared/components/auth-card/auth-card.component';
@@ -12,6 +12,8 @@ import { passwordValidator } from '../../../../shared/validators/password-valida
 import { CaptchaService } from '../../../../shared/services/captcha.service';
 import { NgxTurnstileModule } from 'ngx-turnstile';
 import { environment } from '../../../../../environments/environment.development';
+import { AuthService } from '../../../../core/services/auth.service';
+import { RegisterInterface } from '../../../../shared/interfaces/register.interface';
 
 @Component({
   selector: 'app-register',
@@ -31,9 +33,13 @@ import { environment } from '../../../../../environments/environment.development
   templateUrl: './register.component.html',
 })
 export class RegisterComponent {
+  private captchaService = inject(CaptchaService);
+  private authService = inject(AuthService);
+  private router = inject(Router);
   disableButton = true;
 
   public siteKey = environment.captcha_key;
+  captchaToken: string = '';
 
   public registerForm = new FormGroup(
     {
@@ -56,8 +62,6 @@ export class RegisterComponent {
       validators: [passwordMatcherValidator],
     },
   );
-
-  constructor(private captchaService: CaptchaService) {}
 
   get usernameFormField() {
     return this.registerForm.get('username');
@@ -88,6 +92,7 @@ export class RegisterComponent {
       next: (isCaptchaValid: boolean | undefined) => {
         if (isCaptchaValid === true) {
           console.log('Captcha verified successfully');
+          this.captchaToken = captchaResponse!;
           this.disableButton = false;
         } else if (isCaptchaValid === false) {
           console.error('Captcha verification failed');
@@ -106,7 +111,22 @@ export class RegisterComponent {
 
   register() {
     if (this.registerForm.valid) {
-      console.log(this.registerForm.value);
+      const data: RegisterInterface = {
+        username: this.registerForm.value.username!,
+        email: this.registerForm.value.email!,
+        password: this.registerForm.value.confirmPassword!,
+        captchaToken: this.captchaToken,
+      };
+
+      this.authService.register(data).subscribe({
+        next: () => {
+          // redirect to dashboard
+          this.router.navigate(['/login']);
+        },
+        error: (error) => {
+          console.log(error);
+        },
+      });
     }
   }
 }
