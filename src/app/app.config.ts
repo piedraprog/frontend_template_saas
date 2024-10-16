@@ -31,5 +31,6 @@ export const appConfig: ApplicationConfig = {
     ),
     importProvidersFrom(NoopAnimationsModule),
     importProvidersFrom(HttpClientModule),
+    // importProvidersFrom(CookieService),
   ],
 };

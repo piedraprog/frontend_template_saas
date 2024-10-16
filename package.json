@@ -35,6 +35,7 @@
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.2.1",
     "lint-staged": "^15.2.10",
+    "ngx-cookie-service": "^18.0.0",
     "ngx-turnstile": "^0.2.4",
     "prettier-eslint": "^16.3.0",
     "primeflex": "^3.3.1",

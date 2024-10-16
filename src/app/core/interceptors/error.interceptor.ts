@@ -2,7 +2,6 @@ import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { catchError, throwError } from 'rxjs';
 
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
-  console.log('errorInterceptor');
   return next(req).pipe(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     catchError((error: any) => {

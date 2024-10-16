@@ -5,9 +5,10 @@ import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { AuthCardComponent } from '../../../../shared/components/auth-card/auth-card.component';
 import { LoaderDialogComponent } from '../../../../shared/components/loader-dialog/loader-dialog.component';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../../../core/services/auth.service';
 import { LoginInterface } from '../../../../shared/interfaces/login.interface';
+import { CookieService } from 'ngx-cookie-service';
 
 @Component({
   selector: 'app-login',
@@ -25,6 +26,9 @@ import { LoginInterface } from '../../../../shared/interfaces/login.interface';
 })
 export class LoginComponent {
   private authService = inject(AuthService);
+  private cookieService = inject(CookieService);
+  private router = inject(Router);
+
   public loginForm = new FormGroup(
     {
       email: new FormControl('', [Validators.required, Validators.email]),
@@ -38,13 +42,17 @@ export class LoginComponent {
   login() {
     if (this.loginForm.valid) {
       const data: LoginInterface = {
-        email: this.loginForm.value.email!, // Asegura que email no es null
-        password: this.loginForm.value.password!, // Asegura que password no es null
+        email: this.loginForm.value.email!,
+        password: this.loginForm.value.password!,
       };
 
       this.authService.login(data).subscribe({
         next: (response) => {
-          console.log(response);
+          this.cookieService.set('accessToken', response.accessToken);
+          this.cookieService.set('refreshToken', response.refreshToken);
+
+          // redirect to dashboard
+          this.router.navigate(['/dashboard']);
         },
         error: (error) => {
           console.log(error);
