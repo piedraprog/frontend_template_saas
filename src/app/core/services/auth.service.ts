@@ -17,13 +17,21 @@ export class AuthService {
 
   constructor(private http: HttpClient) {}
 
-  login({ email, password }: LoginInterface): Observable<LoginResponseInterface> {
+  login({ email, password, ip }: LoginInterface): Observable<LoginResponseInterface> {
     const url = `${this.baseUrl}/auth/login`;
     return this.http
-      .post<ApiResponse<LoginResponseInterface>>(url, {
-        email,
-        password,
-      })
+      .post<ApiResponse<LoginResponseInterface>>(
+        url,
+        {
+          email,
+          password,
+        },
+        {
+          headers: {
+            'x-Forwarded-For': ip,
+          },
+        },
+      )
       .pipe(
         map((response: ApiResponse<LoginResponseInterface>) => {
           if (response.status && response.data) {

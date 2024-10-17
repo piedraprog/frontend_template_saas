@@ -1,5 +1,5 @@
 import { NgIf } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
@@ -9,6 +9,7 @@ import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../../../core/services/auth.service';
 import { LoginInterface } from '../../../../shared/interfaces/login.interface';
 import { CookieService } from 'ngx-cookie-service';
+import { IPService } from '../../../../core/services/ip.service';
 
 @Component({
   selector: 'app-login',
@@ -24,10 +25,20 @@ import { CookieService } from 'ngx-cookie-service';
   ],
   templateUrl: './login.component.html',
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
   private authService = inject(AuthService);
   private cookieService = inject(CookieService);
   private router = inject(Router);
+  private ipService = inject(IPService);
+
+  ip: string = '';
+
+  ngOnInit(): void {
+    // if (this.cookieService.get('accessToken')) {
+    //   this.router.navigate(['/dashboard']);
+    // }
+    this.ipService.getUserIP().subscribe((response) => (this.ip = response));
+  }
 
   public loginForm = new FormGroup(
     {
@@ -44,6 +55,7 @@ export class LoginComponent {
       const data: LoginInterface = {
         email: this.loginForm.value.email!,
         password: this.loginForm.value.password!,
+        ip: this.ip,
       };
 
       this.authService.login(data).subscribe({
