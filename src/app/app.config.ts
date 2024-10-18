@@ -3,16 +3,18 @@ import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import {
+  HTTP_INTERCEPTORS,
   HttpClientModule,
   provideHttpClient,
   withFetch,
   withInterceptors,
+  withInterceptorsFromDi,
 } from '@angular/common/http';
 import { authInterceptor } from './core/interceptors/auth.interceptor';
 import { loaderInterceptor } from './core/interceptors/loader.interceptor';
-import { errorInterceptor } from './core/interceptors/error.interceptor';
 import { responseTimeInterceptor } from './core/interceptors/response-time.interceptor';
 import { retryInterceptor } from './core/interceptors/retry.interceptor';
+import { DIErrorInterceptor } from './core/interceptors/DIerror.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -25,10 +27,16 @@ export const appConfig: ApplicationConfig = {
         loaderInterceptor,
         authInterceptor,
         retryInterceptor,
-        errorInterceptor,
+        // errorInterceptor,
       ]),
+      withInterceptorsFromDi(),
       withFetch(),
     ),
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: DIErrorInterceptor,
+      multi: true,
+    },
     importProvidersFrom(NoopAnimationsModule),
     importProvidersFrom(HttpClientModule),
     // importProvidersFrom(CookieService),

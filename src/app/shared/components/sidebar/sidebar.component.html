@@ -1,1 +1,47 @@
-<p>sidebar works!</p>
+<p-menu
+  [model]="items"
+  [styleClass]="
+    isFullDisplay
+      ? 'w-16rem h-screen transition-ease-out transition-duration-200'
+      : 'w-6rem h-screen  transition-ease-in transition-duration-200'
+  "
+>
+  <ng-template pTemplate="start">
+    <button
+      pRipple
+      class="relative overflow-hidden w-full p-link flex align-items-center p-2 pl-3 text-color hover:surface-200 border-noround fadeinleft animation-duration-200"
+      [class]="isFullDisplay ? '' : 'justify-content-center'"
+    >
+      <p-avatar
+        image="https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png"
+        class="mr-2"
+        shape="circle"
+      />
+
+      @if (isFullDisplay) {
+        <span class="inline-flex flex-column">
+          <span class="font-bold">{{ profileInfo?.username }}</span>
+          <span class="text-sm">{{ profileInfo?.email }}</span>
+        </span>
+      }
+    </button>
+  </ng-template>
+  <ng-template pTemplate="item" let-item>
+    <a
+      pRipple
+      class="flex flex-row align-items-center justify-content-center p-menuitem-link text-l"
+    >
+      @if (isFullDisplay) {
+        <span [class]="item.icon" style="font-size: 1.2rem"></span>
+        <span class="ml-2 fadeinleft animation-duration-500">{{ item?.label }}</span>
+        <span class="ml-auto pi pi-angle-right"></span>
+      } @else {
+        <span
+          [class]="!isFullDisplay && item.secondIcon ? item.secondIcon : item.icon"
+          style="font-size: 1.2rem"
+        ></span>
+      }
+    </a>
+  </ng-template>
+</p-menu>
+<p-confirmDialog />

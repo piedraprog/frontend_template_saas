@@ -8,6 +8,8 @@ import {
   RegisterInterface,
   RegisterResponseInterface,
 } from '../../shared/interfaces/register.interface';
+import { CookieService } from 'ngx-cookie-service';
+import { ProfileResponseInterface } from '../models/interfaces/profile.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -15,7 +17,10 @@ import {
 export class AuthService {
   baseUrl = environment.apiUrl;
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private cookieService: CookieService,
+  ) {}
 
   login({ email, password, ip }: LoginInterface): Observable<LoginResponseInterface> {
     const url = `${this.baseUrl}/auth/login`;
@@ -64,26 +69,56 @@ export class AuthService {
       );
   }
 
-  // refreshToken(refreshToken: string): Observable<any> {
+  getProfile(): Observable<ProfileResponseInterface> {
+    const url = `${this.baseUrl}/auth/profile`;
+    return this.http.get<ApiResponse<ProfileResponseInterface>>(url).pipe(
+      map((response: ApiResponse<ProfileResponseInterface>) => {
+        if (response.status && response.data) {
+          return response.data;
+        } else {
+          throw new Error(response.message || 'Error desconocido en el login');
+        }
+      }),
+    );
+  }
 
-  //   const url = `${this.baseUrl}/auth/refresh`;
-  //   return this.http.post<any>(url, { refreshToken });
-  // }
+  refreshToken(refreshToken: string): Observable<{ accessToken: string; refreshToken: string }> {
+    const url = `${this.baseUrl}/auth/refresh`;
+    return this.http
+      .post<ApiResponse<{ accessToken: string; refreshToken: string }>>(url, { refreshToken })
+      .pipe(
+        map((response: ApiResponse<{ accessToken: string; refreshToken: string }>) => {
+          if (response.status && response.data) {
+            return response.data;
+          } else {
+            throw new Error(response.message || 'Error desconocido en el refresh');
+          }
+        }),
+      );
+  }
 
-  // logOut() {
-  //   const url = `${this.baseUrl}/auth/logout`;
-  //   return this.http.post<ApiResponse<any>>(url, {}).pipe(
-  //     map((response: ApiResponse<any>) => {
-  //       if (response.status && response.data) {
-  //         return response.data;
-  //       } else {
-  //         throw new Error(response.message || 'Error desconocido en el logout');
-  //       }
-  //     }),
-  //     catchError((error) => {
-  //       // Aquí puedes manejar los errores de la API
-  //       return throwError(() => new Error(error.message || 'Error en el servidor'));
-  //     }),
-  //   );
-  // }
+  logOut(): Observable<{ message: string }> {
+    console.log('se lanzo el logout');
+    const refreshToken = this.cookieService.get('refreshToken');
+    const url = `${this.baseUrl}/auth/logout`;
+
+    return this.http
+      .post<ApiResponse<{ message: string }>>(url, {
+        refreshToken,
+      })
+      .pipe(
+        map((response: ApiResponse<{ message: string }>) => {
+          if (response.status && response.data) {
+            return response.data;
+          } else {
+            throw new Error(response.message || 'Error desconocido en el logout');
+          }
+        }),
+      );
+  }
+
+  removeTokens() {
+    this.cookieService.delete('accessToken');
+    this.cookieService.delete('refreshToken');
+  }
 }
