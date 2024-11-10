@@ -3,10 +3,12 @@
 @import "primeflex/primeflex.css";
 @import "primeicons/primeicons.css";
 
+
 *{
   margin: 0;
   box-sizing: border-box;
   --primary-color: $primary-color-dark;
+  font-family: "Montserrat", sans-serif;
 }
 
 .cartoon {

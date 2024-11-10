@@ -8,8 +8,10 @@ import { PrimeNGConfig } from 'primeng/api';
   standalone: true,
   imports: [RouterOutlet, LoaderDialogComponent],
   template: `
-    <app-loader-dialog />
-    <router-outlet />
+    <div class="h-min-screen">
+      <app-loader-dialog />
+      <router-outlet />
+    </div>
   `,
 })
 export class AppComponent implements OnInit {

@@ -3,6 +3,8 @@ export interface RegisterInterface {
   email: string;
   password: string;
   captchaToken: string;
+  company: string;
+  termsCondition: boolean;
 }
 
 export interface RegisterResponseInterface {

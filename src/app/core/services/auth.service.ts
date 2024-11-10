@@ -48,15 +48,24 @@ export class AuthService {
       );
   }
 
-  register({ email, username, password, captchaToken }: RegisterInterface): Observable<unknown> {
+  register({
+    email,
+    username,
+    password,
+    captchaToken,
+    company,
+    termsCondition,
+  }: RegisterInterface): Observable<unknown> {
     const url = `${this.baseUrl}/auth/register`;
 
     return this.http
       .post<ApiResponse<RegisterResponseInterface>>(url, {
+        company,
         username,
         email,
         password,
         captchaToken,
+        termsCondition,
       })
       .pipe(
         map((response: ApiResponse<unknown>) => {

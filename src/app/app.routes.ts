@@ -5,7 +5,7 @@ import { sessionGuard } from './core/guards/session.guard';
 export const routes: Routes = [
   {
     path: '',
-    loadChildren: () => import('./pages/public/auth/auth.routes').then((m) => m.AUTH_ROUTES),
+    loadChildren: () => import('./pages/public/public.routes').then((m) => m.PUBLIC_ROUTES),
     canActivate: [sessionGuard],
   },
   {

@@ -5,7 +5,9 @@ import { CardModule } from 'primeng/card';
   standalone: true,
   imports: [CardModule],
   template: `
-    <div class="flex w-full h-screen justify-content-center align-items-center bg-gray-200">
+    <div
+      class="flex w-full min-h-screen justify-content-center align-items-center bg-gray-200 py-4"
+    >
       <p-card
         [header]="title"
         [subheader]="subheader"

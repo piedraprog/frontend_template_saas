@@ -11,6 +11,39 @@
     <!-- Nombre de usuario -->
     <div class="flex flex-column gap-2">
       <label for="email" class="flex flex-column align-items-right gap-2 md:flex-row">
+        Nombre de la empresa
+        <div
+          *ngIf="(corporationFormField?.invalid && corporationFormField?.touched) || form.submitted"
+          class="text-red-500"
+        >
+          <small *ngIf="corporationFormField?.errors?.['required']">
+            *El nombre de empresa es obligatorio.
+          </small>
+          <small *ngIf="corporationFormField?.errors?.['maxlength']">
+            *El nombre de empresa no debe superar los
+            {{ corporationFormField?.errors?.['maxlength']['requiredLength'] | json }} caracteres.
+          </small>
+          <small *ngIf="corporationFormField?.errors?.['minlength']">
+            *El nombre de empresa debe tener al menos
+            {{ corporationFormField?.errors?.['minlength']['requiredLength'] | json }} caracteres.
+          </small>
+          <small *ngIf="corporationFormField?.errors?.['pattern']">
+            *El nombre de empresa debe ser alfanumérico.
+          </small>
+        </div>
+      </label>
+      <input
+        pInputText
+        id="corporation"
+        aria-describedby="email-help"
+        formControlName="corporation"
+        placeholder="Nombre de empresa"
+      />
+    </div>
+
+    <!-- Nombre de usuario -->
+    <div class="flex flex-column gap-2">
+      <label for="email" class="flex flex-column align-items-right gap-2 md:flex-row">
         Nombre de usuario
         <div
           *ngIf="(usernameFormField?.invalid && usernameFormField?.touched) || form.submitted"
@@ -34,7 +67,7 @@
       </label>
       <input
         pInputText
-        id="email"
+        id="username"
         aria-describedby="email-help"
         formControlName="username"
         placeholder="username"
@@ -79,14 +112,25 @@
           </small>
         </div>
       </label>
-      <input
-        pInputText
-        id="password"
-        aria-describedby="password-help"
-        formControlName="password"
-        type="password"
-        placeholder="Ingresa tu contraseña"
-      />
+      <div class="flex justify-content-start w-full gap-2">
+        <input
+          pInputText
+          id="password"
+          aria-describedby="password-help"
+          formControlName="password"
+          [type]="passwordVisible ? 'text' : 'password'"
+          placeholder="Ingresa tu contraseña"
+          class="w-full"
+        />
+        <p-button
+          [icon]="passwordVisible ? 'pi pi-eye-slash' : 'pi pi-eye'"
+          [rounded]="true"
+          [text]="true"
+          severity="secondary"
+          (onClick)="passwordToggle()"
+        />
+      </div>
+
       <div class="text-red-400 text-sm" *ngIf="passwordFormField?.dirty && passwordErrors">
         <span class="block" *ngIf="!passwordErrors.hasMinLength">
           *Debe contener al menos 8 caracteres.
@@ -129,17 +173,51 @@
           </small>
         </div>
       </label>
-      <input
-        [className]="
-          registerForm.errors?.['misMatch'] ? 'p-inputtext border-red-400' : 'p-inputtext'
+      <div class="flex justify-content-start w-full gap-2">
+        <input
+          [className]="
+            registerForm.errors?.['misMatch']
+              ? 'p-inputtext border-red-400 w-full'
+              : 'p-inputtext w-full'
+          "
+          pInputText
+          id="confirmPassword"
+          aria-describedby="password-help"
+          formControlName="confirmPassword"
+          placeholder="Ingresa tu contraseña"
+          type="password"
+          class="w-full"
+          [type]="confirmPasswordVisible ? 'text' : 'password'"
+        />
+        <p-button
+          [icon]="confirmPasswordVisible ? 'pi pi-eye-slash' : 'pi pi-eye'"
+          [rounded]="true"
+          [text]="true"
+          severity="secondary"
+          (onClick)="confirmPasswordToggle()"
+        />
+      </div>
+    </div>
+
+    <!-- Aceptar Términos y condiciones -->
+    <div class="flex flex-column align-items-start gap-2">
+      <div class="flex-row">
+        <p-checkbox formControlName="termsCondition" [binary]="true" />
+        <label for="termsCondition">
+          Aceptar
+          <a routerLink="/terms-conditions">terminos y Condiciones</a>
+        </label>
+      </div>
+      <div
+        *ngIf="
+          (termsConditionFormField?.dirty && termsConditionFormField?.touched) || form.submitted
         "
-        pInputText
-        id="confirmPassword"
-        aria-describedby="password-help"
-        formControlName="confirmPassword"
-        placeholder="Ingresa tu contraseña"
-        type="password"
-      />
+        class="text-danger"
+      >
+        <small *ngIf="termsConditionFormField?.errors?.['required']" class="text-red-500">
+          *Debe aceptar los terminos y condiciones.
+        </small>
+      </div>
     </div>
 
     <!-- Ir al inicio -->
@@ -150,6 +228,7 @@
       </small>
     </div>
 
+    <!-- CLOUDFLARE CAPTCHA -->
     <div class="w-full flex flex-row gap-2 justify-content-center">
       <ngx-turnstile
         [siteKey]="siteKey"
