@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpContext } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { ApiResponse } from '../../shared/interfaces/response.interface';
 import { environment } from '../../../environments/environment.development';
@@ -10,6 +10,7 @@ import {
 } from '../../shared/interfaces/register.interface';
 import { CookieService } from 'ngx-cookie-service';
 import { ProfileResponseInterface } from '../models/interfaces/profile.interface';
+import { BYPASS_JW_TOKEN } from '../interceptors/auth.interceptor';
 
 @Injectable({
   providedIn: 'root',
@@ -32,8 +33,10 @@ export class AuthService {
           password,
         },
         {
+          context: new HttpContext().set(BYPASS_JW_TOKEN, true),
           headers: {
             'x-Forwarded-For': ip,
+            'Platform': 'web',
           },
         },
       )
@@ -42,6 +45,7 @@ export class AuthService {
           if (response.status && response.data) {
             return response.data;
           } else {
+            console.log(response);
             throw new Error(response.message || 'Error desconocido en el login');
           }
         }),
@@ -107,7 +111,6 @@ export class AuthService {
   }
 
   logOut(): Observable<{ message: string }> {
-    console.log('se lanzo el logout');
     const refreshToken = this.cookieService.get('refreshToken');
     const url = `${this.baseUrl}/auth/logout`;
 

@@ -15,11 +15,13 @@ import { loaderInterceptor } from './core/interceptors/loader.interceptor';
 import { responseTimeInterceptor } from './core/interceptors/response-time.interceptor';
 import { retryInterceptor } from './core/interceptors/retry.interceptor';
 import { DIErrorInterceptor } from './core/interceptors/DIerror.interceptor';
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(routes),
     provideZoneChangeDetection({ eventCoalescing: true }),
+    provideAnimationsAsync(),
     // importProvidersFrom(BrowserAnimationsModule),
     provideHttpClient(
       withInterceptors([

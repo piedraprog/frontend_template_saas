@@ -15,6 +15,7 @@ import { CookieService } from 'ngx-cookie-service';
 @Injectable()
 export class DIErrorInterceptor implements HttpInterceptor {
   private isRefreshing = false; // Variable para evitar múltiples refresh
+  private readonly excludedUrls = ['/auth/login', '/auth/register'];
 
   constructor(
     private authService: AuthService,
@@ -23,6 +24,11 @@ export class DIErrorInterceptor implements HttpInterceptor {
   ) {}
 
   intercept(req: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
+    // Comprobar si la URL está en la lista de rutas excluidas
+    if (this.excludedUrls.some((url) => req.url.includes(url))) {
+      return next.handle(req); // Si está en las excluidas, continuar sin interceptar
+    }
+
     // Verificar si la solicitud ya tiene el token actualizado (para evitar ciclos)
     if (
       req.headers.has('Authorization') &&
@@ -33,7 +39,7 @@ export class DIErrorInterceptor implements HttpInterceptor {
         return next.handle(req); // Pasar la solicitud sin interceptarla
       }
     }
-
+    console.log('interceptor');
     return next.handle(req).pipe(
       catchError((error: HttpErrorResponse) => {
         if (error.status === 401 && !this.isRefreshing) {

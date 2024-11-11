@@ -2,12 +2,11 @@ import { Component } from '@angular/core';
 import { DialogModule } from 'primeng/dialog';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { LoaderService } from '../../../core/services/loading.service';
-import { AsyncPipe } from '@angular/common';
 
 @Component({
   selector: 'app-loader-dialog',
   standalone: true,
-  imports: [DialogModule, ProgressSpinnerModule, AsyncPipe],
+  imports: [DialogModule, ProgressSpinnerModule],
   template: `
     <p-dialog
       [(visible)]="show"

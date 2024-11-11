@@ -1,5 +1,5 @@
 import { HttpClient, HttpContext } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
 import { BYPASS_JW_TOKEN } from '../interceptors/auth.interceptor';
 
@@ -7,7 +7,8 @@ import { BYPASS_JW_TOKEN } from '../interceptors/auth.interceptor';
   providedIn: 'root',
 })
 export class IPService {
-  constructor(private http: HttpClient) {}
+  private http = inject(HttpClient);
+  // constructor(private http: HttpClient) {}
 
   getUserIP(): Observable<string> {
     const url = `https://api.ipify.org/?format=json`;

@@ -1,3 +1,4 @@
+<p-toast />
 <app-auth-card
   [title]="'Iniciar Sesión'"
   [subheader]="'Ingresa tus credenciales para iniciar sesión'"
@@ -46,14 +47,24 @@
           </small>
         </div>
       </label>
-      <input
-        pInputText
-        id="password"
-        aria-describedby="password-help"
-        formControlName="password"
-        type="password"
-        placeholder="Ingresa tu contraseña"
-      />
+      <div class="flex justify-content-start w-full gap-2">
+        <input
+          pInputText
+          id="password"
+          aria-describedby="password-help"
+          formControlName="password"
+          [type]="passwordVisible ? 'text' : 'password'"
+          placeholder="Ingresa tu contraseña"
+          class="w-full"
+        />
+        <p-button
+          [icon]="passwordVisible ? 'pi pi-eye-slash' : 'pi pi-eye'"
+          [rounded]="true"
+          [text]="true"
+          severity="secondary"
+          (onClick)="passwordToggle()"
+        />
+      </div>
     </div>
 
     <!-- Recuperar contraseña -->

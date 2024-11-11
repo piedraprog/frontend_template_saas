@@ -69,7 +69,7 @@ export class RegisterComponent {
       termsCondition: new FormControl<boolean>(false, [Validators.requiredTrue]),
     },
     {
-      updateOn: 'blur',
+      updateOn: 'change',
       validators: [passwordMatcherValidator],
     },
   );
