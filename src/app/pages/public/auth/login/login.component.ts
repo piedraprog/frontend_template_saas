@@ -41,9 +41,6 @@ export class LoginComponent implements OnInit {
   ip: string = '';
 
   ngOnInit(): void {
-    // if (this.cookieService.get('accessToken')) {
-    //   this.router.navigate(['/dashboard']);
-    // }
     this.ipService.getUserIP().subscribe((response) => (this.ip = response));
   }
 
@@ -69,9 +66,10 @@ export class LoginComponent implements OnInit {
         next: (response) => {
           this.cookieService.set('accessToken', response.accessToken);
           this.cookieService.set('refreshToken', response.refreshToken);
+          this.cookieService.set('userId', response.userId);
 
           // redirect to dashboard
-          this.router.navigate(['/dashboard']);
+          this.router.navigate([`/${response.userId}/dashboard`]);
         },
         error: (error: HttpErrorResponse) => {
           this.messageService.add({

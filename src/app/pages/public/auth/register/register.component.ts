@@ -50,7 +50,7 @@ export class RegisterComponent {
       corporation: new FormControl<string>('', [
         Validators.pattern(RegexUtils.OnlyLettersRegx),
         Validators.minLength(5),
-        Validators.maxLength(10),
+        Validators.maxLength(15),
         Validators.required,
       ]),
       username: new FormControl<string>('', [

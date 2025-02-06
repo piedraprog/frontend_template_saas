@@ -2,8 +2,7 @@ import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
 import { CookieService } from 'ngx-cookie-service';
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const authGuard: CanActivateFn = (route, state) => {
+export const authGuard: CanActivateFn = () => {
   const cookieService = inject(CookieService);
   const router = inject(Router);
 

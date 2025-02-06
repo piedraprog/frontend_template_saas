@@ -1,11 +1,21 @@
 import { Routes } from '@angular/router';
-import { DashboardComponent } from './dashboard/dashboard.component';
-import { AdminLoyautComponent } from './admin-loyaut/admin-loyaut.component';
+import { userResolver } from '../../core/resolvers/user.resolver';
+import BaseLayoutComponent from '../../shared/components/base-layout/base-layout.component';
 
 export const ADMIN_ROUTES: Routes = [
   {
     path: '',
-    component: AdminLoyautComponent,
-    children: [{ path: '', component: DashboardComponent }],
+    component: BaseLayoutComponent,
+    resolve: { userId: userResolver },
+    children: [
+      {
+        path: 'dashboard',
+        loadComponent: () => import('./dashboard/dashboard.component'),
+      },
+      {
+        path: 'configuration',
+        loadComponent: () => import('./configuration/configuration.component'),
+      },
+    ],
   },
 ];

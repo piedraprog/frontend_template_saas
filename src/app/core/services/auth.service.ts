@@ -1,5 +1,5 @@
 import { HttpClient, HttpContext } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { ApiResponse } from '../../shared/interfaces/response.interface';
 import { environment } from '../../../environments/environment.development';
 import { map, Observable } from 'rxjs';
@@ -9,14 +9,17 @@ import {
   RegisterResponseInterface,
 } from '../../shared/interfaces/register.interface';
 import { CookieService } from 'ngx-cookie-service';
-import { ProfileResponseInterface } from '../models/interfaces/profile.interface';
 import { BYPASS_JW_TOKEN } from '../interceptors/auth.interceptor';
+import { UserService } from './user.service';
+import { UserInterface } from '../models/interfaces/user.interface';
+import { ProfileResponseInterface } from '../models/interfaces/profile-response.interface';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
-  baseUrl = environment.apiUrl;
+  private userService = inject(UserService);
+  private baseUrl = environment.apiUrl;
 
   constructor(
     private http: HttpClient,
@@ -82,12 +85,12 @@ export class AuthService {
       );
   }
 
-  getProfile(): Observable<ProfileResponseInterface> {
+  getProfile() {
     const url = `${this.baseUrl}/auth/profile`;
     return this.http.get<ApiResponse<ProfileResponseInterface>>(url).pipe(
-      map((response: ApiResponse<ProfileResponseInterface>) => {
+      map((response: ApiResponse<UserInterface>) => {
         if (response.status && response.data) {
-          return response.data;
+          this.userService.setUserData(response.data);
         } else {
           throw new Error(response.message || 'Error desconocido en el login');
         }

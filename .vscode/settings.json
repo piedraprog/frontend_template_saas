@@ -18,5 +18,6 @@
     "titleBar.inactiveForeground": "#e7e7e799",
     "activityBar.background": "#e72b67"
   },
-  "peacock.color": "c8174f"
+  "peacock.color": "c8174f",
+  "cSpell.words": ["confirmdialog"]
 }

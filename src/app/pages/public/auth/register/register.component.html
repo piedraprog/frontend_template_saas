@@ -238,14 +238,14 @@
       ></ngx-turnstile>
     </div>
 
-    <!-- Botón de inicio de sesión -->
+    <!-- Botón de registro de usuario -->
     <div class="w-full flex flex-row gap-2 justify-content-center">
       <p-button
         type="submit"
         label="Registrarme"
         styleClass="w-full bg-indigo-900 border-indigo-900 text-white hover:bg-indigo-800"
         class="w-full"
-        [disabled]="disableButton"
+        [disabled]="!disableButton"
       />
     </div>
   </form>

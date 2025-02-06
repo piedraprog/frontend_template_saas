@@ -5,6 +5,7 @@ export interface LoginInterface {
 }
 
 export interface LoginResponseInterface {
+  userId: string;
   accessToken: string;
   refreshToken: string;
 }

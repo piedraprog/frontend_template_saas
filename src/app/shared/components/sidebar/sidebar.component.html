@@ -20,8 +20,8 @@
 
       @if (isFullDisplay) {
         <span class="inline-flex flex-column">
-          <span class="font-bold">{{ profileInfo?.username }}</span>
-          <span class="text-sm">{{ profileInfo?.email }}</span>
+          <span class="font-bold">{{ profileData().username }}</span>
+          <span class="text-sm">{{ profileData().email }}</span>
         </span>
       }
     </button>
@@ -30,10 +30,13 @@
     <a
       pRipple
       class="flex flex-row align-items-center justify-content-center p-menuitem-link text-l"
+      [routerLink]="item.routerLink"
     >
       @if (isFullDisplay) {
         <span [class]="item.icon" style="font-size: 1.2rem"></span>
-        <span class="ml-2 fadeinleft animation-duration-500">{{ item?.label }}</span>
+        <span class="ml-2 fadeinleft animation-duration-500">
+          {{ item?.label }}
+        </span>
         <span class="ml-auto pi pi-angle-right"></span>
       } @else {
         <span

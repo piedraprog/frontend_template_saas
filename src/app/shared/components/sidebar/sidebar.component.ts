@@ -1,5 +1,5 @@
-import { JsonPipe, NgClass, NgFor, NgIf } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Component, computed, inject, OnInit } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 import { SidebarModule } from 'primeng/sidebar';
 import { CardModule } from 'primeng/card';
@@ -10,44 +10,41 @@ import { BadgeModule } from 'primeng/badge';
 import { RippleModule } from 'primeng/ripple';
 import { AvatarModule } from 'primeng/avatar';
 import { AuthService } from '../../../core/services/auth.service';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { ProfileResponseInterface } from '../../../core/models/interfaces/profile.interface';
+import { UserService } from '../../../core/services/user.service';
 
 @Component({
   selector: 'app-sidebar',
   standalone: true,
   imports: [
+    CommonModule,
     SidebarModule,
     ButtonModule,
-    NgClass,
-    NgFor,
-    NgIf,
     CardModule,
     DividerModule,
     MenuModule,
     BadgeModule,
     RippleModule,
     AvatarModule,
-    JsonPipe,
     ConfirmDialogModule,
+    RouterModule,
   ],
   providers: [ConfirmationService],
   templateUrl: './sidebar.component.html',
 })
 export class SidebarComponent implements OnInit {
   private authService = inject(AuthService);
+  private userService = inject(UserService);
   private router = inject(Router);
   private confirmationService = inject(ConfirmationService);
 
-  profileInfo: ProfileResponseInterface | undefined;
+  profileData = computed(() => this.userService.userData());
   isFullDisplay = true;
   items: MenuItem[] | undefined;
   endItems: MenuItem[] | undefined;
 
   ngOnInit() {
-    this.authService.getProfile().subscribe((profile) => (this.profileInfo = profile));
-
     this.items = [
       {
         separator: true,
@@ -57,6 +54,8 @@ export class SidebarComponent implements OnInit {
           {
             label: 'Dashboard',
             icon: PrimeIcons.CHART_BAR,
+            visible: true,
+            routerLink: 'dashboard',
           },
           {
             label: 'Users',
@@ -71,6 +70,7 @@ export class SidebarComponent implements OnInit {
           {
             label: 'Settings',
             icon: PrimeIcons.COG,
+            routerLink: 'configuration',
           },
           {
             label: 'Toggle',

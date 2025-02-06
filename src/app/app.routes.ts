@@ -9,7 +9,7 @@ export const routes: Routes = [
     canActivate: [sessionGuard],
   },
   {
-    path: 'dashboard',
+    path: ':id',
     loadChildren: () => import('./pages/private/private.routes').then((m) => m.ADMIN_ROUTES),
     canActivate: [authGuard],
   },
