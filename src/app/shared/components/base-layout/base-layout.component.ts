@@ -7,9 +7,13 @@ import { SidebarComponent } from '../sidebar/sidebar.component';
   standalone: true,
   imports: [RouterOutlet, SidebarComponent, RouterModule],
   template: `
-    <div class="bg-gray-200 flex gap-4">
-      <app-sidebar></app-sidebar>
-      <router-outlet></router-outlet>
+    <div class="bg-gray-200 flex flex-row">
+      <app-sidebar />
+
+      <!-- Router outlet que ocupa el espacio restante -->
+      <div class="flex-grow-1">
+        <router-outlet></router-outlet>
+      </div>
     </div>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,

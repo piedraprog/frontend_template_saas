@@ -13,8 +13,8 @@ export const ADMIN_ROUTES: Routes = [
         loadComponent: () => import('./dashboard/dashboard.component'),
       },
       {
-        path: 'configuration',
-        loadComponent: () => import('./configuration/configuration.component'),
+        path: 'settings',
+        loadChildren: () => import('./settings/settings.routes').then((m) => m.SETTINGS_ROUTES),
       },
     ],
   },

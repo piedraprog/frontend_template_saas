@@ -1,10 +1,10 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 
 @Component({
-  selector: 'app-dashboard',
+  selector: 'app-notification-config',
   standalone: true,
   imports: [],
-  templateUrl: './dashboard.component.html',
+  templateUrl: './notification-config.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export default class DashboardComponent {}
+export default class NotificationConfigComponent {}

@@ -1,10 +1,10 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 
 @Component({
-  selector: 'app-dashboard',
+  selector: 'app-profile-config',
   standalone: true,
   imports: [],
-  templateUrl: './dashboard.component.html',
+  templateUrl: './profile-config.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export default class DashboardComponent {}
+export default class ProfileConfigComponent {}

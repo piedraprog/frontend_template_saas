@@ -1,10 +1,10 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 
 @Component({
-  selector: 'app-dashboard',
+  selector: 'app-billing-config',
   standalone: true,
   imports: [],
-  templateUrl: './dashboard.component.html',
+  templateUrl: './billing-config.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export default class DashboardComponent {}
+export default class BillingConfigComponent {}

@@ -70,7 +70,7 @@ export class SidebarComponent implements OnInit {
           {
             label: 'Settings',
             icon: PrimeIcons.COG,
-            routerLink: 'configuration',
+            routerLink: 'settings',
           },
           {
             label: 'Toggle',

@@ -1,0 +1,42 @@
+<div class="flex flex-column h-screen p-2 gap-2">
+  <!-- Otros elementos (por ejemplo, un header) -->
+  <div class="bg-white p-4 border-round-lg flex flex-row justify-content-center align-items-center">
+    <span class="text-gray-900 text-4xl font-bold">Configuración</span>
+  </div>
+
+  <div class="flex flex-row align-items-start flex-grow-1 gap-2">
+    <!-- <div class="flex bg-white w-3 h-2rem border-round-lg"> -->
+    <div class="p-col-8">
+      <!-- Información de la Cuenta -->
+      <p-accordion>
+        <p-accordionTab header="Información de la Cuenta">
+          <p routerLink="profile" class="cursor-pointer">
+            Detalles generales de la cuenta del usuario.
+          </p>
+        </p-accordionTab>
+      </p-accordion>
+      <!-- Cuentas de Pago -->
+      <p-accordion>
+        <p-accordionTab header="Cuentas de Pago">
+          <p>Información sobre las cuentas de pago asociadas.</p>
+        </p-accordionTab>
+      </p-accordion>
+      <!-- Membresía -->
+      <p-accordion>
+        <p-accordionTab header="Membresía">
+          <p>Detalles sobre el plan de membresía actual.</p>
+        </p-accordionTab>
+      </p-accordion>
+      <!-- Administración de Usuarios -->
+      <p-accordion>
+        <p-accordionTab header="administración de Usuarios">
+          <p>Información sobre la administración de usuarios.</p>
+        </p-accordionTab>
+      </p-accordion>
+    </div>
+    <!-- </div> -->
+    <div class="flex bg-white h-full border-round-lg flex-grow-1">
+      <router-outlet />
+    </div>
+  </div>
+</div>

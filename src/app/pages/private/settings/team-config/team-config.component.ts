@@ -1,10 +1,10 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 
 @Component({
-  selector: 'app-dashboard',
+  selector: 'app-team-config',
   standalone: true,
   imports: [],
-  templateUrl: './dashboard.component.html',
+  templateUrl: './team-config.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export default class DashboardComponent {}
+export default class TeamConfigComponent {}
