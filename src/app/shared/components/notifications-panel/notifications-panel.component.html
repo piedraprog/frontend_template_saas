@@ -1,0 +1,156 @@
+<div class="notifications-container">
+  <div class="notifications-header">
+    <h3>Notificaciones</h3>
+    <div class="header-actions">
+      @if (unreadCount() > 0) {
+        <p-button
+          label="Marcar todas como leídas"
+          icon="pi pi-check"
+          (onClick)="markAllAsRead()"
+          [loading]="isLoading()"
+          severity="secondary"
+          [outlined]="true"
+          styleClass="p-button-sm"
+        ></p-button>
+      }
+      <p-button
+        icon="pi pi-refresh"
+        (onClick)="loadNotifications()"
+        [loading]="isLoading()"
+        severity="secondary"
+        [text]="true"
+        [rounded]="true"
+        [pTooltip]="'Actualizar'"
+        aria-label="Actualizar notificaciones"
+      ></p-button>
+    </div>
+  </div>
+
+  <div class="notifications-content">
+    <p-tabs [value]="activeTabValue()" (valueChange)="activeTabValue.set($event ?? '0')">
+      <p-tablist>
+        <p-tab value="0">
+          Activas
+          @if (unreadCount() > 0) {
+            <p-badge [value]="unreadCount().toString()" severity="info" styleClass="ml-2"></p-badge>
+          }
+        </p-tab>
+        <p-tab value="1">Archivadas</p-tab>
+      </p-tablist>
+      <p-tabpanels>
+        <!-- Pestaña de notificaciones activas -->
+        <p-tabpanel value="0">
+          @if (isLoading()) {
+            <div class="loading-state">
+              @for (i of [1, 2, 3, 4]; track i) {
+                <p-skeleton width="100%" height="4rem" styleClass="mb-2"></p-skeleton>
+              }
+            </div>
+          } @else if (notifications().length === 0) {
+            <div class="empty-state">
+              <i class="pi pi-bell-slash"></i>
+              <p>No tienes notificaciones activas</p>
+            </div>
+          } @else {
+            <div class="notifications-list">
+              @for (notification of notifications(); track notification.id) {
+                <div
+                  class="notification-item"
+                  [class.unread]="notification.status === 'unread'"
+                  [class.read]="notification.status === 'read'"
+                  tabindex="0"
+                  (click)="navigateToNotification(notification)"
+                  (keyup.enter)="navigateToNotification(notification)"
+                  role="button"
+                  [attr.aria-label]="'Notificación: ' + notification.title"
+                >
+                  <div class="notification-icon">
+                    <i [class]="getNotificationIcon(notification.type)"></i>
+                  </div>
+                  <div class="notification-content">
+                    <h4 class="notification-title">{{ notification.title }}</h4>
+                    <p class="notification-message">{{ notification.message }}</p>
+                    <span class="notification-time">
+                      {{ notification.createdAt | date: 'short' }}
+                    </span>
+                  </div>
+                  <div class="notification-actions">
+                    @if (notification.status === 'unread') {
+                      <p-tag severity="info" value="Nuevo" styleClass="notification-badge"></p-tag>
+                    }
+                    <button
+                      pButton
+                      icon="pi pi-check"
+                      class="p-button-rounded p-button-text p-button-sm"
+                      (click)="markAsRead($event, notification)"
+                      [attr.aria-label]="'Marcar como leído: ' + notification.title"
+                      pTooltip="Marcar como leído"
+                    ></button>
+                    <button
+                      pButton
+                      icon="pi pi-archive"
+                      class="p-button-rounded p-button-text p-button-sm"
+                      (click)="markAsArchived($event, notification)"
+                      [attr.aria-label]="'Archivar: ' + notification.title"
+                      pTooltip="Archivar"
+                    ></button>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </p-tabpanel>
+
+        <!-- Pestaña de notificaciones archivadas -->
+        <p-tabpanel value="1">
+          @if (isLoading()) {
+            <div class="loading-state">
+              @for (i of [1, 2, 3, 4]; track i) {
+                <p-skeleton width="100%" height="4rem" styleClass="mb-2"></p-skeleton>
+              }
+            </div>
+          } @else if (archivedNotifications().length === 0) {
+            <div class="empty-state">
+              <i class="pi pi-archive"></i>
+              <p>No tienes notificaciones archivadas</p>
+            </div>
+          } @else {
+            <div class="notifications-list">
+              @for (notification of archivedNotifications(); track notification.id) {
+                <div
+                  class="notification-item read"
+                  tabindex="0"
+                  (click)="navigateToNotification(notification)"
+                  (keyup.enter)="navigateToNotification(notification)"
+                  role="button"
+                  [attr.aria-label]="'Notificación archivada: ' + notification.title"
+                >
+                  <div class="notification-icon">
+                    <i [class]="getNotificationIcon(notification.type)"></i>
+                  </div>
+                  <div class="notification-content">
+                    <h4 class="notification-title">{{ notification.title }}</h4>
+                    <p class="notification-message">{{ notification.message }}</p>
+                    <span class="notification-time">
+                      {{ notification.createdAt | date: 'short' }}
+                    </span>
+                  </div>
+                  <div class="notification-actions">
+                    <button
+                      pButton
+                      icon="pi pi-undo"
+                      class="p-button-rounded p-button-text p-button-sm"
+                      (click)="unarchiveNotification($event, notification)"
+                      [attr.aria-label]="'Desarchivar: ' + notification.title"
+                      pTooltip="Desarchivar"
+                    ></button>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </p-tabpanel>
+      </p-tabpanels>
+    </p-tabs>
+  </div>
+</div>

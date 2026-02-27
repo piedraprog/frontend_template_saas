@@ -1,0 +1,16 @@
+.view-plans-content {
+  min-height: 120px;
+}
+
+.plans-list {
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.plan-item {
+  transition: background-color 0.2s;
+}
+
+.plan-item:hover {
+  background-color: var(--p-surface-hover);
+}

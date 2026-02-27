@@ -1,0 +1,43 @@
+<header class="mobile-header">
+  <div class="header-content">
+    <!-- Logo / Título -->
+    <div class="header-brand" (click)="onLogoClick()">
+      <span class="brand-icon">🎫</span>
+      <span class="brand-text">{{ pageTitle() }}</span>
+    </div>
+
+    <!-- Acciones -->
+    <div class="header-actions">
+      @if (showNotifications()) {
+        <button
+          type="button"
+          class="action-btn"
+          (click)="toggleNotifications($event)"
+          aria-label="Notificaciones"
+        >
+          @if (notificationBadge()) {
+            <i class="pi pi-bell" pBadge [value]="notificationBadge()"></i>
+          } @else {
+            <i class="pi pi-bell"></i>
+          }
+        </button>
+      }
+
+      <!-- Avatar del usuario -->
+      <p-avatar
+        [label]="userData().username.charAt(0).toUpperCase() || 'U'"
+        shape="circle"
+        size="normal"
+        styleClass="user-avatar"
+      />
+    </div>
+  </div>
+</header>
+
+<!-- Popover de notificaciones -->
+<p-popover #notificationsPopover styleClass="notifications-popover">
+  <app-notifications-panel
+    [visible]="showNotificationsPanel()"
+    (closePanel)="closeNotifications()"
+  />
+</p-popover>

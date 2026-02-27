@@ -1,9 +1,17 @@
-import { RoleEnum } from '../enums/role.enum';
+import { SystemRole } from '../enums/system-role.enum';
 
 export interface UserInterface {
   id: string;
   username: string;
   email: string;
-  role: RoleEnum;
+  role: SystemRole;
   companyId: string;
+  isOwner: boolean;
+  permissions: number;
+  active: boolean;
+  customRoleId?: string;
+  avatar?: string;
+  phone?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 }

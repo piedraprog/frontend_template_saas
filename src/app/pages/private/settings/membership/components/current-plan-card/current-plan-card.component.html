@@ -1,0 +1,169 @@
+@if (subscription(); as sub) {
+  <div class="plan-card">
+    <div class="plan-header">
+      <div class="plan-info">
+        <h4 class="plan-name">{{ plan()?.name || 'Sin Plan' }}</h4>
+        <p class="plan-description">{{ plan()?.description || 'No tienes un plan activo' }}</p>
+      </div>
+      <div class="plan-badge">
+        <span class="status-badge" [class.active]="sub.status === 'active'">
+          {{ sub.status === 'active' ? 'Activo' : 'Inactivo' }}
+        </span>
+      </div>
+    </div>
+
+    @if (plan(); as p) {
+      <div class="plan-details">
+        <div class="detail-item">
+          <i class="pi pi-dollar"></i>
+          <div class="detail-content">
+            <span class="detail-label">Precio mensual</span>
+            <span class="detail-value">${{ p.price }} / mes</span>
+          </div>
+        </div>
+
+        @if (sub.currentPeriodEnd) {
+          <div class="detail-item">
+            <i class="pi pi-clock"></i>
+            <div class="detail-content">
+              <span class="detail-label">Próxima renovación</span>
+              <span class="detail-value">{{ sub.currentPeriodEnd | date: 'dd/MM/yyyy' }}</span>
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- Usage Section -->
+      @if (usage(); as u) {
+        <div class="plan-features">
+          <h5>Uso del Plan</h5>
+          <div class="limits-grid">
+            <!-- Active Raffles -->
+            @if (u['max_active_raffles']; as metric) {
+              <div class="limit-item" [class.limit-exceeded]="metric.exceeded">
+                <div class="limit-header">
+                  <span class="limit-label">Rifas Activas</span>
+                  <span class="limit-value">
+                    {{ metric.currentUsage }} /
+                    {{ metric.limit === 'Unlimited' ? '∞' : metric.limit }}
+                  </span>
+                </div>
+                <div class="progress-bar-container">
+                  <div
+                    class="progress-bar"
+                    [style.width.%]="metric.percentageUsed"
+                    [class.warning]="metric.percentageUsed > 80 && metric.percentageUsed < 100"
+                    [class.danger]="metric.percentageUsed >= 100"
+                  ></div>
+                </div>
+                @if (metric.exceeded) {
+                  <p class="limit-exceeded-msg">
+                    Límite alcanzado. Actualiza tu plan para crear más rifas.
+                  </p>
+                }
+              </div>
+            }
+
+            <!-- Members -->
+            @if (u['max_members']; as metric) {
+              <div class="limit-item" [class.limit-exceeded]="metric.exceeded">
+                <div class="limit-header">
+                  <span class="limit-label">Miembros del Equipo</span>
+                  <span class="limit-value">
+                    {{ metric.currentUsage }} /
+                    {{ metric.limit === 'Unlimited' ? '∞' : metric.limit }}
+                  </span>
+                </div>
+                <div class="progress-bar-container">
+                  <div
+                    class="progress-bar"
+                    [style.width.%]="metric.percentageUsed"
+                    [class.warning]="metric.percentageUsed > 80 && metric.percentageUsed < 100"
+                    [class.danger]="metric.percentageUsed >= 100"
+                  ></div>
+                </div>
+                @if (metric.exceeded) {
+                  <p class="limit-exceeded-msg">
+                    Límite alcanzado. Actualiza tu plan para invitar más miembros.
+                  </p>
+                }
+              </div>
+            }
+
+            <!-- Seller Codes -->
+            @if (u['max_seller_codes']; as metric) {
+              <div class="limit-item" [class.limit-exceeded]="metric.exceeded">
+                <div class="limit-header">
+                  <span class="limit-label">Códigos de Vendedor</span>
+                  <span class="limit-value">
+                    {{ metric.currentUsage }} /
+                    {{ metric.limit === 'Unlimited' ? '∞' : metric.limit }}
+                  </span>
+                </div>
+                <div class="progress-bar-container">
+                  <div
+                    class="progress-bar"
+                    [style.width.%]="metric.percentageUsed"
+                    [class.warning]="metric.percentageUsed > 80 && metric.percentageUsed < 100"
+                    [class.danger]="metric.percentageUsed >= 100"
+                  ></div>
+                </div>
+                @if (metric.exceeded) {
+                  <p class="limit-exceeded-msg">
+                    Límite alcanzado. Actualiza tu plan para más códigos de vendedor.
+                  </p>
+                }
+              </div>
+            }
+
+            <!-- Tickets per raffle -->
+            @if (u['max_tickets_per_raffle']; as metric) {
+              <div class="limit-item" [class.limit-exceeded]="metric.exceeded">
+                <div class="limit-header">
+                  <span class="limit-label">Tickets por rifa (máx.)</span>
+                  <span class="limit-value">
+                    {{ metric.currentUsage }} /
+                    {{ metric.limit === 'Unlimited' ? '∞' : metric.limit }}
+                  </span>
+                </div>
+                <div class="progress-bar-container">
+                  <div
+                    class="progress-bar"
+                    [style.width.%]="metric.percentageUsed"
+                    [class.warning]="metric.percentageUsed > 80 && metric.percentageUsed < 100"
+                    [class.danger]="metric.percentageUsed >= 100"
+                  ></div>
+                </div>
+                @if (metric.exceeded) {
+                  <p class="limit-exceeded-msg">
+                    Límite alcanzado. Actualiza tu plan para rifas con más tickets.
+                  </p>
+                }
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      <div class="plan-actions">
+        <p-button
+          label="Mejorar Plan"
+          icon="pi pi-arrow-up"
+          (onClick)="handleUpgrade()"
+          styleClass="w-full"
+        />
+      </div>
+    } @else {
+      <div class="empty-state">
+        <i class="pi pi-inbox"></i>
+        <p>No tienes un plan activo</p>
+        <p-button label="Ver Planes" icon="pi pi-eye" (onClick)="handleUpgrade()" />
+      </div>
+    }
+  </div>
+} @else {
+  <div class="loading-state">
+    <i class="pi pi-spin pi-spinner"></i>
+    <p>Cargando información del plan...</p>
+  </div>
+}

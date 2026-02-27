@@ -1,0 +1,43 @@
+@if (addons() && addons().length > 0) {
+  <div class="addons-grid">
+    @for (addon of addons(); track addon.id) {
+      <div class="addon-card">
+        <div class="addon-header">
+          <div class="addon-icon">
+            <i class="pi pi-star"></i>
+          </div>
+          <h4 class="addon-name">{{ formatFeature(addon.featureSlug) }}</h4>
+        </div>
+
+        <p class="addon-description">{{ addon.description }}</p>
+
+        <div class="addon-pricing">
+          <div class="price-amount">
+            <span class="currency">$</span>
+            <span class="amount">{{ addon.monthlyPrice }}</span>
+            <span class="period">/ mes</span>
+          </div>
+        </div>
+
+        <div class="addon-actions">
+          <p-button
+            label="Agregar"
+            icon="pi pi-plus"
+            (onClick)="handleBuy(addon)"
+            styleClass="w-full"
+            [outlined]="true"
+          />
+        </div>
+      </div>
+    }
+  </div>
+} @else {
+  <div class="empty-state">
+    <i class="pi pi-check-circle"></i>
+    <p>No hay complementos disponibles en este momento</p>
+    <small>
+      Tu plan incluye todas las características disponibles o ya has adquirido todos los
+      complementos
+    </small>
+  </div>
+}

@@ -1,0 +1,258 @@
+:host ::ng-deep .p-button {
+    margin-right: 0.5rem;
+}
+
+:host ::ng-deep .p-datatable-header {
+    padding: 1rem;
+}
+
+// Estilos mejorados para la tabla en desktop
+:host ::ng-deep .p-datatable {
+  // Estilos para las celdas del header
+  .p-datatable-thead > tr > th {
+    text-align: left;
+    padding: 0.75rem 1rem !important; // Padding horizontal 16px, vertical 12px (más compacto)
+    font-size: 0.875rem !important; // ~14px - más pequeño que antes
+    font-weight: 600;
+    line-height: 1.4;
+    color: #374151;
+    background: #f9fafb;
+    border-bottom: 2px solid #e5e7eb;
+  }
+
+  // Estilos para las celdas del body
+  .p-datatable-tbody > tr > td {
+    cursor: auto;
+    padding: 0.625rem 1rem !important; // Padding vertical 10px, horizontal 16px (más compacto)
+    font-size: 0.875rem !important; // ~14px - tamaño estándar para tablas
+    line-height: 1.5;
+    color: #1f2937;
+    vertical-align: middle;
+  }
+
+  // Altura de fila más compacta
+  .p-datatable-tbody > tr {
+    height: auto;
+    min-height: 44px; // Altura mínima para legibilidad
+  }
+
+  // Hover state mejorado
+  .p-datatable-tbody > tr:hover {
+    background: #f9fafb;
+  }
+
+  // Estilos para el tamaño pequeño (p-datatable-sm) - aplicado por defecto
+  &.p-datatable-sm {
+    .p-datatable-thead > tr > th {
+      padding: 0.625rem 0.875rem !important; // Padding más compacto
+      font-size: 0.8125rem !important; // ~13px
+      font-weight: 600;
+      line-height: 1.4;
+    }
+
+    .p-datatable-tbody > tr > td {
+      padding: 0.5rem 0.875rem !important; // Padding más compacto (8px vertical, 14px horizontal)
+      font-size: 0.8125rem !important; // ~13px
+      line-height: 1.4;
+    }
+
+    .p-datatable-tbody > tr {
+      min-height: 40px; // Altura mínima más compacta
+    }
+  }
+}
+
+// Estilos para vista móvil (cards)
+.mobile-cards-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  width: 100%;
+}
+
+.mobile-card {
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 0.75rem;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e5e7eb;
+  width: 100%;
+  box-sizing: border-box;
+  transition: all 0.2s ease;
+
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+.card-header-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.card-primary-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.primary-value {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #1f2937;
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.secondary-value {
+  font-size: 0.8125rem;
+  color: #6b7280;
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.card-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid #f3f4f6;
+}
+
+.detail-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.8125rem;
+}
+
+.detail-label {
+  font-weight: 500;
+  color: #9ca3af;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.detail-value {
+  color: #374151;
+  font-weight: 500;
+  text-align: right;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+  min-width: 0;
+}
+
+.card-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  flex-shrink: 0;
+}
+
+.action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+
+  i {
+    font-size: 0.875rem;
+    color: #6b7280;
+  }
+
+  &:hover {
+    background: #f9fafb;
+    border-color: #d1d5db;
+
+    i {
+      color: #374151;
+    }
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.action-btn-edit {
+  &:hover {
+    background: #f0fdf4;
+    border-color: #86efac;
+
+    i {
+      color: #16a34a;
+    }
+  }
+}
+
+.action-btn-delete {
+  &:hover {
+    background: #fef2f2;
+    border-color: #fecaca;
+
+    i {
+      color: #dc2626;
+    }
+  }
+}
+
+.loading-container,
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+  text-align: center;
+  color: #6b7280;
+
+  i {
+    font-size: 2rem;
+    margin-bottom: 0.75rem;
+    color: #9ca3af;
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.875rem;
+  }
+}
+
+// Ocultar tabla en móvil
+@media (max-width: 639px) {
+  :host ::ng-deep .p-datatable {
+    display: none;
+  }
+}
+
+// Ocultar cards en desktop
+@media (min-width: 640px) {
+  .mobile-cards-container {
+    display: none;
+  }
+}

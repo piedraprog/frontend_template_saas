@@ -1,0 +1,512 @@
+<div class="user-admin-container">
+  <!-- Fixed Header -->
+  <header class="header">
+    <h1 class="header-title">Equipo</h1>
+    <p-button label="Crear Nuevo Usuario" icon="pi pi-plus" (click)="openNew()" />
+  </header>
+
+  <!-- Two-Panel Layout -->
+  <div class="content-wrapper">
+    <!-- Left Sidebar: User List (Grouped by Role) -->
+    <aside class="sidebar">
+      <div class="search-container">
+        <span class="p-input-icon-left w-full">
+          <input
+            type="text"
+            pInputText
+            placeholder="Buscar usuarios..."
+            [(ngModel)]="searchQuery"
+            (ngModelChange)="onSearchUsers($event)"
+            class="w-full"
+          />
+        </span>
+      </div>
+
+      <div class="user-list-grouped">
+        @if (loading()) {
+          <div class="loading-state">
+            <i class="pi pi-spin pi-spinner"></i>
+            <p>Cargando usuarios...</p>
+          </div>
+        } @else if (usersByRole().length === 0) {
+          <div class="empty-state">
+            <i class="pi pi-users"></i>
+            <p>No hay usuarios</p>
+          </div>
+        } @else {
+          @for (roleGroup of usersByRole(); track roleGroup.roleId) {
+            <div class="role-group">
+              <!-- Role Header (Clickable to expand/collapse) -->
+              <button class="role-header" (click)="toggleRoleGroup(roleGroup.roleId)">
+                <i
+                  [class]="
+                    isExpanded(roleGroup.roleId) ? 'pi pi-chevron-down' : 'pi pi-chevron-right'
+                  "
+                ></i>
+                <i class="pi pi-tag"></i>
+                <span class="role-name">{{ roleGroup.roleName }}</span>
+                <span class="user-count">({{ roleGroup.users.length }})</span>
+                @if (roleGroup.roleId !== null) {
+                  <button class="role-settings-btn" (click)="editRole($event, roleGroup.roleId!)">
+                    <i class="pi pi-cog"></i>
+                  </button>
+                }
+              </button>
+
+              <!-- Users in this role (shown when expanded) -->
+              @if (isExpanded(roleGroup.roleId)) {
+                <div class="users-in-role">
+                  @for (user of roleGroup.users; track user.id) {
+                    <button
+                      class="user-item"
+                      [class.active]="selectedUserForView()?.id === user.id"
+                      (click)="selectUserForView(user)"
+                    >
+                      <div class="user-avatar">
+                        <i class="pi pi-user"></i>
+                      </div>
+                      <div class="user-info">
+                        <span class="user-name flex align-items-center gap-1">
+                          {{ user.username }}
+                          @if (isUserCustomized(user)) {
+                            <i
+                              class="pi pi-shield text-primary"
+                              style="font-size: 0.8rem"
+                              pTooltip="Permisos Personalizados"
+                            ></i>
+                          }
+                        </span>
+                        <span class="user-email">{{ user.email }}</span>
+                      </div>
+                      <i class="pi pi-chevron-right"></i>
+                    </button>
+                  }
+                </div>
+              }
+            </div>
+          }
+        }
+      </div>
+
+      <!-- Footer with Create Role button -->
+      <div class="sidebar-footer">
+        <p-button
+          label="Crear Rol"
+          icon="pi pi-plus"
+          [outlined]="true"
+          (click)="openCreateRoleDialog()"
+          styleClass="w-full"
+        />
+      </div>
+    </aside>
+
+    <!-- Main Panel: User Details & Permissions -->
+    <main class="main-content">
+      @if (selectedUserForView(); as user) {
+        <div class="content-scroll">
+          <!-- User Profile Header -->
+          <div class="profile-header">
+            <div class="profile-info">
+              <h2 class="profile-title">Detalles del Usuario</h2>
+              <p class="profile-description">
+                Gestiona la información y permisos de acceso para este usuario
+              </p>
+            </div>
+            <div class="profile-actions">
+              @if (!isEditingProfile()) {
+                <p-button
+                  label="Editar"
+                  [outlined]="true"
+                  icon="pi pi-pencil"
+                  severity="info"
+                  (click)="startEditingProfile()"
+                />
+              } @else {
+                <p-button
+                  label="Cancelar"
+                  [outlined]="true"
+                  icon="pi pi-times"
+                  severity="secondary"
+                  (click)="cancelEditingProfile()"
+                  [disabled]="isSavingProfile()"
+                />
+                <p-button
+                  label="Guardar"
+                  icon="pi pi-check"
+                  severity="success"
+                  (click)="saveProfileChanges()"
+                  [loading]="isSavingProfile()"
+                />
+              }
+              @if (user.id.toString() !== tokenService.getUserId()) {
+                <p-button
+                  icon="pi pi-trash"
+                  [outlined]="false"
+                  (click)="confirmDeleteUser(user)"
+                  severity="danger"
+                />
+              }
+            </div>
+          </div>
+
+          <!-- Custom Permissions Banner -->
+          @if (!user.customRoleId) {
+            <div
+              class="surface-ground p-3 border-round mb-3 flex align-items-center justify-content-between border-1 surface-border"
+            >
+              <div class="flex align-items-center gap-3">
+                <i class="pi pi-shield text-primary text-xl"></i>
+                <div>
+                  <span class="font-bold block text-900">Permisos Personalizados</span>
+                  <span class="text-sm text-600">
+                    Este usuario tiene una configuración única de permisos.
+                  </span>
+                </div>
+              </div>
+              <p-button
+                label="Convertir a Rol"
+                icon="pi pi-save"
+                [outlined]="true"
+                size="small"
+                (click)="convertToRole()"
+              />
+            </div>
+          }
+
+          <!-- User Basic Info Card -->
+          <div class="section">
+            <div class="section-header">
+              <div class="flex align-items-center gap-2">
+                <i class="pi pi-user"></i>
+                <h3>Información Básica</h3>
+              </div>
+              @if (isSavingProfile()) {
+                <p-tag value="Guardando..." severity="info" icon="pi pi-spin pi-spinner" />
+              } @else if (profileSaveSuccess()) {
+                <p-tag value="Guardado" severity="success" icon="pi pi-check" />
+              } @else if (profileSaveError(); as error) {
+                <p-tag [value]="error" severity="danger" icon="pi pi-times" />
+              }
+            </div>
+            <div class="info-grid">
+              <!-- Username -->
+              <div class="info-item">
+                <span>Nombre Completo</span>
+                @if (isEditingProfile()) {
+                  <div class="editable-input-wrapper">
+                    <input
+                      type="text"
+                      pInputText
+                      [formControl]="profileForm.controls.username"
+                      class="w-full"
+                      placeholder="Ingrese nombre de usuario"
+                    />
+                    @if (usernameErrors; as error) {
+                      <small class="p-error">{{ error }}</small>
+                    }
+                  </div>
+                } @else {
+                  <p>{{ user.username }}</p>
+                }
+              </div>
+
+              <!-- Email -->
+              <div class="info-item">
+                <span>Correo Electrónico</span>
+                @if (isEditingProfile()) {
+                  <div class="editable-input-wrapper">
+                    <input
+                      type="email"
+                      pInputText
+                      [formControl]="profileForm.controls.email"
+                      class="w-full"
+                      placeholder="Ingrese email"
+                    />
+                    @if (emailErrors; as error) {
+                      <small class="p-error">{{ error }}</small>
+                    }
+                  </div>
+                } @else {
+                  <p>{{ user.email }}</p>
+                }
+              </div>
+
+              <!-- Role -->
+              <div class="info-item">
+                <span>Rol</span>
+                @if (isEditingProfile()) {
+                  <div class="editable-input-wrapper">
+                    <p-select
+                      [options]="availableRoles()"
+                      optionLabel="name"
+                      optionValue="id"
+                      [formControl]="profileForm.controls.customRoleId"
+                      placeholder="Seleccionar rol"
+                      class="w-full"
+                      [showClear]="true"
+                    />
+                  </div>
+                } @else {
+                  <p class="flex align-items-center gap-2">
+                    {{ user.roleName || 'Sin rol asignado' }}
+                    @if (isUserCustomized(user)) {
+                      <span
+                        class="inline-flex align-items-center gap-1 px-2 py-1 border-round surface-100 text-xs font-medium text-primary"
+                      >
+                        <i class="pi pi-shield" style="font-size: 0.7rem"></i>
+                        Personalizado
+                      </span>
+                    }
+                  </p>
+                }
+              </div>
+            </div>
+          </div>
+
+          <!-- Permissions Section -->
+          <div class="section">
+            <div class="section-header">
+              <div class="flex gap-2">
+                <i class="pi pi-key"></i>
+                <h3>Permisos de Acceso</h3>
+              </div>
+              <p class="text-sm text-600 m-0 mb-2">
+                Selecciona los permisos que deseas otorgar a este usuario. Los cambios se aplicarán
+                inmediatamente.
+              </p>
+            </div>
+            <app-permission-editor
+              [currentPermissions]="getEffectivePermissions(user)"
+              [rolePermissions]="getRolePermissions(user)"
+              [loading]="loading()"
+              (savePermissions)="onSavePermissions($event)"
+              (canceled)="showPermissionEditor.set(false)"
+            />
+          </div>
+        </div>
+      } @else {
+        <!-- Empty State: No User Selected -->
+        <div class="empty-selection">
+          <i class="pi pi-users"></i>
+          <h3>Selecciona un usuario</h3>
+          <p>Elige un usuario de la lista para ver y gestionar sus detalles</p>
+        </div>
+      }
+    </main>
+  </div>
+</div>
+
+<!-- Create User Modal -->
+<app-user-create-modal
+  [visible]="showCreateModal()"
+  (visibleChange)="showCreateModal.set($event)"
+  [roles]="availableRoles()"
+  (userCreated)="loadUsers()"
+/>
+
+<!-- Edit User Dialog -->
+<p-dialog
+  header="Editar Usuario"
+  [(visible)]="editUserDialog"
+  [modal]="true"
+  [style]="{ width: '450px' }"
+  [draggable]="false"
+  [resizable]="false"
+>
+  <ng-template pTemplate="content">
+    <form [formGroup]="userForm">
+      <div class="field mb-4">
+        <label for="edit-username" class="font-medium mb-2 block">Nombre Completo</label>
+        <input pInputText id="edit-username" formControlName="username" required class="w-full" />
+        <small
+          *ngIf="userForm.get('username')?.invalid && userForm.get('username')?.touched"
+          class="p-error"
+        >
+          El nombre es requerido
+        </small>
+      </div>
+      <div class="field mb-4">
+        <label for="edit-email" class="font-medium mb-2 block">Correo Electrónico</label>
+        <input
+          pInputText
+          id="edit-email"
+          formControlName="email"
+          required
+          type="email"
+          class="w-full"
+        />
+        <small
+          *ngIf="userForm.get('email')?.invalid && userForm.get('email')?.touched"
+          class="p-error"
+        >
+          Correo electrónico inválido
+        </small>
+      </div>
+      <div class="field mb-4">
+        <label for="edit-role" class="font-medium mb-2 block">Rol</label>
+        <p-select
+          [options]="availableRoles()"
+          formControlName="customRoleId"
+          optionLabel="name"
+          optionValue="id"
+          placeholder="Seleccionar Rol"
+          class="w-full"
+          appendTo="body"
+        />
+        <small
+          *ngIf="userForm.get('customRoleId')?.invalid && userForm.get('customRoleId')?.touched"
+          class="p-error"
+        >
+          El rol es requerido
+        </small>
+      </div>
+    </form>
+  </ng-template>
+  <ng-template pTemplate="footer">
+    <p-button
+      label="Cancelar"
+      [outlined]="true"
+      (click)="editUserDialog = false"
+      class="p-button-secondary"
+    />
+    <p-button
+      label="Guardar"
+      (click)="saveNewUser()"
+      [loading]="loading()"
+      class="p-button-primary"
+    />
+  </ng-template>
+</p-dialog>
+
+<!-- Delete Confirmation Dialog -->
+<p-dialog
+  [(visible)]="deleteUserDialog"
+  [style]="{ width: '450px' }"
+  header="Confirmar Eliminación"
+  [modal]="true"
+>
+  <div class="confirmation-content flex align-items-center gap-3">
+    <i class="pi pi-exclamation-triangle text-warning" style="font-size: 2rem"></i>
+    <span>¿Está seguro de que desea eliminar este usuario?</span>
+  </div>
+  <ng-template pTemplate="footer">
+    <p-button
+      label="Cancelar"
+      [outlined]="true"
+      (click)="deleteUserDialog = false"
+      [disabled]="loading()"
+    />
+    <p-button label="Eliminar" severity="danger" (click)="deleteUser()" [loading]="loading()" />
+  </ng-template>
+</p-dialog>
+
+<!-- Role Editor Dialog -->
+<p-dialog
+  [(visible)]="roleDialogVisible"
+  [style]="{ width: '600px', maxWidth: '95vw' }"
+  [header]="selectedRoleForEdit() ? 'Editar Rol' : 'Crear Nuevo Rol'"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  (onHide)="closeRoleDialog()"
+>
+  <ng-template pTemplate="content">
+    <form [formGroup]="roleForm" class="flex flex-column gap-3">
+      <!-- Role Name -->
+      <div class="field">
+        <label for="role-name" class="font-bold block mb-2">Nombre del Rol</label>
+        <input
+          id="role-name"
+          type="text"
+          pInputText
+          formControlName="name"
+          class="w-full"
+          placeholder="Ej: Gerente de Ventas"
+        />
+        <small
+          *ngIf="roleForm.get('name')?.invalid && roleForm.get('name')?.touched"
+          class="p-error block mt-1"
+        >
+          El nombre es requerido (mínimo 3 caracteres)
+        </small>
+      </div>
+
+      <!-- Description -->
+      <div class="field">
+        <label for="role-desc" class="font-bold block mb-2">Descripción</label>
+        <textarea
+          id="role-desc"
+          pInputTextarea
+          formControlName="description"
+          rows="2"
+          class="w-full"
+          placeholder="Descripción opcional del rol"
+        ></textarea>
+      </div>
+
+      <!-- Permissions -->
+      <div class="field">
+        <label class="font-bold block mb-2">Permisos del Rol</label>
+        <div class="border-1 surface-border border-round p-2 surface-ground">
+          <app-permission-editor
+            [currentPermissions]="roleForm.get('permissions')?.value || 0"
+            (savePermissions)="onRolePermissionsChange($event)"
+            [loading]="false"
+          />
+        </div>
+      </div>
+    </form>
+  </ng-template>
+
+  <ng-template pTemplate="footer">
+    @if (selectedRoleForEdit()) {
+      <div class="flex justify-content-between w-full">
+        @if (!selectedRoleForEdit()?.isSystemRole) {
+          <p-button
+            label="Eliminar Rol"
+            icon="pi pi-trash"
+            severity="danger"
+            [outlined]="true"
+            (click)="deleteRole()"
+            [loading]="isSavingRole()"
+          />
+        } @else {
+          <div></div>
+        }
+        <div class="flex gap-2">
+          <p-button
+            label="Cancelar"
+            icon="pi pi-times"
+            [outlined]="true"
+            severity="secondary"
+            (click)="closeRoleDialog()"
+          />
+          <p-button
+            label="Guardar Cambios"
+            icon="pi pi-check"
+            (click)="saveRole()"
+            [loading]="isSavingRole()"
+          />
+        </div>
+      </div>
+    } @else {
+      <div class="flex justify-content-end gap-2">
+        <p-button
+          label="Cancelar"
+          icon="pi pi-times"
+          [outlined]="true"
+          severity="secondary"
+          (click)="closeRoleDialog()"
+        />
+        <p-button
+          label="Crear Rol"
+          icon="pi pi-check"
+          (click)="saveRole()"
+          [loading]="isSavingRole()"
+        />
+      </div>
+    }
+  </ng-template>
+</p-dialog>
+
+<!-- Confirmation Dialog -->

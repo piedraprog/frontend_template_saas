@@ -1,0 +1,101 @@
+<nav class="bottom-nav">
+  <!-- Items de navegación -->
+  @for (item of navItems(); track item.id) {
+    @if (item.route) {
+      <a
+        class="nav-item"
+        [routerLink]="item.route"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: false }"
+        pRipple
+      >
+        <span class="nav-icon-wrapper">
+          @if (item.badge && item.badge > 0) {
+            <i [class]="item.icon" pBadge [value]="item.badge.toString()"></i>
+          } @else {
+            <i [class]="item.icon"></i>
+          }
+        </span>
+        <span class="nav-label">{{ item.label }}</span>
+      </a>
+    } @else {
+      <button
+        class="nav-item"
+        [class.active]="isActive(item)"
+        [class.nav-item-quick-action]="item.id.includes('quick-action') || item.id === 'new-raffle'"
+        (click)="onItemClick(item, $event)"
+        pRipple
+        type="button"
+      >
+        <span class="nav-icon-wrapper">
+          @if (item.badge && item.badge > 0) {
+            <i [class]="item.icon" pBadge [value]="item.badge.toString()"></i>
+          } @else {
+            <i [class]="item.icon"></i>
+          }
+        </span>
+        <span class="nav-label">{{ item.label }}</span>
+      </button>
+    }
+  }
+
+  <!-- Avatar del usuario -->
+  <button
+    class="nav-profile"
+    (click)="toggleProfile($event)"
+    type="button"
+    pRipple
+    aria-label="Perfil de usuario"
+  >
+    <p-avatar
+      [label]="(userData().username.charAt(0) || 'U').toUpperCase()"
+      shape="circle"
+      size="normal"
+      styleClass="profile-avatar"
+    />
+  </button>
+</nav>
+
+<!-- Popover de notificaciones -->
+<p-popover #notificationsPopover styleClass="notifications-popover" [appendTo]="'body'">
+  <app-notifications-panel
+    [visible]="showNotificationsPanel()"
+    (closePanel)="closeNotifications()"
+  />
+</p-popover>
+
+<!-- Popover de perfil -->
+<p-popover #profilePopover styleClass="profile-popover" [appendTo]="'body'">
+  <div class="profile-menu">
+    <div class="profile-header">
+      <p-avatar
+        [label]="(userData().username.charAt(0) || 'U').toUpperCase()"
+        shape="circle"
+        size="large"
+        styleClass="profile-avatar-large"
+      />
+      <div class="profile-info">
+        <p class="profile-name">{{ userData().username }}</p>
+        <p class="profile-email">{{ userData().email }}</p>
+      </div>
+    </div>
+    <div class="profile-actions">
+      <a
+        [routerLink]="['settings', 'profile']"
+        class="profile-action-item"
+        (click)="closeProfile()"
+      >
+        <i class="pi pi-user"></i>
+        <span>Mi Perfil</span>
+      </a>
+      <a routerLink="settings" class="profile-action-item" (click)="closeProfile()">
+        <i class="pi pi-cog"></i>
+        <span>Ajustes</span>
+      </a>
+      <button type="button" class="profile-action-item profile-action-logout" (click)="onLogout()">
+        <i class="pi pi-sign-out"></i>
+        <span>Cerrar Sesión</span>
+      </button>
+    </div>
+  </div>
+</p-popover>

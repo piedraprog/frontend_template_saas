@@ -1,0 +1,169 @@
+<div class="roles-page">
+  <app-page-header title="Roles" icon="pi pi-shield" [showBack]="false">
+    <p-button label="Nuevo Rol" icon="pi pi-plus" (onClick)="openCreate()" id="btn-create-role" />
+  </app-page-header>
+
+  @if (isLoading()) {
+    <div class="loading-container">
+      @for (i of [1, 2, 3]; track i) {
+        <p-skeleton height="5rem" styleClass="mb-3" />
+      }
+    </div>
+  } @else if (roles().length === 0) {
+    <div class="empty-state">
+      <i class="pi pi-shield"></i>
+      <h3>No hay roles</h3>
+      <p>Crea roles personalizados para gestionar los permisos de tu equipo.</p>
+      <p-button label="Crear primer rol" icon="pi pi-plus" (onClick)="openCreate()" />
+    </div>
+  } @else {
+    <div class="roles-list">
+      @for (role of roles(); track role.id) {
+        <div class="role-card">
+          <div class="role-info">
+            <div class="role-icon">
+              <i class="pi pi-shield"></i>
+            </div>
+            <div class="role-details">
+              <h3 class="role-name">{{ role.name }}</h3>
+              <span class="role-perms">
+                {{ permissionCount(role.permissions) }} permisos activos
+              </span>
+            </div>
+          </div>
+          <div class="role-actions">
+            <p-button
+              icon="pi pi-pencil"
+              [rounded]="true"
+              [text]="true"
+              severity="secondary"
+              (onClick)="openEdit(role)"
+              [attr.aria-label]="'Editar ' + role.name"
+            />
+            @if (!role.isDefault) {
+              <p-button
+                icon="pi pi-trash"
+                [rounded]="true"
+                [text]="true"
+                severity="danger"
+                (onClick)="deleteRole(role)"
+                [attr.aria-label]="'Eliminar ' + role.name"
+              />
+            }
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>
+
+<!-- Dialog Crear -->
+<p-dialog
+  header="Nuevo Rol"
+  [modal]="true"
+  [(visible)]="showCreateDialog"
+  [style]="{ width: '480px' }"
+  id="dialog-create-role"
+>
+  <ng-template pTemplate="content">
+    <div class="dialog-content">
+      <div class="field">
+        <label for="role-name">Nombre del rol</label>
+        <input
+          id="role-name"
+          type="text"
+          pInputText
+          [(ngModel)]="newRoleName"
+          placeholder="Ej: Moderador"
+          class="w-full"
+        />
+      </div>
+
+      <div class="field">
+        <label>Permisos</label>
+        <div class="permissions-grid">
+          @for (perm of permissionOptions; track perm.key) {
+            <div class="permission-item">
+              <p-checkbox
+                [binary]="true"
+                [ngModel]="hasPermission(newRolePermissions, perm.value)"
+                (onChange)="togglePermission(perm.value)"
+                [inputId]="'perm-' + perm.key"
+              />
+              <label [for]="'perm-' + perm.key" class="perm-label">{{ perm.label }}</label>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </ng-template>
+  <ng-template pTemplate="footer">
+    <p-button
+      label="Cancelar"
+      severity="secondary"
+      [text]="true"
+      (onClick)="showCreateDialog.set(false)"
+    />
+    <p-button
+      label="Crear"
+      icon="pi pi-check"
+      (onClick)="createRole()"
+      [disabled]="!newRoleName.trim()"
+    />
+  </ng-template>
+</p-dialog>
+
+<!-- Dialog Editar -->
+<p-dialog
+  header="Editar Rol"
+  [modal]="true"
+  [(visible)]="showEditDialog"
+  [style]="{ width: '480px' }"
+  id="dialog-edit-role"
+>
+  <ng-template pTemplate="content">
+    <div class="dialog-content">
+      <div class="field">
+        <label for="edit-role-name">Nombre del rol</label>
+        <input
+          id="edit-role-name"
+          type="text"
+          pInputText
+          [(ngModel)]="newRoleName"
+          class="w-full"
+        />
+      </div>
+
+      <div class="field">
+        <label>Permisos</label>
+        <div class="permissions-grid">
+          @for (perm of permissionOptions; track perm.key) {
+            <div class="permission-item">
+              <p-checkbox
+                [binary]="true"
+                [ngModel]="hasPermission(newRolePermissions, perm.value)"
+                (onChange)="togglePermission(perm.value)"
+                [inputId]="'edit-perm-' + perm.key"
+              />
+              <label [for]="'edit-perm-' + perm.key" class="perm-label">{{ perm.label }}</label>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </ng-template>
+  <ng-template pTemplate="footer">
+    <p-button
+      label="Cancelar"
+      severity="secondary"
+      [text]="true"
+      (onClick)="showEditDialog.set(false)"
+    />
+    <p-button
+      label="Guardar"
+      icon="pi pi-check"
+      (onClick)="updateRole()"
+      [disabled]="!newRoleName.trim()"
+    />
+  </ng-template>
+</p-dialog>

@@ -1,0 +1,38 @@
+<div class="settings-container">
+  <!-- Header -->
+  <div class="settings-header">
+    <h1 class="settings-title">
+      <i class="pi pi-cog"></i>
+      Configuración
+    </h1>
+  </div>
+
+  <!-- Grid de cards -->
+  <div class="settings-grid">
+    @for (item of settingsItems(); track item.id) {
+      <div
+        class="settings-card"
+        (click)="onItemClick(item)"
+        (keydown.enter)="onItemClick(item)"
+        tabindex="0"
+        role="button"
+        pRipple
+      >
+        <div class="card-icon">
+          <i [class]="item.icon"></i>
+        </div>
+        <div class="card-content">
+          <h3 class="card-title">{{ item.title }}</h3>
+          <p class="card-description">{{ item.description }}</p>
+        </div>
+        <div class="card-arrow">
+          @if (isExternalLink(item)) {
+            <i class="pi pi-external-link"></i>
+          } @else {
+            <i class="pi pi-chevron-right"></i>
+          }
+        </div>
+      </div>
+    }
+  </div>
+</div>

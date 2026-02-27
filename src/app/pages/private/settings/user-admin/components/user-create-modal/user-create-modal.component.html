@@ -1,0 +1,117 @@
+<p-dialog
+  header="Crear Nuevo Usuario"
+  [visible]="visible"
+  (visibleChange)="onHide()"
+  [modal]="true"
+  [style]="{ width: '450px' }"
+  [draggable]="false"
+  [resizable]="false"
+  appendTo="body"
+>
+  <ng-template pTemplate="content">
+    @if (membersLimitExceeded()) {
+      <div class="mb-3 p-3 border-round surface-ground border-1 border-red-200 text-red-700">
+        <i class="pi pi-exclamation-triangle mr-2"></i>
+        Límite de miembros alcanzado. Actualiza tu plan para invitar más usuarios.
+      </div>
+    }
+    <form [formGroup]="createForm" class="flex flex-column gap-3 pt-2">
+      <!-- Username Field -->
+      <div class="field">
+        <label for="username" class="font-medium mb-2 block">Nombre Completo</label>
+        <input
+          pInputText
+          id="username"
+          formControlName="username"
+          class="w-full"
+          [class.ng-invalid]="
+            createForm.get('username')?.invalid && createForm.get('username')?.touched
+          "
+          placeholder="Ej: Juan Pérez"
+        />
+        <small
+          class="p-error block mt-1"
+          *ngIf="createForm.get('username')?.invalid && createForm.get('username')?.touched"
+        >
+          {{ getErrorMessage(createForm.get('username'), 'Nombre') }}
+        </small>
+      </div>
+
+      <!-- Email Field -->
+      <div class="field">
+        <label for="email" class="font-medium mb-2 block">Correo Electrónico</label>
+        <input
+          pInputText
+          id="email"
+          formControlName="email"
+          type="email"
+          class="w-full"
+          [class.ng-invalid]="createForm.get('email')?.invalid && createForm.get('email')?.touched"
+          placeholder="juan@ejemplo.com"
+        />
+        <small
+          class="p-error block mt-1"
+          *ngIf="createForm.get('email')?.invalid && createForm.get('email')?.touched"
+        >
+          {{ getErrorMessage(createForm.get('email'), 'Correo electrónico') }}
+        </small>
+        <small class="text-color-secondary block mt-2">
+          El usuario recibirá un correo con instrucciones para iniciar sesión.
+        </small>
+      </div>
+
+      <!-- Role Field -->
+      <div class="field">
+        <label for="role" class="font-medium mb-2 block">Rol</label>
+        <p-select
+          id="role"
+          [options]="roles"
+          formControlName="customRoleId"
+          optionLabel="name"
+          optionValue="id"
+          placeholder="Seleccionar Rol"
+          class="w-full"
+          appendTo="body"
+          [showClear]="true"
+        >
+          <ng-template pTemplate="selectedItem" let-selectedOption>
+            <div class="flex align-items-center gap-2" *ngIf="selectedOption">
+              <div>{{ selectedOption.name }}</div>
+            </div>
+          </ng-template>
+          <ng-template let-role pTemplate="item">
+            <div class="flex align-items-center gap-2">
+              <div>{{ role.name }}</div>
+            </div>
+          </ng-template>
+        </p-select>
+        <small
+          class="p-error block mt-1"
+          *ngIf="createForm.get('customRoleId')?.invalid && createForm.get('customRoleId')?.touched"
+        >
+          El rol es requerido
+        </small>
+      </div>
+    </form>
+  </ng-template>
+
+  <ng-template pTemplate="footer">
+    <div class="flex justify-content-end gap-2">
+      <p-button
+        label="Cancelar"
+        [outlined]="true"
+        icon="pi pi-times"
+        (click)="onHide()"
+        [disabled]="loading()"
+        severity="secondary"
+      />
+      <p-button
+        label="Crear Usuario"
+        icon="pi pi-check"
+        (click)="onSubmit()"
+        [loading]="loading()"
+        [disabled]="createForm.invalid || membersLimitExceeded()"
+      />
+    </div>
+  </ng-template>
+</p-dialog>

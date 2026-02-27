@@ -1,0 +1,353 @@
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 64px;
+  background: #ffffff;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 0 0.5rem;
+  z-index: 1000;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+  gap: 0.25rem;
+
+  // Safe area para dispositivos con notch
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  text-decoration: none;
+  color: #6b7280;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 64px;
+  flex: 1;
+  max-width: 80px;
+
+  &:hover {
+    background: #f3f4f6;
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+
+  &.active {
+    color: var(--p-primary-color, #3b82f6);
+
+    .nav-icon-wrapper i {
+      color: var(--p-primary-color, #3b82f6);
+    }
+
+    .nav-label {
+      font-weight: 600;
+    }
+  }
+
+  // Botón de acción rápida (Nueva Rifa) - color primario
+  &.nav-item-quick-action {
+    background: var(--p-primary-500, #3b82f6);
+    color: #ffffff;
+    min-width: 56px;
+    max-width: 56px;
+    padding: 10px;
+
+    .nav-icon-wrapper i {
+      color: #ffffff;
+      font-size: 1.5rem;
+    }
+
+    .nav-label {
+      display: none; // Ocultar label en mobile para el botón de acción rápida
+    }
+
+    &:hover {
+      background: var(--p-primary-600, #2563eb);
+    }
+
+    &:active {
+      transform: scale(0.95);
+      background: var(--p-primary-700, #1d4ed8);
+    }
+  }
+}
+
+.nav-icon-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 24px;
+
+  i {
+    font-size: 1.25rem;
+    transition: color 0.2s ease;
+  }
+
+  // Ajustar posición del badge
+  :deep(.p-badge) {
+    position: absolute;
+    top: -6px;
+    right: -10px;
+    min-width: 18px;
+    height: 18px;
+    font-size: 0.65rem;
+    line-height: 18px;
+  }
+}
+
+.nav-label {
+  font-size: 0.7rem;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.nav-profile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  border-radius: 12px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 64px;
+  flex: 1;
+  max-width: 80px;
+
+  &:hover {
+    background: #f3f4f6;
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+
+  ::ng-deep .profile-avatar {
+    width: 36px;
+    height: 36px;
+  }
+}
+
+// Estilos para popovers
+:host ::ng-deep .notifications-popover {
+  .p-popover {
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e5e7eb;
+    margin-bottom: 0.5rem;
+  }
+
+  .p-popover-content {
+    padding: 0 !important;
+  }
+
+  // En móvil, posicionar arriba del bottom-nav
+  @media (max-width: 639px) {
+    .p-popover {
+      bottom: 72px !important;
+      top: auto !important;
+      left: 50% !important;
+      transform: translateX(-50%) !important;
+      width: calc(100vw - 2rem) !important;
+      max-width: calc(100vw - 2rem) !important;
+      max-height: calc(100vh - 10rem) !important;
+    }
+
+    .p-popover-arrow {
+      bottom: -8px !important;
+      top: auto !important;
+    }
+  }
+
+  // Desktop: posicionar desde el botón
+  @media (min-width: 640px) {
+    .p-popover {
+      margin-top: 0.5rem;
+    }
+  }
+}
+
+:host ::ng-deep .profile-popover {
+  .p-popover {
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e5e7eb;
+    margin-bottom: 0.5rem;
+  }
+
+  .p-popover-content {
+    padding: 0 !important;
+  }
+
+  // En móvil, posicionar arriba del bottom-nav
+  @media (max-width: 639px) {
+    .p-popover {
+      bottom: 72px !important;
+      top: auto !important;
+      right: 1rem !important;
+      left: auto !important;
+      width: 280px !important;
+      max-width: calc(100vw - 2rem) !important;
+    }
+
+    .p-popover-arrow {
+      bottom: -8px !important;
+      top: auto !important;
+      right: 1rem !important;
+    }
+  }
+
+  // Desktop: posicionar desde el botón
+  @media (min-width: 640px) {
+    .p-popover {
+      margin-top: 0.5rem;
+    }
+  }
+}
+
+.profile-menu {
+  min-width: 280px;
+  padding: 0.75rem;
+}
+
+.profile-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border-bottom: 1px solid #e5e7eb;
+  margin-bottom: 0.5rem;
+
+  .profile-info {
+    flex: 1;
+    min-width: 0;
+
+    .profile-name {
+      font-size: 0.9375rem;
+      font-weight: 600;
+      color: #1f2937;
+      margin: 0 0 0.25rem 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .profile-email {
+      font-size: 0.8125rem;
+      color: #6b7280;
+      margin: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+
+  ::ng-deep .profile-avatar-large {
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+  }
+}
+
+.profile-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.profile-action-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border-radius: 8px;
+  text-decoration: none;
+  color: #374151;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.9375rem;
+  width: 100%;
+  text-align: left;
+
+  i {
+    font-size: 1rem;
+    color: #6b7280;
+    width: 20px;
+    text-align: center;
+  }
+
+  span {
+    flex: 1;
+  }
+
+  &:hover {
+    background: #f3f4f6;
+    color: #1f2937;
+
+    i {
+      color: #374151;
+    }
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+
+  &.profile-action-logout {
+    color: #dc2626;
+    margin-top: 0.5rem;
+    border-top: 1px solid #e5e7eb;
+    padding-top: 0.875rem;
+
+    i {
+      color: #dc2626;
+    }
+
+    &:hover {
+      background: #fef2f2;
+      color: #b91c1c;
+
+      i {
+        color: #b91c1c;
+      }
+    }
+  }
+}
+
+// Tema oscuro (si se implementa)
+:host-context(.dark-mode) {
+  .bottom-nav {
+    background: #1f2937;
+    border-top-color: #374151;
+  }
+
+  .nav-item,
+  .nav-profile {
+    color: #9ca3af;
+
+    &:hover {
+      background: #374151;
+    }
+  }
+
+  .nav-item.active {
+    color: var(--p-primary-color, #60a5fa);
+  }
+}
