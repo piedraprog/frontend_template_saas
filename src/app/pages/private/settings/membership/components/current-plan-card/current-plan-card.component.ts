@@ -1,10 +1,10 @@
-import { Component, input, output } from '@angular/core';
+import { Component, EventEmitter, Output, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   SubscriptionUsage,
   PlanSummary,
   SubscriptionStatus,
-} from '../../../../../../core/models/plan.model';
+} from '../../../../../../core/models/interfaces/subscription.interface';
 import { ButtonModule } from 'primeng/button';
 
 @Component({
@@ -18,7 +18,7 @@ export class CurrentPlanCardComponent {
   plan = input<PlanSummary | null>(null);
   subscription = input<SubscriptionStatus | null>(null);
   usage = input<SubscriptionUsage | null>(null);
-  upgradePlan = output<void>();
+  @Output() upgradePlan = new EventEmitter<void>();
 
   handleUpgrade() {
     this.upgradePlan.emit();

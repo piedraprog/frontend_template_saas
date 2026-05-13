@@ -1,5 +1,5 @@
-import { Injectable } from '@angular/core';
-import { environment } from '../../../environments/environment.development';
+import { inject, Injectable } from '@angular/core';
+import { environment } from '../../../environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { map, Observable } from 'rxjs';
 import { ApiResponse } from '../interfaces/response.interface';
@@ -9,7 +9,7 @@ import { ApiResponse } from '../interfaces/response.interface';
 })
 export class CaptchaService {
   apiUrl = environment.apiUrl;
-  constructor(private http: HttpClient) {}
+  private http = inject(HttpClient);
 
   confirmCaptcha(captchaResponse: string | null): Observable<boolean> {
     const url = `${this.apiUrl}/auth/captcha`;

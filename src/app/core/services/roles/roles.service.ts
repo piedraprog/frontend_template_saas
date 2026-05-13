@@ -1,15 +1,30 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable, map } from 'rxjs';
-import { environment } from '../../../environments/environment';
-import { ApiResponse } from '../../shared/interfaces/response.interface';
-import { RoleInterface, CreateRoleDto, UpdateRoleDto } from '../models/interfaces/role.interface';
+import { environment } from '../../../../environments/environment';
+import { ApiResponse } from '../../../shared/interfaces/response.interface';
+import {
+  RoleInterface,
+  CreateRoleDto,
+  UpdateRoleDto,
+} from '../../models/interfaces/role.interface';
+import { TokenService } from '../auth/token.service';
+
+/** Alias usado en vistas de administración de equipo. */
+export type CustomRole = RoleInterface;
+
+export interface RoleFormPayload {
+  name: string;
+  permissions: number;
+  description?: string;
+}
 
 @Injectable({
   providedIn: 'root',
 })
 export class RolesService {
   private http = inject(HttpClient);
+  private tokenService = inject(TokenService);
   private baseUrl = `${environment.apiUrl}/roles`;
 
   list(): Observable<RoleInterface[]> {
@@ -19,6 +34,11 @@ export class RolesService {
         return Array.isArray(data) ? data : [];
       }),
     );
+  }
+
+  /** @deprecated usar `list()` */
+  getRoles(): Observable<RoleInterface[]> {
+    return this.list();
   }
 
   getById(id: string): Observable<RoleInterface | null> {
@@ -75,5 +95,25 @@ export class RolesService {
           return data;
         }),
       );
+  }
+
+  createRole(payload: RoleFormPayload): Observable<RoleInterface> {
+    const companyId = this.tokenService.getCompanyId() ?? '';
+    return this.create({
+      name: payload.name,
+      permissions: payload.permissions,
+      companyId,
+    });
+  }
+
+  updateRole(id: string, payload: RoleFormPayload): Observable<RoleInterface> {
+    return this.update(id, {
+      name: payload.name,
+      permissions: payload.permissions,
+    });
+  }
+
+  deleteRole(id: string): Observable<{ deleted: true }> {
+    return this.delete(id);
   }
 }

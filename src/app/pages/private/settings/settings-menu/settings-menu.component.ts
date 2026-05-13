@@ -1,8 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
-import { CardModule } from 'primeng/card';
-import { RippleModule } from 'primeng/ripple';
 import { UserService } from '../../../../core/services/user.service';
 import { PermissionService } from '../../../../core/services/permission.service';
 import { Permission } from '../../../../core/models/enums/permission.enum';
@@ -23,7 +21,7 @@ interface SettingsItem {
 @Component({
   selector: 'app-settings-menu',
   standalone: true,
-  imports: [CommonModule, CardModule, RippleModule],
+  imports: [CommonModule],
   templateUrl: './settings-menu.component.html',
   styleUrl: './settings-menu.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -43,6 +41,13 @@ export default class SettingsMenuComponent {
       description: 'Información personal y contraseña',
       icon: 'pi pi-user',
       route: 'profile',
+    },
+    {
+      id: 'notification',
+      title: 'Notificaciones',
+      description: 'Canales de avisos por correo y en la aplicación',
+      icon: 'pi pi-bell',
+      route: 'notification',
     },
     {
       id: 'user-admin',
@@ -70,9 +75,9 @@ export default class SettingsMenuComponent {
     },
     {
       id: 'terms',
-      title: 'Términos de Uso',
+      title: 'Términos de uso',
       description: 'Ver condiciones de la plataforma',
-      icon: 'pi pi-file',
+      icon: 'pi pi-file-pdf',
       externalUrl: '/terms',
     },
   ];

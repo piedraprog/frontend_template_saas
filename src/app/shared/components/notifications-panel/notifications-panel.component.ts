@@ -22,7 +22,6 @@ import { PrimengModule } from '../../modules/primeng.module';
 
 @Component({
   selector: 'app-notifications-panel',
-  standalone: true,
   imports: [CommonModule, PrimengModule],
   templateUrl: './notifications-panel.component.html',
   styleUrl: './notifications-panel.component.scss',

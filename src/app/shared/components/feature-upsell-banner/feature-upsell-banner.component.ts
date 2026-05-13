@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject, input, OnInit, signal } from '@angular/core';
-import { ButtonModule } from 'primeng/button';
+import { ButtonModule, ButtonSeverity } from 'primeng/button';
 import { Router } from '@angular/router';
 
 export interface UpsellBannerData {
@@ -20,10 +20,10 @@ export interface UpsellBannerData {
   template: `
     @if (!isDismissed()) {
       <div
-        class="upsell-banner flex align-items-center justify-content-between p-3 border-round-md gap-3"
+        class="upsell-banner flex items-center justify-between p-3 rounded-md gap-3"
         [class]="getBannerClass()"
       >
-        <div class="flex align-items-start gap-3 flex-1">
+        <div class="flex items-start gap-3 flex-1">
           <!-- Icon -->
           <i [class]="getIconClass()" class="text-2xl mt-1"></i>
 
@@ -35,7 +35,7 @@ export interface UpsellBannerData {
         </div>
 
         <!-- Actions -->
-        <div class="flex align-items-center gap-2">
+        <div class="flex items-center gap-2">
           @if (data().ctaText) {
             <p-button
               [label]="data()!.ctaText"
@@ -45,7 +45,7 @@ export interface UpsellBannerData {
             />
           }
 
-          @if (data()?.dismissible !== false) {
+          @if (data().dismissible !== false) {
             <button
               class="dismiss-btn p-button-text p-button-rounded p-button-sm"
               (click)="dismiss()"
@@ -143,13 +143,13 @@ export class FeatureUpsellBannerComponent implements OnInit {
     }
   }
 
-  getButtonSeverity(): 'success' | 'warning' | 'info' {
+  getButtonSeverity(): ButtonSeverity {
     const variant = this.data().variant || 'info';
     switch (variant) {
       case 'success':
         return 'success';
       case 'warning':
-        return 'warning';
+        return 'warn';
       default:
         return 'info';
     }

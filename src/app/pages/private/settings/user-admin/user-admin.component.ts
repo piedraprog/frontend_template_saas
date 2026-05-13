@@ -15,15 +15,17 @@ import {
   Validators,
   FormsModule,
 } from '@angular/forms';
-import { RolesService, CustomRole } from '../../../../core/services/roles.service';
-import { CookieService } from 'ngx-cookie-service';
+import { RolesService, CustomRole } from '../../../../core/services/roles/roles.service';
 import { TokenService } from '../../../../core/services/auth/token.service';
 import { AdminUserService } from '../../../../core/services/admin-user.service';
 import { ToastService } from '../../../../shared/services/toast.service';
 import { PrimengModule } from '../../../../shared/modules/primeng.module';
 import { UserInterface } from '../../../../core/models/interfaces/user.interface';
+import { SystemRole } from '../../../../core/models/enums/system-role.enum';
 import { ConfirmationService } from 'primeng/api';
-import { AuthService } from '../../../../core/services/auth/auth.service';
+import { AuthService } from '../../../../core/services/auth.service';
+import { UserService } from '../../../../core/services/user.service';
+import { RouterModule } from '@angular/router';
 
 import { PermissionEditorComponent } from './components/permission-editor/permission-editor.component';
 import { UserCreateModalComponent } from './components/user-create-modal/user-create-modal.component';
@@ -35,6 +37,7 @@ import { UserCreateModalComponent } from './components/user-create-modal/user-cr
     CommonModule,
     ReactiveFormsModule,
     FormsModule,
+    RouterModule,
     PrimengModule,
     PermissionEditorComponent,
     UserCreateModalComponent,
@@ -49,10 +52,10 @@ export default class UserAdminComponent implements OnInit {
   adminUserService = inject(AdminUserService);
   toastService = inject(ToastService);
   confirmationService = inject(ConfirmationService);
-  private cookieService = inject(CookieService);
   tokenService = inject(TokenService);
   rolesService = inject(RolesService);
   private authService = inject(AuthService);
+  private userService = inject(UserService);
 
   // Signals del servicio (readonly)
   users = this.adminUserService.users;
@@ -126,22 +129,19 @@ export default class UserAdminComponent implements OnInit {
                 'Tus permisos han sido actualizados. Recarga la página si es necesario.',
               );
             },
-            error: (error) => {
+            error: (error: unknown) => {
               console.error('Error al refrescar permisos del usuario actual:', error);
             },
           });
         }
       },
-      error: (error) => {
+      error: (error: unknown) => {
         console.error('Error al actualizar permisos', error);
         this.toastService.error('Error al actualizar los permisos');
       },
     });
   }
 
-  companyId = this.cookieService.get('teamId');
-
-  // Computed property to group users by role
   usersByRole = computed(() => {
     const users = this.users();
     const roles = this.availableRoles();
@@ -294,7 +294,7 @@ export default class UserAdminComponent implements OnInit {
       next: (roles) => {
         this.availableRoles.set(roles);
       },
-      error: (error) => {
+      error: (error: unknown) => {
         console.error('Error al cargar roles', error);
         this.toastService.error('No se pudieron cargar los roles');
       },
@@ -308,9 +308,9 @@ export default class UserAdminComponent implements OnInit {
       search: '',
     };
 
-    this.adminUserService.getUsersByCompanyId(this.companyId, params).subscribe({
+    this.adminUserService.getTeamMembers(params).subscribe({
       next: () => {},
-      error: (error) => {
+      error: (error: unknown) => {
         console.error('Error al cargar usuarios', error);
         this.toastService.error('No se pudieron cargar los usuarios');
       },
@@ -318,14 +318,18 @@ export default class UserAdminComponent implements OnInit {
   }
 
   getEmptyUser(): UserInterface {
-    const companyId = this.cookieService.get('teamId');
+    const companyId = this.userService.userData().companyId ?? '';
     return {
       id: '',
       username: '',
       email: '',
       avatar: '',
-      customRoleId: '', // Will be set by dropdown
-      companyId: companyId,
+      role: SystemRole.MEMBER,
+      isOwner: false,
+      permissions: 0,
+      active: false,
+      customRoleId: '',
+      companyId,
     };
   }
 
@@ -369,7 +373,7 @@ export default class UserAdminComponent implements OnInit {
             this.userForm.reset(this.getEmptyUser());
             this.loadUsers();
           },
-          error: (error) => {
+          error: (error: unknown) => {
             console.error('Error al actualizar usuario', error);
             this.toastService.error('No se pudo actualizar el usuario');
           },
@@ -393,9 +397,14 @@ export default class UserAdminComponent implements OnInit {
         this.deleteUserDialog = false;
         this.selectedUser.set(this.getEmptyUser());
       },
-      error: (error) => {
+      error: (error: unknown) => {
         console.error('Error al eliminar usuario', error);
-        const message = error?.error?.message || error?.message || 'No se pudo eliminar el usuario';
+        const message =
+          error !== null && typeof error === 'object' && ('error' in error || 'message' in error)
+            ? ((error as { error?: { message?: string }; message?: string }).error?.message ??
+              (error as { message?: string }).message ??
+              'No se pudo eliminar el usuario')
+            : 'No se pudo eliminar el usuario';
         this.toastService.error(message);
       },
     });
@@ -513,7 +522,7 @@ export default class UserAdminComponent implements OnInit {
           this.loadRoles(); // Reload roles to update view
           this.loadUsers(); // Reload users to reflect changes
         },
-        error: (err) => {
+        error: (err: unknown) => {
           console.error('Error updating role', err);
           this.toastService.error('Error al actualizar el rol');
           this.isSavingRole.set(false);
@@ -527,7 +536,7 @@ export default class UserAdminComponent implements OnInit {
           this.closeRoleDialog();
           this.loadRoles();
         },
-        error: (err) => {
+        error: (err: unknown) => {
           console.error('Error creating role', err);
           this.toastService.error('Error al crear el rol');
           this.isSavingRole.set(false);
@@ -556,7 +565,7 @@ export default class UserAdminComponent implements OnInit {
             this.loadRoles();
             this.loadUsers();
           },
-          error: (err) => {
+          error: (err: unknown) => {
             console.error('Error deleting role', err);
             this.toastService.error('Error al eliminar el rol');
             this.isSavingRole.set(false);
@@ -613,7 +622,7 @@ export default class UserAdminComponent implements OnInit {
     const updateData: Partial<UserInterface> = {
       username: formValue.username!,
       email: formValue.email!,
-      customRoleId: formValue.customRoleId,
+      customRoleId: formValue.customRoleId ?? undefined,
     };
 
     this.adminUserService.updateUser(user.id, updateData).subscribe({
@@ -629,8 +638,8 @@ export default class UserAdminComponent implements OnInit {
         if (this.selectedUserForView()?.id === updatedUser.id) {
           this.selectedUserForView.set({
             ...updatedUser,
-            customRoleId: formValue.customRoleId, // Ensure this follows local update
-            roleName: updatedUser.roleName, // Backend returns this
+            customRoleId: formValue.customRoleId ?? undefined,
+            roleName: updatedUser.roleName,
           });
         }
 

@@ -5,10 +5,14 @@ export interface UserInterface {
   username: string;
   email: string;
   role: SystemRole;
+  /** Etiqueta de rol devuelta por el backend para UI */
+  roleName?: string;
   companyId: string;
   isOwner: boolean;
   permissions: number;
   active: boolean;
+  /** Permisos personalizados (bitmask); si difiere del rol, el usuario aparece como “personalizado”. */
+  customPermissions?: number | null;
   customRoleId?: string;
   avatar?: string;
   phone?: string;

@@ -18,10 +18,9 @@ import {
   FormsModule,
 } from '@angular/forms';
 import { PrimengModule } from '../../../../../../shared/modules/primeng.module';
-import { CustomRole } from '../../../../../../core/services/roles.service';
+import { CustomRole } from '../../../../../../core/services/roles/roles.service';
 import { AdminUserService } from '../../../../../../core/services/admin-user.service';
 import { ToastService } from '../../../../../../shared/services/toast.service';
-import { CookieService } from 'ngx-cookie-service';
 import { PlansService } from '../../../../../../core/services/plans.service';
 import {
   getErrorMessage,
@@ -41,7 +40,6 @@ export class UserCreateModalComponent implements OnChanges {
   private fb = inject(FormBuilder);
   private adminUserService = inject(AdminUserService);
   private toastService = inject(ToastService);
-  private cookieService = inject(CookieService);
   private plansService = inject(PlansService);
 
   @Input() visible = false;
@@ -54,15 +52,10 @@ export class UserCreateModalComponent implements OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['visible']?.currentValue === true) {
-      const companyId = this.cookieService.get('teamId');
-      if (companyId) {
-        this.plansService.getSubscriptionSummary(companyId).subscribe({
-          next: (res) => this.membersLimitExceeded.set(res.usage?.max_members?.exceeded === true),
-          error: () => this.membersLimitExceeded.set(false),
-        });
-      } else {
-        this.membersLimitExceeded.set(false);
-      }
+      this.plansService.getSubscriptionSummary().subscribe({
+        next: (res) => this.membersLimitExceeded.set(res.usage?.max_members?.exceeded === true),
+        error: () => this.membersLimitExceeded.set(false),
+      });
     }
   }
 
@@ -97,13 +90,11 @@ export class UserCreateModalComponent implements OnChanges {
 
     this.loading.set(true);
     const formValue = this.createForm.value;
-    const companyId = this.cookieService.get('teamId');
 
     this.adminUserService
       .createUser({
         username: formValue.username,
         email: formValue.email,
-        companyId: companyId,
         customRoleId: formValue.customRoleId,
       })
       .pipe(finalize(() => this.loading.set(false)))

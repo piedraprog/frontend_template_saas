@@ -1,7 +1,6 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PlansService } from '../../../../core/services/plans.service';
-import { UserService } from '../../../../core/services/user.service';
 import {
   SubscriptionUsage,
   PlanSummary,
@@ -13,16 +12,23 @@ import { CurrentPlanCardComponent } from './components/current-plan-card/current
 // import { AddonListComponent } from './components/addon-list/addon-list.component';
 import { PageHeaderComponent } from '../../../../shared/components/page-header/page-header.component';
 import { ViewPlansModalComponent } from './components/view-plans-modal/view-plans-modal.component';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-membership',
-  imports: [CommonModule, CurrentPlanCardComponent, PageHeaderComponent, ViewPlansModalComponent],
+  standalone: true,
+  imports: [
+    CommonModule,
+    CurrentPlanCardComponent,
+    PageHeaderComponent,
+    ViewPlansModalComponent,
+    RouterModule,
+  ],
   templateUrl: './membership.component.html',
   styleUrls: ['./membership.component.scss'],
 })
 export class MembershipComponent implements OnInit {
   private plansService = inject(PlansService);
-  private userService = inject(UserService);
 
   currentPlan = signal<PlanSummary | null>(null);
   currentSubscription = signal<SubscriptionStatus | null>(null);
@@ -38,11 +44,7 @@ export class MembershipComponent implements OnInit {
   }
 
   loadData() {
-    const companyId = this.userService.userData().companyId;
-    if (!companyId) return;
-
-    // T5: Solo summary; no se pide getAddons() hasta integrar pasarela
-    this.plansService.getSubscriptionSummary(companyId).subscribe({
+    this.plansService.getSubscriptionSummary().subscribe({
       next: (summary) => {
         this.currentPlan.set(summary.plan);
         this.currentSubscription.set(summary.subscription);
@@ -60,7 +62,7 @@ export class MembershipComponent implements OnInit {
 
   // T5: Addons ocultos hasta integrar pasarela. Descomentar cuando se reactive la sección de addons.
   // handleBuyAddon(addon: Addon) {
-  //   const companyId = this.userService.userData().companyId;
+  //   const companyId = ''; // al reactivar: obtener de UserService/Token (mismo contexto que JWT)
   //   if (
   //     !confirm(
   //       `¿Estás seguro de solicitar el addon "${addon.name || addon.featureSlug}" por $${addon.monthlyPrice}/mes?`,

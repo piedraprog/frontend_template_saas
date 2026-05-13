@@ -1,4 +1,11 @@
 <div class="user-admin-container">
+  <nav class="admin-toolbar" aria-label="Navegación del equipo">
+    <a routerLink=".." class="admin-toolbar-link">
+      <i class="pi pi-arrow-left" aria-hidden="true"></i>
+      Configuración
+    </a>
+  </nav>
+
   <!-- Fixed Header -->
   <header class="header">
     <h1 class="header-title">Equipo</h1>
@@ -66,7 +73,7 @@
                         <i class="pi pi-user"></i>
                       </div>
                       <div class="user-info">
-                        <span class="user-name flex align-items-center gap-1">
+                        <span class="user-name flex items-center gap-1">
                           {{ user.username }}
                           @if (isUserCustomized(user)) {
                             <i
@@ -152,13 +159,13 @@
           <!-- Custom Permissions Banner -->
           @if (!user.customRoleId) {
             <div
-              class="surface-ground p-3 border-round mb-3 flex align-items-center justify-content-between border-1 surface-border"
+              class="bg-slate-50 p-3 rounded-md mb-3 flex items-center justify-between border border-slate-200"
             >
-              <div class="flex align-items-center gap-3">
+              <div class="flex items-center gap-3">
                 <i class="pi pi-shield text-primary text-xl"></i>
                 <div>
-                  <span class="font-bold block text-900">Permisos Personalizados</span>
-                  <span class="text-sm text-600">
+                  <span class="font-bold block text-slate-900">Permisos Personalizados</span>
+                  <span class="text-sm text-slate-600">
                     Este usuario tiene una configuración única de permisos.
                   </span>
                 </div>
@@ -176,7 +183,7 @@
           <!-- User Basic Info Card -->
           <div class="section">
             <div class="section-header">
-              <div class="flex align-items-center gap-2">
+              <div class="flex items-center gap-2">
                 <i class="pi pi-user"></i>
                 <h3>Información Básica</h3>
               </div>
@@ -247,11 +254,11 @@
                     />
                   </div>
                 } @else {
-                  <p class="flex align-items-center gap-2">
+                  <p class="flex items-center gap-2">
                     {{ user.roleName || 'Sin rol asignado' }}
                     @if (isUserCustomized(user)) {
                       <span
-                        class="inline-flex align-items-center gap-1 px-2 py-1 border-round surface-100 text-xs font-medium text-primary"
+                        class="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-slate-100 text-xs font-medium text-primary"
                       >
                         <i class="pi pi-shield" style="font-size: 0.7rem"></i>
                         Personalizado
@@ -270,7 +277,7 @@
                 <i class="pi pi-key"></i>
                 <h3>Permisos de Acceso</h3>
               </div>
-              <p class="text-sm text-600 m-0 mb-2">
+              <p class="text-sm text-slate-600 m-0 mb-2">
                 Selecciona los permisos que deseas otorgar a este usuario. Los cambios se aplicarán
                 inmediatamente.
               </p>
@@ -385,7 +392,7 @@
   header="Confirmar Eliminación"
   [modal]="true"
 >
-  <div class="confirmation-content flex align-items-center gap-3">
+  <div class="confirmation-content flex items-center gap-3">
     <i class="pi pi-exclamation-triangle text-warning" style="font-size: 2rem"></i>
     <span>¿Está seguro de que desea eliminar este usuario?</span>
   </div>
@@ -411,7 +418,7 @@
   (onHide)="closeRoleDialog()"
 >
   <ng-template pTemplate="content">
-    <form [formGroup]="roleForm" class="flex flex-column gap-3">
+    <form [formGroup]="roleForm" class="flex flex-col gap-3">
       <!-- Role Name -->
       <div class="field">
         <label for="role-name" class="font-bold block mb-2">Nombre del Rol</label>
@@ -447,7 +454,7 @@
       <!-- Permissions -->
       <div class="field">
         <label class="font-bold block mb-2">Permisos del Rol</label>
-        <div class="border-1 surface-border border-round p-2 surface-ground">
+        <div class="border border-slate-200 rounded-md p-2 bg-slate-50">
           <app-permission-editor
             [currentPermissions]="roleForm.get('permissions')?.value || 0"
             (savePermissions)="onRolePermissionsChange($event)"
@@ -460,7 +467,7 @@
 
   <ng-template pTemplate="footer">
     @if (selectedRoleForEdit()) {
-      <div class="flex justify-content-between w-full">
+      <div class="flex justify-between w-full">
         @if (!selectedRoleForEdit()?.isSystemRole) {
           <p-button
             label="Eliminar Rol"
@@ -490,7 +497,7 @@
         </div>
       </div>
     } @else {
-      <div class="flex justify-content-end gap-2">
+      <div class="flex justify-end gap-2">
         <p-button
           label="Cancelar"
           icon="pi pi-times"

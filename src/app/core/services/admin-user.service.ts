@@ -49,17 +49,17 @@ export class AdminUserService {
   });
   public pagination = this.#paginationSignal.asReadonly();
 
-  getUsersByCompanyId(
-    companyId: string,
-    params?: {
-      page?: number;
-      limit?: number;
-      sortField?: string;
-      sortOrder?: number;
-      search?: string;
-    },
-  ): Observable<PaginatedResponse<UserInterface>> {
-    const url = `${this.baseUrl}/users/company/${companyId}`;
+  /**
+   * Miembros de la compañía del JWT (`GET /users/team`); no envía UUID en URL.
+   */
+  getTeamMembers(params?: {
+    page?: number;
+    limit?: number;
+    sortField?: string;
+    sortOrder?: number;
+    search?: string;
+  }): Observable<PaginatedResponse<UserInterface>> {
+    const url = `${this.baseUrl}/users/team`;
     this.loadingSignal.set(true);
 
     return this.http
@@ -90,7 +90,6 @@ export class AdminUserService {
   createUser(userData: {
     username: string;
     email: string;
-    companyId: string;
     customRoleId?: string;
     password?: string;
   }): Observable<UserInterface> {

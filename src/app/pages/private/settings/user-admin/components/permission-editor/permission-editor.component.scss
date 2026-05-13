@@ -107,7 +107,7 @@
   }
 
   // Footer con botones
-  .flex.justify-content-end {
+  .flex.justify-end {
     margin-top: 1.5rem;
     padding-top: 1rem;
     border-top: 2px solid var(--p-surface-border);
@@ -123,7 +123,7 @@
       grid-template-columns: 1fr !important;
     }
 
-    .flex.justify-content-end {
+    .flex.justify-end {
       flex-direction: column-reverse;
       gap: 0.5rem;
 

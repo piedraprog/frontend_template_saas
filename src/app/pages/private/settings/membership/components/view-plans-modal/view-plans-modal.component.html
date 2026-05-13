@@ -10,23 +10,23 @@
 >
   <div class="view-plans-content">
     @if (loading()) {
-      <div class="flex justify-content-center align-items-center py-5">
+      <div class="flex justify-center items-center py-5">
         <p-progressSpinner [style]="{ width: '40px', height: '40px' }" strokeWidth="4" />
       </div>
     } @else if (error()) {
       <p class="text-red-600 m-0">{{ error() }}</p>
     } @else {
-      <p class="text-color-secondary mb-3">
+      <p class="text-slate-500 mb-3">
         Planes disponibles. Próximamente: integración con pasarela de pago para cambiar de plan.
       </p>
       <div class="plans-list">
         @for (plan of plans(); track plan.id) {
-          <div class="plan-item border-1 surface-border border-round p-3 mb-2">
-            <div class="flex justify-content-between align-items-start flex-wrap gap-2">
+          <div class="plan-item border border-slate-200 rounded-md p-3 mb-2">
+            <div class="flex justify-between items-start flex-wrap gap-2">
               <div>
                 <h4 class="m-0 text-lg">{{ plan.name }}</h4>
                 @if (plan.description) {
-                  <p class="text-color-secondary text-sm mt-1 mb-0">{{ plan.description }}</p>
+                  <p class="text-slate-500 text-sm mt-1 mb-0">{{ plan.description }}</p>
                 }
               </div>
               <div class="plan-pricing text-right">
@@ -35,7 +35,7 @@
                   <span class="text-sm">/ mes</span>
                 </span>
                 @if (planPriceYearly(plan); as yearly) {
-                  <p class="text-sm text-color-secondary m-0 mt-1">${{ yearly }} / año</p>
+                  <p class="text-sm text-slate-500 m-0 mt-1">${{ yearly }} / año</p>
                 }
               </div>
             </div>
@@ -43,7 +43,7 @@
         }
       </div>
       @if (plans().length === 0 && !loading()) {
-        <p class="text-color-secondary m-0">No hay planes disponibles en este momento.</p>
+        <p class="text-slate-500 m-0">No hay planes disponibles en este momento.</p>
       }
     }
   </div>

@@ -15,7 +15,7 @@ import { DataViewModule } from 'primeng/dataview';
 import { DatePickerModule } from 'primeng/datepicker';
 import { DialogModule } from 'primeng/dialog';
 import { DividerModule } from 'primeng/divider';
-import { DropdownModule } from 'primeng/dropdown';
+import { SelectModule } from 'primeng/select';
 import { FloatLabelModule } from 'primeng/floatlabel';
 import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
@@ -24,7 +24,6 @@ import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
 import { MessageModule } from 'primeng/message';
-import { MessagesModule } from 'primeng/messages';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { PaginatorModule } from 'primeng/paginator';
 import { PanelModule } from 'primeng/panel';
@@ -58,7 +57,7 @@ const PRIMENG_MODULES = [
   DatePickerModule,
   DialogModule,
   DividerModule,
-  DropdownModule,
+  SelectModule,
   FloatLabelModule,
   IconFieldModule,
   InputIconModule,
@@ -67,7 +66,6 @@ const PRIMENG_MODULES = [
   InputNumberModule,
   InputTextModule,
   MessageModule,
-  MessagesModule,
   MultiSelectModule,
   PaginatorModule,
   PanelModule,

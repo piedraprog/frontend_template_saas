@@ -1,29 +1,85 @@
-# Angular Project Template
+# SaaS Admin Boilerplate
 
 ## Descripción
 
-Este proyecto es un **template** de una aplicación en Angular que puede servir como punto de partida para desarrollar nuevas aplicaciones. Incluye una estructura básica de carpetas y archivos, componentes preconfigurados y una guía de configuración inicial. El objetivo es facilitar el desarrollo de proyectos nuevos proporcionando una base sólida y bien organizada.
+Base admin para productos SaaS construida con Angular, PrimeNG y Tailwind CSS para utilidades de layout.
 
 ## Características
 
-- **Angular 17+**: Utiliza la última versión estable de Angular.
-- **Estructura modular**: Implementación modular para facilitar el escalado y mantenimiento del proyecto.
-- **Servicios predefinidos**: Incluye ejemplos de servicios HTTP para facilitar la integración con APIs.
-- **Rutas configuradas**: Sistema de enrutamiento básico preconfigurado con ejemplos de lazy loading.
-- **Estilos con SCSS**: Preparado para el uso de SCSS como preprocesador de estilos.
-- **Soporte para i18n**: Configurado para internacionalización, listo para admitir varios idiomas.
-- **Testing**: Configuración inicial de pruebas unitarias con Karma y Jasmine.
+- Angular 20 con componentes standalone.
+- Estado local y compartido con `signal()` y `computed()` cuando no haga falta un stream RxJS.
+- PrimeNG como sistema UI principal y **Tailwind CSS** únicamente como utilidades de layout/espaciado (preflight desactivado para coexistir con estilos de Prime).
+- Layout privado con sidebar, navbar, bottom navigation mobile y paneles de settings.
+- Interceptores HTTP funcionales para auth, loader, retry y response time.
+- Formularios reactivos para auth y flujos administrativos.
+- Guards funcionales para auth, permisos, owner y sesión.
 
 ## Requisitos Previos
 
 Asegúrate de tener las siguientes herramientas instaladas en tu entorno de desarrollo antes de clonar el proyecto:
 
-- [Node.js](https://nodejs.org/) (v18 o superior)
-- [Angular CLI](https://angular.io/cli) (v17 o superior)
+- [Node.js](https://nodejs.org/) 20.19+ o 22.12+
+- [Bun](https://bun.sh/) 1.1+
+- [Angular CLI](https://angular.dev/cli) 20.x
 - [Git](https://git-scm.com/)
 
+## Instalación
 
-## Por hacer
+```bash
+bun install
+bun run start
+```
 
-- TODO: Hacer un componente de input en el que le pases las props y sea repicable.
-- TODO: Hacer prueba con interceptores [DI-based_interceptors](https://angular.dev/guide/http/interceptors#di-based-interceptors)
+La app queda disponible en `http://localhost:4200`.
+
+## URLs de API sin tocar código en cada entorno
+
+Lee [.env.example](.env.example): explica `environment.ts` / `environment.development.ts` y el archivo opcional **`assets/runtime-environment.json`** (mismo patrón que suelen usar paneles desplegados con Nginx/Dokploy para no recompilar al pasar de local a prod).
+
+## Estructura base
+
+```text
+src/app/
+├── core/
+│   ├── guards/
+│   ├── interceptors/
+│   ├── models/
+│   ├── resolvers/
+│   └── services/
+├── pages/
+│   ├── private/
+│   └── public/
+└── shared/
+    ├── components/
+    ├── interfaces/
+    ├── modules/
+    ├── pipes/
+    ├── services/
+    ├── utils/
+    └── validators/
+```
+
+## Reglas de desarrollo
+
+- Componentes nuevos: standalone, `ChangeDetectionStrategy.OnPush`, `inject()` para dependencias.
+- Estado de componente o servicio: signals por defecto. RxJS se reserva para HTTP, websockets y streams reales.
+- Formularios: Reactive Forms.
+- UI: importar `PrimengModule` compartido cuando un componente necesite varios módulos de PrimeNG; utilidades de layout con **Tailwind** (`tailwind.config.js`, preflight desactivado).
+- Interfaces: no declararlas dentro de componentes; ubicarlas en `core/models` o `shared/interfaces`.
+- Flujos destructivos: confirmar con modal y cerrar con toast.
+- Mobile: validar sidebar, navbar, navegación inferior y diálogos.
+
+## Actualización de versión
+
+Para cambios mayores de Angular, usar el update guide oficial y avanzar de una major a la siguiente:
+
+```bash
+bunx ng update @angular/cli@^20 @angular/core@^20
+```
+
+Luego correr:
+
+```bash
+bun run build
+bun run lint
+```

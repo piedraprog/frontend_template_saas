@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
-import { ModalsService } from '../../../core/services/modals.service';
+import { DynamicDialogRef } from 'primeng/dynamicdialog';
 import { Router } from '@angular/router';
 
 export interface UpgradeModalData {
@@ -18,12 +18,12 @@ export interface UpgradeModalData {
   standalone: true,
   imports: [CommonModule, ButtonModule],
   template: `
-    <div class="flex flex-column align-items-center gap-3 p-4">
+    <div class="flex flex-col items-center gap-3 p-4">
       <!-- Icon -->
       <i class="pi pi-lock text-7xl text-orange-500"></i>
 
       <!-- Title -->
-      <h2 class="p-mt-3 text-center">
+      <h2 class="mt-3 text-center">
         {{ data()?.featureName || 'Función Premium' }}
       </h2>
 
@@ -37,8 +37,8 @@ export interface UpgradeModalData {
 
       <!-- Current vs Required Plan -->
       @if (data()?.currentPlan && data()?.requiredPlan) {
-        <div class="w-full px-4 py-3 bg-gray-100 border-round">
-          <div class="flex justify-content-between align-items-center">
+        <div class="w-full px-4 py-3 bg-gray-100 rounded-lg">
+          <div class="flex justify-between items-center">
             <div class="text-center flex-1">
               <p class="text-sm text-gray-600 m-0">Tu plan actual</p>
               <p class="text-lg font-bold m-0">{{ data()?.currentPlan }}</p>
@@ -55,12 +55,12 @@ export interface UpgradeModalData {
       }
 
       <!-- Benefits List -->
-      @if (data()?.benefits && data()?.benefits.length > 0) {
+      @if ((data()?.benefits?.length ?? 0) > 0) {
         <div class="w-full px-4">
           <p class="font-semibold mb-2">Con esta función podrás:</p>
           <ul class="list-none p-0 m-0">
             @for (benefit of data()!.benefits; track benefit) {
-              <li class="flex align-items-start mb-2">
+              <li class="flex items-start mb-2">
                 <i class="pi pi-check text-green-500 mt-1 mr-2"></i>
                 <span class="text-gray-700">{{ benefit }}</span>
               </li>
@@ -93,13 +93,13 @@ export interface UpgradeModalData {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UpgradeModalComponent {
-  private modalService = inject(ModalsService);
-  private router = inject(Router);
+  private readonly dialogRef = inject(DynamicDialogRef, { optional: true });
+  private readonly router = inject(Router);
 
   data = input<UpgradeModalData>();
 
   viewPlans() {
-    this.modalService.closeModal();
+    this.dialogRef?.close();
 
     // Navigate to plans/pricing page with preselected feature
     this.router.navigate(['/plans'], {
@@ -111,6 +111,6 @@ export class UpgradeModalComponent {
   }
 
   closeModal() {
-    this.modalService.closeModal();
+    this.dialogRef?.close();
   }
 }

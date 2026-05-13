@@ -1,8 +1,7 @@
-import { HttpClient } from '@angular/common/http';
 import { computed, Injectable, signal } from '@angular/core';
-import { CookieService } from 'ngx-cookie-service';
-import { environment } from '../../../environments/environment.development';
+import { environment } from '../../../environments/environment';
 import { UserInterface } from '../models/interfaces/user.interface';
+import { SystemRole } from '../models/enums/system-role.enum';
 
 @Injectable({
   providedIn: 'root',
@@ -14,16 +13,14 @@ export class UserService {
     id: '',
     username: '',
     email: '',
-    role: 1,
+    role: SystemRole.MEMBER,
     companyId: '',
+    isOwner: false,
+    permissions: 0,
+    active: false,
   });
 
   public userData = computed(() => this.#userData());
-
-  constructor(
-    private http: HttpClient,
-    private cookieService: CookieService,
-  ) {}
 
   setUserData(user: UserInterface) {
     this.#userData.set(user); // Guarda los datos en el signal

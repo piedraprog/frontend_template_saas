@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { DialogModule } from 'primeng/dialog';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { LoaderService } from '../../../core/services/loading.service';
@@ -9,7 +9,7 @@ import { LoaderService } from '../../../core/services/loading.service';
   imports: [DialogModule, ProgressSpinnerModule],
   template: `
     <p-dialog
-      [(visible)]="show"
+      [visible]="loaderService.isVisible()"
       [style]="{ width: '250px' }"
       [baseZIndex]="10000"
       [closable]="false"
@@ -17,19 +17,14 @@ import { LoaderService } from '../../../core/services/loading.service';
       [resizable]="false"
       [modal]="true"
     >
-      <div class="flex flex-column justify-content-center align-items-center">
+      <div class="flex flex-col justify-center items-center">
         <p-progressSpinner ariaLabel="loading" strokeWidth="4" animationDuration="4s" />
         <span class="font-bold">Cargando</span>
       </div>
     </p-dialog>
   `,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LoaderDialogComponent {
-  show = false;
-
-  constructor(private loaderService: LoaderService) {
-    this.loaderService.showLoader$.subscribe((show) => {
-      this.show = show;
-    });
-  }
+  protected readonly loaderService = inject(LoaderService);
 }

@@ -32,7 +32,8 @@ export const SETTINGS_ROUTES: Routes = [
       {
         path: 'membership',
         canActivate: [ownerGuard],
-        loadComponent: () => import('./membership/membership.component'),
+        loadComponent: () =>
+          import('./membership/membership.component').then((m) => m.MembershipComponent),
       },
       {
         path: 'notification',

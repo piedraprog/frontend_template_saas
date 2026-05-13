@@ -5,12 +5,12 @@
   <form
     [formGroup]="registerForm"
     (ngSubmit)="register()"
-    class="flex flex-column gap-4"
+    class="flex flex-col gap-4"
     #form="ngForm"
   >
     <!-- Nombre de usuario -->
-    <div class="flex flex-column gap-2">
-      <label for="email" class="flex flex-column align-items-right gap-2 md:flex-row">
+    <div class="flex flex-col gap-2">
+      <label for="email" class="flex flex-col items-end gap-2 md:flex-row">
         Nombre de la empresa
         <div
           *ngIf="(corporationFormField?.invalid && corporationFormField?.touched) || form.submitted"
@@ -42,8 +42,8 @@
     </div>
 
     <!-- Nombre de usuario -->
-    <div class="flex flex-column gap-2">
-      <label for="email" class="flex flex-column align-items-right gap-2 md:flex-row">
+    <div class="flex flex-col gap-2">
+      <label for="email" class="flex flex-col items-end gap-2 md:flex-row">
         Nombre de usuario
         <div
           *ngIf="(usernameFormField?.invalid && usernameFormField?.touched) || form.submitted"
@@ -75,8 +75,8 @@
     </div>
 
     <!-- Correo electrónico -->
-    <div class="flex flex-column gap-2">
-      <label for="email" class="flex flex-column align-items-right gap-2 md:flex-row">
+    <div class="flex flex-col gap-2">
+      <label for="email" class="flex flex-col items-end gap-2 md:flex-row">
         Correo Electrónico
         <div
           *ngIf="(emailFormField?.invalid && emailFormField?.touched) || form.submitted"
@@ -100,8 +100,8 @@
     </div>
 
     <!-- Contraseña -->
-    <div class="flex flex-column gap-2">
-      <label for="password" class="flex align-items-center gap-2">
+    <div class="flex flex-col gap-2">
+      <label for="password" class="flex items-center gap-2">
         Contraseña
         <div
           *ngIf="(passwordFormField?.invalid && passwordFormField?.touched) || form.submitted"
@@ -112,7 +112,7 @@
           </small>
         </div>
       </label>
-      <div class="flex justify-content-start w-full gap-2">
+      <div class="flex justify-start w-full gap-2">
         <input
           pInputText
           id="password"
@@ -155,8 +155,8 @@
     </div>
 
     <!-- Confirmar Contraseña -->
-    <div class="flex flex-column gap-2">
-      <label for="password" class="flex align-items-center gap-2">
+    <div class="flex flex-col gap-2">
+      <label for="password" class="flex items-center gap-2">
         Confirmar Contraseña
         <div
           *ngIf="
@@ -173,7 +173,7 @@
           </small>
         </div>
       </label>
-      <div class="flex justify-content-start w-full gap-2">
+      <div class="flex justify-start w-full gap-2">
         <input
           [className]="
             registerForm.errors?.['misMatch']
@@ -200,8 +200,8 @@
     </div>
 
     <!-- Aceptar Términos y condiciones -->
-    <div class="flex flex-column align-items-start gap-2">
-      <div class="flex-row">
+    <div class="flex flex-col items-start gap-2">
+      <div class="flex flex-row items-start gap-2">
         <p-checkbox formControlName="termsCondition" [binary]="true" />
         <label for="termsCondition">
           Aceptar
@@ -221,7 +221,7 @@
     </div>
 
     <!-- Ir al inicio -->
-    <div class="flex flex-column gap-2">
+    <div class="flex flex-col gap-2">
       <small>¿Ya tienes una cuenta?</small>
       <small>
         <a routerLink="/login" class="p-0 text-sm text-gray-900 font-bold">Iniciar Sesión</a>
@@ -229,7 +229,7 @@
     </div>
 
     <!-- CLOUDFLARE CAPTCHA -->
-    <div class="w-full flex flex-row gap-2 justify-content-center">
+    <div class="w-full flex flex-row gap-2 justify-center">
       <ngx-turnstile
         [siteKey]="siteKey"
         (resolved)="confirmCaptcha($event)"
@@ -239,7 +239,7 @@
     </div>
 
     <!-- Botón de registro de usuario -->
-    <div class="w-full flex flex-row gap-2 justify-content-center">
+    <div class="w-full flex flex-row gap-2 justify-center">
       <p-button
         type="submit"
         label="Registrarme"

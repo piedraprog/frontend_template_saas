@@ -1,12 +1,12 @@
-<p-toast />
+<p-toast position="top-right" styleClass="app-toast-stack" [life]="5200" />
 <app-auth-card
   [title]="'Iniciar Sesión'"
   [subheader]="'Ingresa tus credenciales para iniciar sesión'"
 >
-  <form [formGroup]="loginForm" (ngSubmit)="login()" class="flex flex-column gap-4" #form="ngForm">
+  <form [formGroup]="loginForm" (ngSubmit)="login()" class="flex flex-col gap-4" #form="ngForm">
     <!-- Correo electrónico -->
-    <div class="flex flex-column gap-2">
-      <label for="email" class="flex flex-column align-items-right gap-2 md:flex-row">
+    <div class="flex flex-col gap-2">
+      <label for="email" class="flex flex-col items-end gap-2 md:flex-row">
         Correo Electrónico
         <div
           *ngIf="
@@ -32,8 +32,8 @@
     </div>
 
     <!-- Contraseña -->
-    <div class="flex flex-column gap-2">
-      <label for="password" class="flex align-items-center gap-2">
+    <div class="flex flex-col gap-2">
+      <label for="password" class="flex items-center gap-2">
         Contraseña
         <div
           *ngIf="
@@ -47,7 +47,7 @@
           </small>
         </div>
       </label>
-      <div class="flex justify-content-start w-full gap-2">
+      <div class="flex justify-start w-full gap-2">
         <input
           pInputText
           id="password"
@@ -68,7 +68,7 @@
     </div>
 
     <!-- Recuperar contraseña -->
-    <div class="flex flex-column gap-2">
+    <div class="flex flex-col gap-2">
       <small>¿Olvidaste tu contraseña?</small>
       <small>
         <a routerLink="/recovery" class="p-0 text-sm text-gray-900 font-bold">
@@ -78,10 +78,10 @@
     </div>
 
     <!-- Botón de inicio de sesión -->
-    <div class="w-full flex flex-row gap-2 justify-content-center">
+    <div class="w-full flex flex-row gap-2 justify-center">
       <a
         routerLink="/register"
-        class="p-0 p-button no-underline bg-white border-2 border-indigo-900 font-bold w-full flex justify-content-center text-gray-900 hover:text-white hover:bg-gray-800"
+        class="p-0 p-button no-underline bg-white border-2 border-indigo-900 font-bold w-full flex justify-center text-gray-900 hover:text-white hover:bg-gray-800"
       >
         Registrarme
       </a>

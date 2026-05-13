@@ -26,9 +26,9 @@ export class PlansService {
   private http = inject(HttpClient);
   private apiUrl = environment.apiUrl;
 
-  getCurrentSubscription(companyId: string): Observable<SubscriptionInterface> {
+  getCurrentSubscription(): Observable<SubscriptionInterface> {
     return this.http
-      .get<ApiResponse<SubscriptionInterface>>(`${this.apiUrl}/companies/${companyId}/subscription`)
+      .get<ApiResponse<SubscriptionInterface>>(`${this.apiUrl}/billing/subscription`)
       .pipe(
         map((response: ApiResponse<SubscriptionInterface>) => {
           if (response.status && response.data) {
@@ -56,11 +56,9 @@ export class PlansService {
     // return this.http.get<ApiResponse<AddonInterface[]>>(`${this.apiUrl}/addons`).pipe(...)
   }
 
-  getSubscriptionSummary(companyId: string): Observable<SubscriptionSummary> {
+  getSubscriptionSummary(): Observable<SubscriptionSummary> {
     return this.http
-      .get<
-        ApiResponse<SubscriptionSummary>
-      >(`${this.apiUrl}/companies/${companyId}/subscription/summary`)
+      .get<ApiResponse<SubscriptionSummary>>(`${this.apiUrl}/billing/subscription/summary`)
       .pipe(
         map((response: ApiResponse<SubscriptionSummary>) => {
           if (response.status && response.data) {

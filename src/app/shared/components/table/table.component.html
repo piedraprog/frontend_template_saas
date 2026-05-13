@@ -1,6 +1,6 @@
 <div
-  [ngClass]="title ? 'md:justify-content-between' : 'md:justify-content-end gap-2'"
-  class="flex flex-column md:flex-row md:align-items-center w-full mb-3"
+  [ngClass]="title ? 'md:justify-between' : 'md:justify-end gap-2'"
+  class="flex flex-col md:flex-row md:items-center w-full mb-3"
 >
   <h5 class="m-0" *ngIf="title">{{ title }}</h5>
   <div class="flex" *ngIf="showSearch">
@@ -16,8 +16,7 @@
   <div class="mt-3 md:mt-0">
     <p-button
       *ngIf="showCreateButton"
-      class="flex flex-row p-menuitem-link text-l p-1"
-      class="justify-content-start"
+      class="flex flex-row justify-start p-menuitem-link text-l p-1"
       severity="info"
       (onClick)="onCreate()"
     >

@@ -10,7 +10,7 @@ import { RegexUtils } from '../../../../shared/utils/regex.utils';
 import { passwordValidator } from '../../../../shared/validators/password-validator';
 import { CaptchaService } from '../../../../shared/services/captcha.service';
 import { NgxTurnstileModule } from 'ngx-turnstile';
-import { environment } from '../../../../../environments/environment.development';
+import { environment } from '../../../../../environments/environment';
 import { AuthService } from '../../../../core/services/auth.service';
 import { RegisterInterface } from '../../../../shared/interfaces/register.interface';
 import { PasswordModule } from 'primeng/password';

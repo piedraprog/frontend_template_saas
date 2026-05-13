@@ -1,0 +1,4 @@
+{
+  "apiUrl": "https://api.tudominio.com",
+  "captcha_key": "tu_site_key_turnstile"
+}

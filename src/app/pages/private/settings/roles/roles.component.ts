@@ -6,6 +6,7 @@ import { Permission } from '../../../../core/models/enums/permission.enum';
 import { PageHeaderComponent } from '../../../../shared/components/page-header/page-header.component';
 import { PrimengModule } from '../../../../shared/modules/primeng.module';
 import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 import { UserService } from '../../../../core/services/user.service';
 
 interface PermissionOption {
@@ -18,7 +19,7 @@ interface PermissionOption {
 @Component({
   selector: 'app-roles',
   standalone: true,
-  imports: [CommonModule, PrimengModule, FormsModule, PageHeaderComponent],
+  imports: [CommonModule, PrimengModule, FormsModule, RouterModule, PageHeaderComponent],
   templateUrl: './roles.component.html',
   styleUrl: './roles.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

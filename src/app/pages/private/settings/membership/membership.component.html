@@ -1,18 +1,27 @@
-<div class="settings-page">
-  <!-- Header con botón volver -->
-  <app-page-header title="Gestión de Membresía" icon="pi pi-crown"></app-page-header>
+<div class="membership-shell">
+  <nav class="membership-toolbar" aria-label="Navegación de configuración">
+    <a routerLink=".." class="membership-toolbar-link">
+      <i class="pi pi-arrow-left" aria-hidden="true"></i>
+      Configuración
+    </a>
+  </nav>
 
-  <!-- Contenido Principal -->
-  <div class="profile-container">
-    <!-- Current Plan Section -->
-    <section class="profile-card">
-      <div class="card-header">
-        <div class="card-title">
-          <i class="pi pi-briefcase"></i>
-          <h3>Plan Actual</h3>
+  <app-page-header title="Gestión de membresía" icon="pi pi-crown"></app-page-header>
+
+  <p class="membership-lead">
+    Consulta tu plan actual, límites de uso y opciones para mejorar cuando integres la pasarela de
+    pagos.
+  </p>
+
+  <div class="membership-cards">
+    <section class="membership-card">
+      <div class="membership-card-head">
+        <div class="membership-card-title">
+          <i class="pi pi-briefcase" aria-hidden="true"></i>
+          <h3>Plan actual</h3>
         </div>
       </div>
-      <div class="card-content">
+      <div class="membership-card-body">
         <app-current-plan-card
           [plan]="currentPlan()"
           [subscription]="currentSubscription()"
@@ -24,15 +33,15 @@
 
     <!-- T5: Addons ocultos hasta integrar pasarela (Stripe/NowPayments). Descomentar cuando esté listo. -->
     <!--
-    <section class="profile-card">
-      <div class="card-header">
-        <div class="card-title">
+    <section class="membership-card">
+      <div class="membership-card-head">
+        <div class="membership-card-title">
           <i class="pi pi-plus-circle"></i>
-          <h3>Complementos Disponibles</h3>
+          <h3>Complementos disponibles</h3>
         </div>
-        <span class="badge">Potencia tu plan</span>
+        <span class="membership-badge">Potencia tu plan</span>
       </div>
-      <div class="card-content">
+      <div class="membership-card-body">
         <app-addon-list
           [addons]="availableAddons()"
           (buy)="handleBuyAddon($event)"
@@ -41,7 +50,6 @@
     </section>
     -->
 
-    <!-- T6: Modal Ver planes obtiene lista desde GET /plans (plansService.getPlans), no desde el summary -->
     <app-view-plans-modal
       [visible]="showViewPlansModal()"
       (visibleChange)="showViewPlansModal.set($event)"

@@ -1,7 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, inject, OnInit } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
-import { SidebarModule } from 'primeng/sidebar';
 import { CardModule } from 'primeng/card';
 import { DividerModule } from 'primeng/divider';
 import { ConfirmationService, MenuItem, PrimeIcons } from 'primeng/api';
@@ -17,9 +16,9 @@ import { UserService } from '../../../core/services/user.service';
 @Component({
   selector: 'app-sidebar',
   standalone: true,
+  host: { class: 'admin-sidebar-host shrink-0' },
   imports: [
     CommonModule,
-    SidebarModule,
     ButtonModule,
     CardModule,
     DividerModule,
@@ -44,7 +43,18 @@ export class SidebarComponent implements OnInit {
   items: MenuItem[] | undefined;
   endItems: MenuItem[] | undefined;
 
+  private tenantIdFromUrl(): string | undefined {
+    const path = this.router.url.split('?')[0] ?? '';
+    const first = path.replace(/^\//, '').split('/').filter(Boolean)[0];
+    return first || undefined;
+  }
+
   ngOnInit() {
+    const tid = this.tenantIdFromUrl();
+    const dash = tid ? ['/', tid, 'dashboard'] : ['/dashboard'];
+    const settingsHome = tid ? ['/', tid, 'settings'] : ['/settings'];
+    const userAdmin = tid ? ['/', tid, 'settings', 'user-admin'] : ['/settings', 'user-admin'];
+
     this.items = [
       {
         separator: true,
@@ -55,11 +65,12 @@ export class SidebarComponent implements OnInit {
             label: 'Dashboard',
             icon: PrimeIcons.CHART_BAR,
             visible: true,
-            routerLink: 'dashboard',
+            routerLink: dash,
           },
           {
-            label: 'Users',
+            label: 'Usuarios',
             icon: PrimeIcons.USER,
+            routerLink: userAdmin,
           },
         ],
       },
@@ -68,19 +79,19 @@ export class SidebarComponent implements OnInit {
         separator: true,
         items: [
           {
-            label: 'Settings',
+            label: 'Configuración',
             icon: PrimeIcons.COG,
-            routerLink: 'settings',
+            routerLink: settingsHome,
           },
           {
-            label: 'Toggle',
+            label: 'Colapsar menú',
             icon: 'pi pi-angle-double-left',
             secondIcon: 'pi pi-angle-double-right',
             command: () => this.toggleSidebar(),
-            tooltip: 'Toggle Sidebar',
+            tooltip: 'Colapsar menú',
           },
           {
-            label: 'Logout',
+            label: 'Cerrar sesión',
             icon: 'pi pi-sign-out',
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             command: ($event: any) => this.logout($event),
@@ -94,12 +105,16 @@ export class SidebarComponent implements OnInit {
     this.isFullDisplay = !this.isFullDisplay;
   }
 
+  onMenuLeafAction(item: MenuItem, event: MouseEvent): void {
+    item.command?.({ originalEvent: event, item });
+  }
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   logout(event: any): void {
     this.confirmationService.confirm({
       target: event.target as EventTarget,
-      message: 'Are you sure that you want to proceed?',
-      header: 'Confirmation',
+      message: '¿Deseas cerrar sesión en esta cuenta?',
+      header: 'Confirmar cierre de sesión',
       icon: 'pi pi-exclamation-triangle',
       acceptIcon: 'none',
       rejectIcon: 'none',
@@ -117,7 +132,8 @@ export class SidebarComponent implements OnInit {
         });
       },
       reject: () => {
-        this.router.navigate(['/dashboard']);
+        const t = this.tenantIdFromUrl();
+        void this.router.navigate(t ? ['/', t, 'dashboard'] : ['/dashboard']);
       },
     });
   }

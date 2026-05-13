@@ -4,9 +4,6 @@
     "angular.ng-template",
     "vivaxy.vscode-conventional-commits",
     "usernamehw.errorlens",
-    "dbaeumer.vscode-eslint",
-    "esbenp.prettier-vscode",
-    "yigitfindikli.primeflexsnippets",
-    "Gruntfuggly.todo-tree"
+    "dbaeumer.vscode-eslint"
   ]
 }

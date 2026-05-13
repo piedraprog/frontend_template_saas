@@ -37,52 +37,62 @@ import { ButtonModule } from 'primeng/button';
     </div>
   `,
   styles: `
+    :host {
+      display: block;
+    }
     .page-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 1rem;
-      background: #ffffff;
-      border-radius: 12px;
-      margin-bottom: 1rem;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      gap: 1rem;
+      padding: 1rem 1.25rem;
+      margin-bottom: 1.25rem;
+      background: linear-gradient(180deg, rgb(255 255 255 / 0.97) 0%, rgb(248 250 252 / 0.98) 100%);
+      border: 1px solid rgb(226 232 240 / 0.95);
+      border-radius: 1rem;
+      box-shadow:
+        0 1px 2px rgb(15 23 42 / 0.06),
+        0 8px 24px rgb(15 23 42 / 0.06);
     }
     .header-left {
       display: flex;
       align-items: center;
       gap: 0.75rem;
+      min-width: 0;
     }
     .back-button {
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 40px;
-      height: 40px;
-      min-width: 40px;
-      min-height: 40px;
-      border-radius: 10px;
-      border: none;
-      background: #f3f4f6;
+      width: 2.75rem;
+      height: 2.75rem;
+      min-width: 2.75rem;
+      min-height: 2.75rem;
+      border-radius: 0.75rem;
+      border: 1px solid rgb(226 232 240 / 0.95);
+      background: rgb(248 250 252 / 0.95);
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition:
+        background 0.18s ease,
+        border-color 0.18s ease,
+        transform 0.12s ease;
       touch-action: manipulation;
       user-select: none;
+      flex-shrink: 0;
       i {
-        font-size: 1.125rem;
-        color: #4b5563;
+        font-size: 1rem;
+        color: #475569;
         pointer-events: none;
       }
       &:hover {
-        background: #e5e7eb;
+        background: #fff;
+        border-color: rgb(var(--p-primary-300, 147 197 253) / 0.85);
         i {
-          color: #1f2937;
+          color: #0f172a;
         }
       }
-      &:active,
-      &:focus {
-        transform: scale(0.95);
-        background: #d1d5db;
-        outline: none;
+      &:active {
+        transform: scale(0.96);
       }
       &:focus-visible {
         outline: 2px solid var(--p-primary-500);
@@ -92,43 +102,44 @@ import { ButtonModule } from 'primeng/button';
     .header-title-wrapper {
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: 0.625rem;
+      min-width: 0;
     }
     .header-icon {
-      font-size: 1.5rem;
-      color: var(--p-primary-500);
+      font-size: 1.375rem;
+      color: var(--p-primary-600, #2563eb);
+      flex-shrink: 0;
     }
     .header-title {
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: #1f2937;
+      font-size: clamp(1.25rem, 2.5vw, 1.5rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: #0f172a;
       margin: 0;
+      line-height: 1.2;
+      overflow-wrap: anywhere;
     }
     .header-actions {
       display: flex;
       align-items: center;
       gap: 0.5rem;
+      flex-shrink: 0;
     }
     @media (max-width: 639px) {
       .page-header {
-        padding: 0.75rem;
-        margin-bottom: 0.75rem;
+        flex-wrap: wrap;
+        padding: 0.875rem 1rem;
+        margin-bottom: 1rem;
       }
-      .header-title {
-        font-size: 1.25rem;
-      }
-      .header-left {
-        gap: 0.5rem;
+      .header-actions {
+        width: 100%;
+        justify-content: flex-end;
       }
       .back-button {
-        width: 44px;
-        height: 44px;
-        min-width: 44px;
-        min-height: 44px;
-        &:active {
-          transform: scale(0.92);
-          background: #d1d5db;
-        }
+        width: 2.875rem;
+        height: 2.875rem;
+        min-width: 2.875rem;
+        min-height: 2.875rem;
       }
     }
   `,

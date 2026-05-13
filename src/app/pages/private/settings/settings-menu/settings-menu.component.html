@@ -1,38 +1,36 @@
-<div class="settings-container">
-  <!-- Header -->
-  <div class="settings-header">
-    <h1 class="settings-title">
-      <i class="pi pi-cog"></i>
-      Configuración
-    </h1>
+<div class="settings-page">
+  <!-- Hero -->
+  <div class="settings-hero">
+    <p class="settings-eyebrow">
+      <i class="pi pi-sliders-h" aria-hidden="true"></i>
+      Centro de control
+    </p>
+    <h1 class="settings-title-display">Configuración</h1>
+    <p class="settings-lead">
+      Ajustes de cuenta, seguridad y avisos. Elige una sección para continuar; los cambios se pueden
+      validar en cada pantalla antes de aplicar políticas en producción.
+    </p>
   </div>
 
-  <!-- Grid de cards -->
+  <!-- Cards -->
   <div class="settings-grid">
     @for (item of settingsItems(); track item.id) {
-      <div
-        class="settings-card"
-        (click)="onItemClick(item)"
-        (keydown.enter)="onItemClick(item)"
-        tabindex="0"
-        role="button"
-        pRipple
-      >
-        <div class="card-icon">
+      <button type="button" class="settings-card" (click)="onItemClick(item)">
+        <div class="card-icon" aria-hidden="true">
           <i [class]="item.icon"></i>
         </div>
         <div class="card-content">
-          <h3 class="card-title">{{ item.title }}</h3>
+          <h2 class="card-title">{{ item.title }}</h2>
           <p class="card-description">{{ item.description }}</p>
         </div>
         <div class="card-arrow">
           @if (isExternalLink(item)) {
             <i class="pi pi-external-link"></i>
           } @else {
-            <i class="pi pi-chevron-right"></i>
+            <i class="pi pi-arrow-right"></i>
           }
         </div>
-      </div>
+      </button>
     }
   </div>
 </div>

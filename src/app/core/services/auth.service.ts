@@ -1,8 +1,8 @@
 import { HttpClient, HttpContext } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { ApiResponse } from '../../shared/interfaces/response.interface';
-import { environment } from '../../../environments/environment.development';
-import { map, Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
+import { map, Observable, tap } from 'rxjs';
 import { LoginInterface, LoginResponseInterface } from '../../shared/interfaces/login.interface';
 import {
   RegisterInterface,
@@ -13,6 +13,20 @@ import { BYPASS_JW_TOKEN } from '../interceptors/auth.interceptor';
 import { UserService } from './user.service';
 import { UserInterface } from '../models/interfaces/user.interface';
 import { ProfileResponseInterface } from '../models/interfaces/profile-response.interface';
+import { SystemRole } from '../models/enums/system-role.enum';
+
+function profileToUser(profile: ProfileResponseInterface): UserInterface {
+  return {
+    id: profile.id,
+    username: profile.username,
+    email: profile.email,
+    companyId: profile.companyId,
+    role: SystemRole.MEMBER,
+    isOwner: false,
+    permissions: typeof profile.role === 'number' ? profile.role : 0,
+    active: true,
+  };
+}
 
 @Injectable({
   providedIn: 'root',
@@ -20,11 +34,8 @@ import { ProfileResponseInterface } from '../models/interfaces/profile-response.
 export class AuthService {
   private userService = inject(UserService);
   private baseUrl = environment.apiUrl;
-
-  constructor(
-    private http: HttpClient,
-    private cookieService: CookieService,
-  ) {}
+  private http = inject(HttpClient);
+  private cookieService = inject(CookieService);
 
   login({ email, password, ip }: LoginInterface): Observable<LoginResponseInterface> {
     const url = `${this.baseUrl}/auth/login`;
@@ -85,17 +96,22 @@ export class AuthService {
       );
   }
 
-  getProfile() {
+  getProfile(): Observable<UserInterface> {
     const url = `${this.baseUrl}/auth/profile`;
     return this.http.get<ApiResponse<ProfileResponseInterface>>(url).pipe(
-      map((response: ApiResponse<UserInterface>) => {
+      map((response: ApiResponse<ProfileResponseInterface>) => {
         if (response.status && response.data) {
-          this.userService.setUserData(response.data);
-        } else {
-          throw new Error(response.message || 'Error desconocido en el login');
+          return profileToUser(response.data);
         }
+        throw new Error(response.message || 'Error desconocido al cargar perfil');
       }),
+      tap((user) => this.userService.setUserData(user)),
     );
+  }
+
+  /** Recarga perfil en memoria tras cambiar permisos del usuario actual. */
+  refreshPermissions(): Observable<void> {
+    return this.getProfile().pipe(map(() => undefined));
   }
 
   refreshToken(refreshToken: string): Observable<{ accessToken: string; refreshToken: string }> {
