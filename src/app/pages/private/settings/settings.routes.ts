@@ -26,7 +26,7 @@ export const SETTINGS_ROUTES: Routes = [
       {
         path: 'roles',
         canActivate: [permissionsGuard],
-        data: { permission: Permission.ROLES_VIEW },
+        data: { permission: Permission.ROLES_MANAGE },
         loadComponent: () => import('./roles/roles.component'),
       },
       {
@@ -34,6 +34,11 @@ export const SETTINGS_ROUTES: Routes = [
         canActivate: [ownerGuard],
         loadComponent: () =>
           import('./membership/membership.component').then((m) => m.MembershipComponent),
+      },
+      {
+        path: 'company',
+        canActivate: [ownerGuard],
+        loadComponent: () => import('./company-settings/company-settings.component'),
       },
       {
         path: 'notification',

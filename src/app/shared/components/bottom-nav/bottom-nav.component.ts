@@ -8,6 +8,7 @@ import {
   ViewChild,
   signal,
 } from '@angular/core';
+import { finalize } from 'rxjs';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { BadgeModule } from 'primeng/badge';
@@ -16,14 +17,14 @@ import { AvatarModule } from 'primeng/avatar';
 import { PopoverModule, Popover } from 'primeng/popover';
 import { UserService } from '../../../core/services/user.service';
 import { NotificationsPanelComponent } from '../notifications-panel/notifications-panel.component';
-import { AuthService } from '../../../core/services/auth/auth.service';
+import { AuthService } from '../../../core/services/auth.service';
 import { NotificationsService } from '../../../core/services/notifications/notifications.service';
 
 export interface BottomNavItem {
   id: string;
   label: string;
   icon: string;
-  route?: string;
+  route?: string | unknown[];
   badge?: number;
   action?: () => void;
 }
@@ -112,16 +113,21 @@ export class BottomNavComponent {
 
   isActive(item: BottomNavItem): boolean {
     if (!item.route) return false;
-    return this.router.url.includes(item.route);
+    const route = Array.isArray(item.route) ? item.route.join('/') : item.route;
+    return this.router.url.includes(route.replace(/^\//, ''));
   }
 
   onLogout(): void {
     this.closeProfile();
-    this.authService.logOut().subscribe({
-      next: () => {
-        this.notificationsService.disconnectWebSocket();
-        this.router.navigate(['/login']);
-      },
-    });
+    this.authService
+      .logOut()
+      .pipe(
+        finalize(() => {
+          this.notificationsService.disconnectWebSocket();
+          this.authService.removeTokens();
+          void this.router.navigateByUrl('/login', { replaceUrl: true });
+        }),
+      )
+      .subscribe();
   }
 }

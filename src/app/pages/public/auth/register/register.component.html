@@ -1,3 +1,5 @@
+<p-toast position="top-right" styleClass="app-toast-stack" [life]="5200" />
+
 <app-auth-card
   [title]="'Crear cuenta'"
   [subheader]="'Registra tu empresa y prepara el acceso inicial al panel administrativo.'"
@@ -209,7 +211,8 @@
       severity="contrast"
       styleClass="auth-button text-sm"
       class="block w-full"
-      [disabled]="!disableButton"
+      [loading]="isSubmitting"
+      [disabled]="!disableButton || isSubmitting"
     />
 
     <p class="text-center text-sm text-slate-500">

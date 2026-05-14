@@ -1,19 +1,11 @@
 <div class="roles-shell">
-  <nav class="roles-toolbar" aria-label="Navegación de configuración">
-    <a routerLink=".." class="roles-toolbar-link">
-      <i class="pi pi-arrow-left" aria-hidden="true"></i>
-      Configuración
-    </a>
-  </nav>
-
-  <app-page-header title="Roles y permisos" icon="pi pi-shield" [showBack]="false">
+  <app-page-header
+    title="Roles y permisos"
+    icon="pi pi-shield"
+    subtitle="Define conjuntos de permisos reutilizables para asignarlos al equipo."
+  >
     <p-button label="Nuevo rol" icon="pi pi-plus" (onClick)="openCreate()" id="btn-create-role" />
   </app-page-header>
-
-  <p class="roles-lead">
-    Define conjuntos de permisos reutilizables para tu equipo. Los cambios aquí complementan la
-    gestión avanzada en usuarios.
-  </p>
 
   @if (isLoading()) {
     <div class="roles-loading">

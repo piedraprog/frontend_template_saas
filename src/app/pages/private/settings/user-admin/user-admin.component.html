@@ -1,16 +1,11 @@
 <div class="user-admin-container">
-  <nav class="admin-toolbar" aria-label="Navegación del equipo">
-    <a routerLink=".." class="admin-toolbar-link">
-      <i class="pi pi-arrow-left" aria-hidden="true"></i>
-      Configuración
-    </a>
-  </nav>
-
-  <!-- Fixed Header -->
-  <header class="header">
-    <h1 class="header-title">Equipo</h1>
-    <p-button label="Crear Nuevo Usuario" icon="pi pi-plus" (click)="openNew()" />
-  </header>
+  <app-page-header
+    title="Equipo"
+    icon="pi pi-users"
+    subtitle="Gestiona usuarios, roles y permisos de acceso del equipo."
+  >
+    <p-button label="Nuevo usuario" icon="pi pi-plus" (click)="openNew()" />
+  </app-page-header>
 
   <!-- Two-Panel Layout -->
   <div class="content-wrapper">
@@ -22,7 +17,7 @@
             type="text"
             pInputText
             placeholder="Buscar usuarios..."
-            [(ngModel)]="searchQuery"
+            [ngModel]="searchQuery()"
             (ngModelChange)="onSearchUsers($event)"
             class="w-full"
           />
@@ -409,7 +404,8 @@
 
 <!-- Role Editor Dialog -->
 <p-dialog
-  [(visible)]="roleDialogVisible"
+  [visible]="roleDialogVisible()"
+  (visibleChange)="roleDialogVisible.set($event)"
   [style]="{ width: '600px', maxWidth: '95vw' }"
   [header]="selectedRoleForEdit() ? 'Editar Rol' : 'Crear Nuevo Rol'"
   [modal]="true"
@@ -516,4 +512,4 @@
   </ng-template>
 </p-dialog>
 
-<!-- Confirmation Dialog -->
+<p-confirmDialog appendTo="body" />

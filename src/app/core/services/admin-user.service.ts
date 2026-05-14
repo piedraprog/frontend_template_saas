@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { HttpClient } from '@angular/common/http';
 import { computed, inject, Injectable, signal } from '@angular/core';
-import { Observable, map, tap } from 'rxjs';
+import { Observable, finalize, map, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { ApiResponse } from '../../shared/interfaces/response.interface';
 import { UserInterface } from '../models/interfaces/user.interface';
@@ -82,8 +82,8 @@ export class AdminUserService {
             hasNext: paginatedResponse.hasNext,
             hasPrev: paginatedResponse.hasPrev,
           });
-          this.loadingSignal.set(false);
         }),
+        finalize(() => this.loadingSignal.set(false)),
       );
   }
 
@@ -107,8 +107,8 @@ export class AdminUserService {
       tap((newUser) => {
         const currentUsers = this.#usersSignal();
         this.#usersSignal.set([...currentUsers, newUser]);
-        this.loadingSignal.set(false);
       }),
+      finalize(() => this.loadingSignal.set(false)),
     );
   }
 
@@ -130,8 +130,8 @@ export class AdminUserService {
           user.id === updatedUser.id ? updatedUser : user,
         );
         this.#usersSignal.set(updatedUsers);
-        this.loadingSignal.set(false);
       }),
+      finalize(() => this.loadingSignal.set(false)),
     );
   }
 
@@ -153,8 +153,8 @@ export class AdminUserService {
           user.id === updatedUser.id ? updatedUser : user,
         );
         this.#usersSignal.set(updatedUsers);
-        this.loadingSignal.set(false);
       }),
+      finalize(() => this.loadingSignal.set(false)),
     );
   }
 
@@ -174,8 +174,8 @@ export class AdminUserService {
         const currentUsers = this.#usersSignal();
         const filteredUsers = currentUsers.filter((user) => user.id !== id);
         this.#usersSignal.set(filteredUsers);
-        this.loadingSignal.set(false);
       }),
+      finalize(() => this.loadingSignal.set(false)),
     );
   }
 
@@ -197,8 +197,8 @@ export class AdminUserService {
           user.id === updatedUser.id ? updatedUser : user,
         );
         this.#usersSignal.set(updatedUsers);
-        this.loadingSignal.set(false);
       }),
+      finalize(() => this.loadingSignal.set(false)),
     );
   }
 }

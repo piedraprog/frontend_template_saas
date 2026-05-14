@@ -1,7 +1,16 @@
 <div class="notifications-container">
+  <p-toast position="top-right" [life]="4000" />
   <div class="notifications-header">
     <h3>Notificaciones</h3>
     <div class="header-actions">
+      <p-button
+        label="Alertas del navegador"
+        icon="pi pi-desktop"
+        (onClick)="requestDesktopNotifications()"
+        severity="secondary"
+        [outlined]="true"
+        styleClass="p-button-sm"
+      ></p-button>
       @if (unreadCount() > 0) {
         <p-button
           label="Marcar todas como leídas"

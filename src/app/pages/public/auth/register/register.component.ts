@@ -15,6 +15,9 @@ import { AuthService } from '../../../../core/services/auth.service';
 import { RegisterInterface } from '../../../../shared/interfaces/register.interface';
 import { PasswordModule } from 'primeng/password';
 import { CheckboxModule } from 'primeng/checkbox';
+import { MessageService } from 'primeng/api';
+import { ToastModule } from 'primeng/toast';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-register',
@@ -29,16 +32,19 @@ import { CheckboxModule } from 'primeng/checkbox';
     NgxTurnstileModule,
     PasswordModule,
     CheckboxModule,
+    ToastModule,
   ],
-  providers: [],
+  providers: [MessageService],
   templateUrl: './register.component.html',
 })
 export class RegisterComponent {
   private captchaService = inject(CaptchaService);
   private authService = inject(AuthService);
   private router = inject(Router);
+  private messageService = inject(MessageService);
 
   disableButton = false;
+  isSubmitting = false;
   passwordVisible = false;
   confirmPasswordVisible = false;
 
@@ -131,7 +137,9 @@ export class RegisterComponent {
   }
 
   register() {
-    if (this.registerForm.valid) {
+    this.registerForm.markAllAsTouched();
+
+    if (this.registerForm.valid && this.disableButton && !this.isSubmitting) {
       const data: RegisterInterface = {
         username: this.registerForm.value.username!,
         email: this.registerForm.value.email!,
@@ -140,15 +148,22 @@ export class RegisterComponent {
         company: this.registerForm.value.corporation!,
         termsCondition: this.registerForm.value.termsCondition!,
       };
-      this.authService.register(data).subscribe({
-        next: () => {
-          // redirect to dashboard
-          this.router.navigate(['/success']);
-        },
-        error: (error) => {
-          console.log(error);
-        },
-      });
+      this.isSubmitting = true;
+      this.authService
+        .register(data)
+        .pipe(finalize(() => (this.isSubmitting = false)))
+        .subscribe({
+          next: () => {
+            this.router.navigate(['/success']);
+          },
+          error: (error) => {
+            this.messageService.add({
+              severity: 'error',
+              summary: 'No se pudo crear la cuenta',
+              detail: error?.error?.message ?? error?.message ?? 'Intenta nuevamente.',
+            });
+          },
+        });
     }
   }
 

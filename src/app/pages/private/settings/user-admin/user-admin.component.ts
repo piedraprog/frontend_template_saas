@@ -26,6 +26,8 @@ import { ConfirmationService } from 'primeng/api';
 import { AuthService } from '../../../../core/services/auth.service';
 import { UserService } from '../../../../core/services/user.service';
 import { RouterModule } from '@angular/router';
+import { finalize } from 'rxjs';
+import { PageHeaderComponent } from '../../../../shared/components/page-header/page-header.component';
 
 import { PermissionEditorComponent } from './components/permission-editor/permission-editor.component';
 import { UserCreateModalComponent } from './components/user-create-modal/user-create-modal.component';
@@ -41,10 +43,12 @@ import { UserCreateModalComponent } from './components/user-create-modal/user-cr
     PrimengModule,
     PermissionEditorComponent,
     UserCreateModalComponent,
+    PageHeaderComponent,
   ],
   templateUrl: './user-admin.component.html',
   styleUrl: './user-admin.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  providers: [ConfirmationService],
 })
 export default class UserAdminComponent implements OnInit {
   // Inyección de servicios
@@ -209,8 +213,8 @@ export default class UserAdminComponent implements OnInit {
     );
   });
 
-  // State for expand/collapse groups
-  expandedGroups = signal<Set<string>>(new Set());
+  /** Grupos colapsados manualmente; vacío = todos expandidos por defecto. */
+  collapsedRoleGroups = signal<Set<string>>(new Set());
 
   // Profile editing
   profileForm = this.fb.group({
@@ -441,23 +445,21 @@ export default class UserAdminComponent implements OnInit {
     return null;
   }
 
-  // Role group expand/collapse
+  // Role group expand/collapse (por defecto todos expandidos)
   isExpanded(roleId: string | null): boolean {
     const key = roleId?.toString() ?? 'custom';
-    return this.expandedGroups().has(key);
+    return !this.collapsedRoleGroups().has(key);
   }
 
   toggleRoleGroup(roleId: string | null) {
     const key = roleId?.toString() ?? 'custom';
-    const expanded = new Set(this.expandedGroups());
-
-    if (expanded.has(key)) {
-      expanded.delete(key);
+    const collapsed = new Set(this.collapsedRoleGroups());
+    if (collapsed.has(key)) {
+      collapsed.delete(key);
     } else {
-      expanded.add(key);
+      collapsed.add(key);
     }
-
-    this.expandedGroups.set(expanded);
+    this.collapsedRoleGroups.set(collapsed);
   }
 
   editRole(event: Event, roleId: string) {
@@ -515,33 +517,37 @@ export default class UserAdminComponent implements OnInit {
 
     if (selectedRole) {
       // Update
-      this.rolesService.updateRole(selectedRole.id, roleData).subscribe({
-        next: () => {
-          this.toastService.success('Rol actualizado correctamente');
-          this.closeRoleDialog();
-          this.loadRoles(); // Reload roles to update view
-          this.loadUsers(); // Reload users to reflect changes
-        },
-        error: (err: unknown) => {
-          console.error('Error updating role', err);
-          this.toastService.error('Error al actualizar el rol');
-          this.isSavingRole.set(false);
-        },
-      });
+      this.rolesService
+        .updateRole(selectedRole.id, roleData)
+        .pipe(finalize(() => this.isSavingRole.set(false)))
+        .subscribe({
+          next: () => {
+            this.toastService.success('Rol actualizado correctamente');
+            this.closeRoleDialog();
+            this.loadRoles(); // Reload roles to update view
+            this.loadUsers(); // Reload users to reflect changes
+          },
+          error: (err: unknown) => {
+            console.error('Error updating role', err);
+            this.toastService.error('Error al actualizar el rol');
+          },
+        });
     } else {
       // Create
-      this.rolesService.createRole(roleData).subscribe({
-        next: () => {
-          this.toastService.success('Rol creado correctamente');
-          this.closeRoleDialog();
-          this.loadRoles();
-        },
-        error: (err: unknown) => {
-          console.error('Error creating role', err);
-          this.toastService.error('Error al crear el rol');
-          this.isSavingRole.set(false);
-        },
-      });
+      this.rolesService
+        .createRole(roleData)
+        .pipe(finalize(() => this.isSavingRole.set(false)))
+        .subscribe({
+          next: () => {
+            this.toastService.success('Rol creado correctamente');
+            this.closeRoleDialog();
+            this.loadRoles();
+          },
+          error: (err: unknown) => {
+            console.error('Error creating role', err);
+            this.toastService.error('Error al crear el rol');
+          },
+        });
     }
   }
 
@@ -558,19 +564,21 @@ export default class UserAdminComponent implements OnInit {
       acceptButtonStyleClass: 'p-button-danger',
       accept: () => {
         this.isSavingRole.set(true);
-        this.rolesService.deleteRole(selectedRole.id).subscribe({
-          next: () => {
-            this.toastService.success('Rol eliminado correctamente');
-            this.closeRoleDialog();
-            this.loadRoles();
-            this.loadUsers();
-          },
-          error: (err: unknown) => {
-            console.error('Error deleting role', err);
-            this.toastService.error('Error al eliminar el rol');
-            this.isSavingRole.set(false);
-          },
-        });
+        this.rolesService
+          .deleteRole(selectedRole.id)
+          .pipe(finalize(() => this.isSavingRole.set(false)))
+          .subscribe({
+            next: () => {
+              this.toastService.success('Rol eliminado correctamente');
+              this.closeRoleDialog();
+              this.loadRoles();
+              this.loadUsers();
+            },
+            error: (err: unknown) => {
+              console.error('Error deleting role', err);
+              this.toastService.error('Error al eliminar el rol');
+            },
+          });
       },
     });
   }
@@ -625,31 +633,32 @@ export default class UserAdminComponent implements OnInit {
       customRoleId: formValue.customRoleId ?? undefined,
     };
 
-    this.adminUserService.updateUser(user.id, updateData).subscribe({
-      next: (updatedUser: UserInterface) => {
-        console.log('Updated User from backend:', updatedUser);
-        this.isSavingProfile.set(false);
-        this.profileSaveSuccess.set(true);
-        this.isEditingProfile.set(false);
-        setTimeout(() => this.profileSaveSuccess.set(false), 2000);
-        this.toastService.success('Perfil actualizado correctamente');
+    this.adminUserService
+      .updateUser(user.id, updateData)
+      .pipe(finalize(() => this.isSavingProfile.set(false)))
+      .subscribe({
+        next: (updatedUser: UserInterface) => {
+          console.log('Updated User from backend:', updatedUser);
+          this.profileSaveSuccess.set(true);
+          this.isEditingProfile.set(false);
+          setTimeout(() => this.profileSaveSuccess.set(false), 2000);
+          this.toastService.success('Perfil actualizado correctamente');
 
-        // Update the local view with the new user data to prevent stale state
-        if (this.selectedUserForView()?.id === updatedUser.id) {
-          this.selectedUserForView.set({
-            ...updatedUser,
-            customRoleId: formValue.customRoleId ?? undefined,
-            roleName: updatedUser.roleName,
-          });
-        }
+          // Update the local view with the new user data to prevent stale state
+          if (this.selectedUserForView()?.id === updatedUser.id) {
+            this.selectedUserForView.set({
+              ...updatedUser,
+              customRoleId: formValue.customRoleId ?? undefined,
+              roleName: updatedUser.roleName,
+            });
+          }
 
-        this.loadUsers();
-      },
-      error: (error: unknown) => {
-        this.isSavingProfile.set(false);
-        this.profileSaveError.set('Error al actualizar el perfil');
-        console.error('Error updating user profile:', error);
-      },
-    });
+          this.loadUsers();
+        },
+        error: (error: unknown) => {
+          this.profileSaveError.set('Error al actualizar el perfil');
+          console.error('Error updating user profile:', error);
+        },
+      });
   }
 }

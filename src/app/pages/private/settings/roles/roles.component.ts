@@ -42,15 +42,15 @@ export default class RolesComponent implements OnInit {
   readonly permissionOptions: PermissionOption[] = [
     { key: 'USERS_VIEW', label: 'Ver usuarios', value: Permission.USERS_VIEW, group: 'Usuarios' },
     {
-      key: 'USERS_CREATE',
-      label: 'Crear usuarios',
-      value: Permission.USERS_CREATE,
+      key: 'USERS_INVITE',
+      label: 'Invitar usuarios',
+      value: Permission.USERS_INVITE,
       group: 'Usuarios',
     },
     {
-      key: 'USERS_UPDATE',
+      key: 'USERS_EDIT',
       label: 'Editar usuarios',
-      value: Permission.USERS_UPDATE,
+      value: Permission.USERS_EDIT,
       group: 'Usuarios',
     },
     {
@@ -59,13 +59,10 @@ export default class RolesComponent implements OnInit {
       value: Permission.USERS_DELETE,
       group: 'Usuarios',
     },
-    { key: 'ROLES_VIEW', label: 'Ver roles', value: Permission.ROLES_VIEW, group: 'Roles' },
-    { key: 'ROLES_CREATE', label: 'Crear roles', value: Permission.ROLES_CREATE, group: 'Roles' },
-    { key: 'ROLES_UPDATE', label: 'Editar roles', value: Permission.ROLES_UPDATE, group: 'Roles' },
     {
-      key: 'ROLES_DELETE',
-      label: 'Eliminar roles',
-      value: Permission.ROLES_DELETE,
+      key: 'ROLES_MANAGE',
+      label: 'Gestionar roles',
+      value: Permission.ROLES_MANAGE,
       group: 'Roles',
     },
     {

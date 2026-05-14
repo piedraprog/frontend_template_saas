@@ -1,5 +1,7 @@
+<p-toast position="top-center" [life]="6000" />
+
 <p-dialog
-  header="Ver planes"
+  header="Planes y pago"
   [visible]="visible"
   (visibleChange)="visibleChange.emit($event)"
   (onHide)="onHide()"
@@ -17,7 +19,7 @@
       <p class="text-red-600 m-0">{{ error() }}</p>
     } @else {
       <p class="text-slate-500 mb-3">
-        Planes disponibles. Próximamente: integración con pasarela de pago para cambiar de plan.
+        Elige un plan. Se abrirá Stripe Checkout para completar el pago con tarjeta.
       </p>
       <div class="plans-list">
         @for (plan of plans(); track plan.id) {
@@ -38,6 +40,16 @@
                   <p class="text-sm text-slate-500 m-0 mt-1">${{ yearly }} / año</p>
                 }
               </div>
+            </div>
+            <div class="mt-3 flex justify-end">
+              <p-button
+                label="Suscribirse con Stripe"
+                icon="pi pi-credit-card"
+                size="small"
+                (onClick)="subscribeToPlan(plan)"
+                [loading]="checkoutPlanId() === plan.id"
+                [disabled]="checkoutPlanId() !== null && checkoutPlanId() !== plan.id"
+              />
             </div>
           </div>
         }

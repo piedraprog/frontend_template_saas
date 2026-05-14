@@ -17,18 +17,21 @@ import {
 } from '../../../core/services/notifications/notifications.service';
 import { NotificationInterface } from '../../../core/models/interfaces/notification.interface';
 import { Subscription, forkJoin, of } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { catchError, filter } from 'rxjs/operators';
 import { PrimengModule } from '../../modules/primeng.module';
+import { MessageService } from 'primeng/api';
+import { ToastModule } from 'primeng/toast';
 
 @Component({
   selector: 'app-notifications-panel',
-  imports: [CommonModule, PrimengModule],
+  imports: [CommonModule, PrimengModule, ToastModule],
   templateUrl: './notifications-panel.component.html',
   styleUrl: './notifications-panel.component.scss',
 })
 export class NotificationsPanelComponent implements OnInit, OnChanges, OnDestroy {
   private notificationsService = inject(NotificationsService);
   private router = inject(Router);
+  private messageService = inject(MessageService);
   private subscriptions: Subscription[] = [];
 
   @Input() visible: boolean = false;
@@ -49,6 +52,9 @@ export class NotificationsPanelComponent implements OnInit, OnChanges, OnDestroy
       this.notificationsService.unreadCount$.subscribe((count) => {
         this.unreadCount.set(count);
       }),
+      this.notificationsService.newNotification$
+        .pipe(filter((n): n is NotificationInterface => n != null))
+        .subscribe((n) => this.showBrowserNotification(n)),
     );
   }
 
@@ -172,4 +178,56 @@ export class NotificationsPanelComponent implements OnInit, OnChanges, OnDestroy
   }
 
   @Output() closePanel = new EventEmitter<void>();
+
+  requestDesktopNotifications(): void {
+    if (typeof globalThis === 'undefined' || !('Notification' in globalThis)) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Navegador',
+        detail: 'Tu navegador no soporta notificaciones de escritorio.',
+      });
+      return;
+    }
+    const perm = globalThis.Notification.permission;
+    if (perm === 'granted') {
+      this.messageService.add({
+        severity: 'info',
+        summary: 'Notificaciones',
+        detail: 'Ya tienes activadas las alertas del navegador.',
+      });
+      return;
+    }
+    if (perm === 'denied') {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Notificaciones',
+        detail:
+          'Los avisos del navegador están bloqueados. Actívalos en la configuración del sitio.',
+      });
+      return;
+    }
+    void globalThis.Notification.requestPermission().then((result) => {
+      if (result === 'granted') {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Notificaciones',
+          detail: 'Recibirás avisos del sistema cuando lleguen notificaciones nuevas.',
+        });
+      }
+    });
+  }
+
+  private showBrowserNotification(n: NotificationInterface): void {
+    if (typeof globalThis === 'undefined' || !('Notification' in globalThis)) {
+      return;
+    }
+    if (globalThis.Notification.permission !== 'granted') {
+      return;
+    }
+    try {
+      new globalThis.Notification(n.title, { body: n.message, tag: n.id });
+    } catch {
+      /* noop */
+    }
+  }
 }

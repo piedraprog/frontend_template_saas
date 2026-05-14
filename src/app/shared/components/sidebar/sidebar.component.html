@@ -1,74 +1,162 @@
-<p-menu
-  [model]="items"
-  [styleClass]="
-    isFullDisplay
-      ? 'w-[16rem] h-screen shrink-0 transition-[width] duration-200 ease-out'
-      : 'w-[5.25rem] h-screen shrink-0 transition-[width] duration-200 ease-out'
-  "
->
-  <ng-template pTemplate="start">
-    <button
+<aside class="admin-sidebar" [class.admin-sidebar-collapsed]="!isFullDisplay()">
+  <nav class="admin-sidebar-nav" aria-label="Navegación principal">
+    @for (item of mainMenuItems(); track item.id) {
+      @if (item.routerLink) {
+        <a
+          pRipple
+          [routerLink]="item.routerLink"
+          routerLinkActive="admin-sidebar-item-active"
+          class="admin-sidebar-item"
+          [class.admin-sidebar-item-collapsed]="!isFullDisplay()"
+          [title]="!isFullDisplay() ? item.label : ''"
+        >
+          <i [class]="item.icon"></i>
+          @if (isFullDisplay()) {
+            <span class="admin-sidebar-label">{{ item.label }}</span>
+            @if (item.module) {
+              <i class="pi pi-angle-right admin-sidebar-chevron"></i>
+            }
+          }
+        </a>
+      } @else {
+        <button
+          pRipple
+          type="button"
+          class="admin-sidebar-item admin-sidebar-button"
+          [class.admin-sidebar-item-collapsed]="!isFullDisplay()"
+          [class.admin-sidebar-notification-button]="item.id === 'notifications'"
+          [title]="!isFullDisplay() ? item.label : ''"
+          (click)="item.command?.($event)"
+        >
+          <span class="admin-sidebar-icon-wrap">
+            <i [class]="item.icon"></i>
+            @if (!isFullDisplay() && item.badge) {
+              <span class="admin-sidebar-dot"></span>
+            }
+          </span>
+          @if (isFullDisplay()) {
+            <span class="admin-sidebar-label">{{ item.label }}</span>
+            @if (item.badge) {
+              <span class="admin-sidebar-badge">{{ item.badge }}</span>
+            }
+          }
+        </button>
+      }
+    }
+  </nav>
+
+  <div class="admin-sidebar-footer">
+    @if (quickActionsItems().length > 0) {
+      <div class="admin-sidebar-quick">
+        @for (item of quickActionsItems(); track item.id) {
+          @if (item.routerLink) {
+            <a
+              pRipple
+              [routerLink]="item.routerLink"
+              class="admin-sidebar-item admin-sidebar-quick-item"
+              [class.admin-sidebar-item-collapsed]="!isFullDisplay()"
+              [title]="!isFullDisplay() ? item.label : ''"
+            >
+              <i [class]="item.icon"></i>
+              @if (isFullDisplay()) {
+                <span class="admin-sidebar-label">{{ item.label }}</span>
+              }
+            </a>
+          } @else {
+            <button
+              pRipple
+              type="button"
+              class="admin-sidebar-item admin-sidebar-button admin-sidebar-quick-item"
+              [class.admin-sidebar-item-collapsed]="!isFullDisplay()"
+              [title]="!isFullDisplay() ? item.label : ''"
+              (click)="item.command?.($event)"
+            >
+              <i [class]="item.icon"></i>
+              @if (isFullDisplay()) {
+                <span class="admin-sidebar-label">{{ item.label }}</span>
+              }
+            </button>
+          }
+        }
+      </div>
+    }
+
+    <div class="admin-sidebar-footer-actions">
+      @for (item of footerMenuItems(); track item.id) {
+        @if (item.routerLink) {
+          <a
+            pRipple
+            [routerLink]="item.routerLink"
+            routerLinkActive="admin-sidebar-item-active"
+            class="admin-sidebar-item"
+            [class.admin-sidebar-item-danger]="item.severity === 'danger'"
+            [class.admin-sidebar-item-collapsed]="!isFullDisplay()"
+            [title]="!isFullDisplay() ? item.label : ''"
+          >
+            <i [class]="item.icon"></i>
+            @if (isFullDisplay()) {
+              <span class="admin-sidebar-label">{{ item.label }}</span>
+            }
+          </a>
+        } @else {
+          <button
+            pRipple
+            type="button"
+            class="admin-sidebar-item admin-sidebar-button"
+            [class.admin-sidebar-item-danger]="item.severity === 'danger'"
+            [class.admin-sidebar-item-collapsed]="!isFullDisplay()"
+            [title]="!isFullDisplay() ? item.label : ''"
+            (click)="item.command?.($event)"
+          >
+            <i [class]="item.icon"></i>
+            @if (isFullDisplay()) {
+              <span class="admin-sidebar-label">{{ item.label }}</span>
+            }
+          </button>
+        }
+      }
+    </div>
+
+    <a
       pRipple
-      type="button"
-      class="relative overflow-hidden w-full p-link flex items-center p-3 pl-3 mx-2 text-slate-800 hover:bg-slate-100/90 rounded-xl transition-colors duration-200"
-      [class]="isFullDisplay ? '' : 'justify-center mx-auto w-11 h-11 p-0'"
+      [routerLink]="routeFor('settings', 'profile')"
+      routerLinkActive="admin-sidebar-profile-active"
+      class="admin-sidebar-profile"
+      [class.admin-sidebar-profile-collapsed]="!isFullDisplay()"
+      [title]="!isFullDisplay() ? profileData().email : ''"
     >
       <p-avatar
-        image="https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png"
-        class="mr-2"
+        [label]="(profileData().username.charAt(0) || 'U').toUpperCase()"
         shape="circle"
+        styleClass="admin-sidebar-avatar"
       />
-
-      @if (isFullDisplay) {
-        <span class="inline-flex flex-col min-w-0 text-left ml-3">
-          <span class="font-bold text-slate-900 truncate">{{ profileData().username }}</span>
-          <span class="text-xs text-slate-500 truncate">{{ profileData().email }}</span>
-        </span>
+      @if (isFullDisplay()) {
+        <div class="min-w-0 flex-1">
+          <p class="truncate text-sm font-bold text-slate-950">{{ profileData().username }}</p>
+          <p class="truncate text-xs font-medium text-slate-500">{{ profileData().email }}</p>
+        </div>
       }
-    </button>
-  </ng-template>
-  <ng-template pTemplate="item" let-item>
-    @if (item.routerLink; as rl) {
-      <a
-        pRipple
-        class="flex flex-row items-center min-h-[2.65rem] p-menuitem-link text-sm font-medium text-slate-700"
-        [class.justify-center]="!isFullDisplay"
-        [class.justify-between]="isFullDisplay"
-        [routerLink]="rl"
-      >
-        @if (isFullDisplay) {
-          <span [class]="item.icon" style="font-size: 1.2rem"></span>
-          <span class="ml-2 flex-1 truncate transition-opacity duration-500 ease-out">
-            {{ item?.label }}
-          </span>
-          <span class="ml-auto pi pi-angle-right text-slate-400 text-xs shrink-0"></span>
-        } @else {
-          <span
-            [class]="!isFullDisplay && item.secondIcon ? item.secondIcon : item.icon"
-            style="font-size: 1.2rem"
-          ></span>
-        }
-      </a>
-    } @else {
-      <button
-        type="button"
-        pRipple
-        class="flex flex-row items-center min-h-[2.65rem] w-full border-none bg-transparent cursor-pointer text-left font-inherit text-sm font-medium text-slate-700 p-menuitem-link"
-        [class.justify-center]="!isFullDisplay"
-        [class.justify-between]="isFullDisplay"
-        (click)="onMenuLeafAction(item, $event)"
-      >
-        @if (isFullDisplay) {
-          <span [class]="item.icon || item.secondIcon" style="font-size: 1.2rem"></span>
-          <span class="ml-2 flex-1 truncate">{{ item?.label }}</span>
-        } @else {
-          <span
-            [class]="!isFullDisplay && item.secondIcon ? item.secondIcon : item.icon"
-            style="font-size: 1.2rem"
-          ></span>
-        }
-      </button>
-    }
-  </ng-template>
-</p-menu>
+    </a>
+  </div>
+</aside>
+
+@if (showNotificationsPanel()) {
+  <button
+    type="button"
+    class="admin-sidebar-overlay"
+    aria-label="Cerrar notificaciones"
+    (click)="closeNotificationsPanel()"
+  ></button>
+  <div
+    #notificationsPanelContainer
+    class="admin-sidebar-notifications"
+    [class.admin-sidebar-notifications-collapsed]="!isFullDisplay()"
+  >
+    <app-notifications-panel
+      [visible]="showNotificationsPanel()"
+      (closePanel)="closeNotificationsPanel()"
+    />
+  </div>
+}
+
 <p-confirmDialog />

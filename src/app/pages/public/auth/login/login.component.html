@@ -69,11 +69,6 @@
       </div>
     </div>
 
-    <div class="flex items-center justify-between gap-4 text-sm">
-      <span class="text-slate-500">¿Olvidaste tu contraseña?</span>
-      <a routerLink="/recovery" class="auth-link">Recuperar contraseña</a>
-    </div>
-
     <div class="grid gap-3 pt-2 sm:grid-cols-2">
       <a
         routerLink="/register"
@@ -87,6 +82,8 @@
         severity="contrast"
         styleClass="auth-button text-sm"
         class="w-full"
+        [loading]="isSubmitting"
+        [disabled]="isSubmitting"
       />
     </div>
   </form>

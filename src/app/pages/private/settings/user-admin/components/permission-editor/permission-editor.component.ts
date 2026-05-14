@@ -46,8 +46,7 @@ export class PermissionEditorComponent implements OnInit {
   localPermissions = signal<number>(0);
 
   /**
-   * Grupos de permisos SaaS base.
-   * Extender en proyectos específicos añadiendo más grupos.
+   * Grupos alineados con `Permission` del backend (misma máscara de bits).
    */
   permissionGroups = signal<PermissionGroup[]>([
     {
@@ -58,42 +57,35 @@ export class PermissionEditorComponent implements OnInit {
         {
           label: 'Ver usuarios',
           value: Permission.USERS_VIEW,
-          description: 'Ver la lista de usuarios',
+          description: 'Ver la lista de usuarios del equipo',
         },
         {
-          label: 'Crear usuarios',
-          value: Permission.USERS_CREATE,
-          description: 'Crear nuevos usuarios',
+          label: 'Invitar usuarios',
+          value: Permission.USERS_INVITE,
+          description: 'Invitar nuevos miembros al equipo',
         },
         {
           label: 'Editar usuarios',
-          value: Permission.USERS_UPDATE,
-          description: 'Editar usuarios existentes',
+          value: Permission.USERS_EDIT,
+          description: 'Editar datos de usuarios existentes',
         },
         {
           label: 'Eliminar usuarios',
           value: Permission.USERS_DELETE,
-          description: 'Eliminar usuarios',
+          description: 'Eliminar usuarios del equipo',
         },
       ],
     },
     {
       name: 'Roles',
-      description: 'Gestión de roles y permisos',
+      description: 'Crear, editar y eliminar roles personalizados',
       icon: 'pi pi-shield',
       permissions: [
         {
-          label: 'Ver roles',
-          value: Permission.ROLES_VIEW,
-          description: 'Ver los roles del equipo',
+          label: 'Gestionar roles',
+          value: Permission.ROLES_MANAGE,
+          description: 'Administrar roles y sus permisos',
         },
-        { label: 'Crear roles', value: Permission.ROLES_CREATE, description: 'Crear nuevos roles' },
-        {
-          label: 'Editar roles',
-          value: Permission.ROLES_UPDATE,
-          description: 'Editar roles existentes',
-        },
-        { label: 'Eliminar roles', value: Permission.ROLES_DELETE, description: 'Eliminar roles' },
       ],
     },
     {
@@ -110,13 +102,13 @@ export class PermissionEditorComponent implements OnInit {
     },
     {
       name: 'Notificaciones',
-      description: 'Acceso al panel de notificaciones',
+      description: 'Panel de notificaciones del equipo',
       icon: 'pi pi-bell',
       permissions: [
         {
           label: 'Ver notificaciones',
           value: Permission.NOTIFICATIONS_VIEW,
-          description: 'Ver notificaciones',
+          description: 'Ver y gestionar notificaciones',
         },
       ],
     },

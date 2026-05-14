@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import {
   HttpEvent,
   HttpInterceptor,
@@ -11,71 +11,71 @@ import { catchError, switchMap } from 'rxjs/operators';
 import { AuthService } from '../services/auth.service';
 import { Router } from '@angular/router';
 import { CookieService } from 'ngx-cookie-service';
+import {
+  SESSION_ACCESS_TOKEN,
+  SESSION_COOKIE_PATH,
+  SESSION_REFRESH_TOKEN,
+} from '../constants/session-cookies';
 
 @Injectable()
 export class DIErrorInterceptor implements HttpInterceptor {
-  private isRefreshing = false; // Variable para evitar múltiples refresh
-  private readonly excludedUrls = ['/auth/login', '/auth/register'];
+  private isRefreshing = false;
 
-  constructor(
-    private authService: AuthService,
-    private router: Router,
-    private cookieService: CookieService,
-  ) {}
+  /** No intentar refrescar token en estas rutas (evita bucles y “revivir” sesión al cerrar). */
+  private readonly excludedUrls = [
+    '/auth/login',
+    '/auth/register',
+    '/auth/logout',
+    '/auth/refresh',
+  ];
+
+  private authService = inject(AuthService);
+  private router = inject(Router);
+  private cookieService = inject(CookieService);
 
   intercept(req: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
-    // Comprobar si la URL está en la lista de rutas excluidas
     if (this.excludedUrls.some((url) => req.url.includes(url))) {
-      return next.handle(req); // Si está en las excluidas, continuar sin interceptar
+      return next.handle(req);
     }
 
-    // Verificar si la solicitud ya tiene el token actualizado (para evitar ciclos)
-    if (
-      req.headers.has('Authorization') &&
-      req.headers.get('Authorization')?.startsWith('Bearer ')
-    ) {
-      // Verificar si ya hemos manejado la solicitud
-      if (req.headers.has('X-Skip-Interceptor')) {
-        return next.handle(req); // Pasar la solicitud sin interceptarla
-      }
-    }
-    console.log('interceptor');
     return next.handle(req).pipe(
       catchError((error: HttpErrorResponse) => {
-        if (error.status === 401 && !this.isRefreshing) {
-          // Si la solicitud falla con un 401 y no estamos en proceso de refrescar
-          this.isRefreshing = true; // Establecer el flag de refresh
-
-          const refreshToken = this.cookieService.get('refreshToken');
-          return this.authService.refreshToken(refreshToken).pipe(
-            switchMap((response) => {
-              // Refresco exitoso, actualizar el token
-              this.cookieService.set('accessToken', response.accessToken);
-              this.cookieService.set('refreshToken', response.refreshToken);
-
-              // Clonar la solicitud original con el nuevo token
-              const clonedRequest = req.clone({
-                setHeaders: {
-                  Authorization: `Bearer ${this.cookieService.get('accessToken')}`,
-                  'X-Skip-Interceptor': 'true', // Añadir el flag para evitar el loop
-                },
-              });
-
-              this.isRefreshing = false; // Resetear el flag de refresh
-
-              return next.handle(clonedRequest); // Reintentar la solicitud con el nuevo token
-            }),
-            catchError((refreshError) => {
-              // El refresh falló, limpiar la sesión y redirigir
-              this.authService.removeTokens();
-              this.isRefreshing = false; // Resetear el flag de refresh
-              this.router.navigate(['/login']);
-              return throwError(() => refreshError);
-            }),
-          );
-        } else {
+        if (error.status !== 401 || this.isRefreshing) {
           return throwError(() => error);
         }
+
+        const refreshToken = this.cookieService.get(SESSION_REFRESH_TOKEN)?.trim();
+        if (!refreshToken) {
+          this.authService.removeTokens();
+          void this.router.navigateByUrl('/login', { replaceUrl: true });
+          return throwError(() => error);
+        }
+
+        this.isRefreshing = true;
+
+        return this.authService.refreshToken(refreshToken).pipe(
+          switchMap((response) => {
+            const cookieOpts = { path: SESSION_COOKIE_PATH };
+            this.cookieService.set(SESSION_ACCESS_TOKEN, response.accessToken, cookieOpts);
+            this.cookieService.set(SESSION_REFRESH_TOKEN, response.refreshToken, cookieOpts);
+
+            const clonedRequest = req.clone({
+              setHeaders: {
+                Authorization: `Bearer ${this.cookieService.get(SESSION_ACCESS_TOKEN)}`,
+                'X-Skip-Interceptor': 'true',
+              },
+            });
+
+            this.isRefreshing = false;
+            return next.handle(clonedRequest);
+          }),
+          catchError((refreshError) => {
+            this.authService.removeTokens();
+            this.isRefreshing = false;
+            void this.router.navigateByUrl('/login', { replaceUrl: true });
+            return throwError(() => refreshError);
+          }),
+        );
       }),
     );
   }

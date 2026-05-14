@@ -1,14 +1,14 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { LoaderDialogComponent } from './shared/components/loader-dialog/loader-dialog.component';
+import { LoadingIndicatorComponent } from './shared/components/loading-indicator/loading-indicator.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, LoaderDialogComponent],
+  imports: [RouterOutlet, LoadingIndicatorComponent],
   template: `
     <div class="min-h-screen">
-      <app-loader-dialog />
+      <app-loading-indicator />
       <router-outlet />
     </div>
   `,

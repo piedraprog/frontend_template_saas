@@ -28,7 +28,12 @@ import { ButtonModule } from 'primeng/button';
           @if (icon()) {
             <i [class]="icon()" class="header-icon"></i>
           }
-          <h1 class="header-title">{{ title() }}</h1>
+          <div class="header-copy">
+            <h1 class="header-title">{{ title() }}</h1>
+            @if (subtitle()) {
+              <p class="header-subtitle">{{ subtitle() }}</p>
+            }
+          </div>
         </div>
       </div>
       <div class="header-actions">
@@ -49,7 +54,7 @@ import { ButtonModule } from 'primeng/button';
       margin-bottom: 1.25rem;
       background: linear-gradient(180deg, rgb(255 255 255 / 0.97) 0%, rgb(248 250 252 / 0.98) 100%);
       border: 1px solid rgb(226 232 240 / 0.95);
-      border-radius: 1rem;
+      border-radius: 0.5rem;
       box-shadow:
         0 1px 2px rgb(15 23 42 / 0.06),
         0 8px 24px rgb(15 23 42 / 0.06);
@@ -68,7 +73,7 @@ import { ButtonModule } from 'primeng/button';
       height: 2.75rem;
       min-width: 2.75rem;
       min-height: 2.75rem;
-      border-radius: 0.75rem;
+      border-radius: 0.5rem;
       border: 1px solid rgb(226 232 240 / 0.95);
       background: rgb(248 250 252 / 0.95);
       cursor: pointer;
@@ -101,7 +106,7 @@ import { ButtonModule } from 'primeng/button';
     }
     .header-title-wrapper {
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       gap: 0.625rem;
       min-width: 0;
     }
@@ -109,15 +114,26 @@ import { ButtonModule } from 'primeng/button';
       font-size: 1.375rem;
       color: var(--p-primary-600, #2563eb);
       flex-shrink: 0;
+      margin-top: 0.125rem;
+    }
+    .header-copy {
+      min-width: 0;
     }
     .header-title {
-      font-size: clamp(1.25rem, 2.5vw, 1.5rem);
+      font-size: clamp(1.2rem, 2vw, 1.45rem);
       font-weight: 800;
-      letter-spacing: -0.02em;
+      letter-spacing: 0;
       color: #0f172a;
       margin: 0;
       line-height: 1.2;
       overflow-wrap: anywhere;
+    }
+    .header-subtitle {
+      max-width: 48rem;
+      margin: 0.3rem 0 0;
+      color: #64748b;
+      font-size: 0.9rem;
+      line-height: 1.45;
     }
     .header-actions {
       display: flex;
@@ -150,6 +166,7 @@ export class PageHeaderComponent {
   private router = inject(Router);
 
   title = input.required<string>();
+  subtitle = input<string>('');
   icon = input<string>('');
   showBack = input<boolean>(true);
   backRoute = input<string>('');

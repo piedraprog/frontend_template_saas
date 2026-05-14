@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
+import { PageHeaderComponent } from '../../../../shared/components/page-header/page-header.component';
 
 interface NotificationPrefRow {
   readonly id: string;
@@ -14,7 +15,7 @@ interface NotificationPrefRow {
 @Component({
   selector: 'app-notification-config',
   standalone: true,
-  imports: [RouterModule, FormsModule, ToggleSwitchModule],
+  imports: [RouterModule, FormsModule, ToggleSwitchModule, PageHeaderComponent],
   templateUrl: './notification-config.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

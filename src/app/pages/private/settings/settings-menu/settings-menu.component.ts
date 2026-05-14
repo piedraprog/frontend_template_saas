@@ -63,7 +63,7 @@ export default class SettingsMenuComponent {
       description: 'Crear y gestionar roles de usuario',
       icon: 'pi pi-shield',
       route: 'roles',
-      permission: Permission.ROLES_VIEW,
+      permission: Permission.ROLES_MANAGE,
     },
     {
       id: 'membership',
@@ -71,6 +71,14 @@ export default class SettingsMenuComponent {
       description: 'Gestionar suscripción y complementos',
       icon: 'pi pi-wallet',
       route: 'membership',
+      ownerOnly: true,
+    },
+    {
+      id: 'company',
+      title: 'Datos de la empresa',
+      description: 'Nombre y logotipo de la organización',
+      icon: 'pi pi-building',
+      route: 'company',
       ownerOnly: true,
     },
     {

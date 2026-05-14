@@ -10,6 +10,13 @@ import {
 } from '../../shared/interfaces/register.interface';
 import { CookieService } from 'ngx-cookie-service';
 import { BYPASS_JW_TOKEN } from '../interceptors/auth.interceptor';
+import {
+  SESSION_ACCESS_TOKEN,
+  SESSION_COOKIE_PATH,
+  SESSION_REFRESH_TOKEN,
+  SESSION_USER_ID,
+} from '../constants/session-cookies';
+import { LOADING_BEHAVIOR, LOADING_SCOPE } from '../interceptors/loader.interceptor';
 import { UserService } from './user.service';
 import { UserInterface } from '../models/interfaces/user.interface';
 import { ProfileResponseInterface } from '../models/interfaces/profile-response.interface';
@@ -22,9 +29,12 @@ function profileToUser(profile: ProfileResponseInterface): UserInterface {
     email: profile.email,
     companyId: profile.companyId,
     role: SystemRole.MEMBER,
-    isOwner: false,
-    permissions: typeof profile.role === 'number' ? profile.role : 0,
+    isOwner: profile.isOwner === true,
+    permissions: profile.permissions ?? 0,
     active: true,
+    customRoleId: profile.customRoleId,
+    customPermissions: profile.customPermissions ?? undefined,
+    avatar: profile.avatar,
   };
 }
 
@@ -77,14 +87,21 @@ export class AuthService {
     const url = `${this.baseUrl}/auth/register`;
 
     return this.http
-      .post<ApiResponse<RegisterResponseInterface>>(url, {
-        company,
-        username,
-        email,
-        password,
-        captchaToken,
-        termsCondition,
-      })
+      .post<ApiResponse<RegisterResponseInterface>>(
+        url,
+        {
+          company,
+          username,
+          email,
+          password,
+          captchaToken,
+          termsCondition,
+        },
+        {
+          context: new HttpContext().set(BYPASS_JW_TOKEN, true),
+          headers: { Platform: 'web' },
+        },
+      )
       .pipe(
         map((response: ApiResponse<unknown>) => {
           if (response.status && response.data) {
@@ -98,7 +115,11 @@ export class AuthService {
 
   getProfile(): Observable<UserInterface> {
     const url = `${this.baseUrl}/auth/profile`;
-    return this.http.get<ApiResponse<ProfileResponseInterface>>(url).pipe(
+    const context = new HttpContext()
+      .set(LOADING_BEHAVIOR, 'page')
+      .set(LOADING_SCOPE, 'auth:profile');
+
+    return this.http.get<ApiResponse<ProfileResponseInterface>>(url, { context }).pipe(
       map((response: ApiResponse<ProfileResponseInterface>) => {
         if (response.status && response.data) {
           return profileToUser(response.data);
@@ -130,13 +151,20 @@ export class AuthService {
   }
 
   logOut(): Observable<{ message: string }> {
-    const refreshToken = this.cookieService.get('refreshToken');
+    const refreshToken = this.cookieService.get(SESSION_REFRESH_TOKEN);
     const url = `${this.baseUrl}/auth/logout`;
+    const context = new HttpContext()
+      .set(LOADING_BEHAVIOR, 'blocking')
+      .set(LOADING_SCOPE, 'auth:logout');
 
     return this.http
-      .post<ApiResponse<{ message: string }>>(url, {
-        refreshToken,
-      })
+      .post<ApiResponse<{ message: string }>>(
+        url,
+        {
+          refreshToken,
+        },
+        { context },
+      )
       .pipe(
         map((response: ApiResponse<{ message: string }>) => {
           if (response.status && response.data) {
@@ -148,8 +176,13 @@ export class AuthService {
       );
   }
 
-  removeTokens() {
-    this.cookieService.delete('accessToken');
-    this.cookieService.delete('refreshToken');
+  /**
+   * Borra cookies de sesión con el mismo path que en login y limpia usuario en memoria.
+   */
+  removeTokens(): void {
+    this.cookieService.delete(SESSION_ACCESS_TOKEN, SESSION_COOKIE_PATH);
+    this.cookieService.delete(SESSION_REFRESH_TOKEN, SESSION_COOKIE_PATH);
+    this.cookieService.delete(SESSION_USER_ID, SESSION_COOKIE_PATH);
+    this.userService.clearSession();
   }
 }

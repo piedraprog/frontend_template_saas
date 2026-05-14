@@ -26,6 +26,20 @@ export class UserService {
     this.#userData.set(user); // Guarda los datos en el signal
   }
 
+  /** Limpia el usuario en memoria (p. ej. tras logout o sesión inválida). */
+  clearSession(): void {
+    this.#userData.set({
+      id: '',
+      username: '',
+      email: '',
+      role: SystemRole.MEMBER,
+      companyId: '',
+      isOwner: false,
+      permissions: 0,
+      active: false,
+    });
+  }
+
   getUserData() {
     return this.#userData; // Retorna el signal
   }

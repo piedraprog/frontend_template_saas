@@ -56,6 +56,29 @@ export class PlansService {
     // return this.http.get<ApiResponse<AddonInterface[]>>(`${this.apiUrl}/addons`).pipe(...)
   }
 
+  /** Sesión Stripe Checkout para suscribirse a un plan (`gateway`: stripe | nowpayments). */
+  createSubscriptionCheckout(
+    planId: string,
+    gateway: 'stripe' | 'nowpayments' = 'stripe',
+  ): Observable<{ id: string; url: string | null }> {
+    return this.http
+      .post<ApiResponse<{ id: string; url: string | null }>>(
+        `${this.apiUrl}/subscriptions/checkout`,
+        {
+          planId,
+          gateway,
+        },
+      )
+      .pipe(
+        map((response) => {
+          if (response.status && response.data) {
+            return response.data;
+          }
+          throw new Error(response.message ?? 'No se pudo iniciar el pago');
+        }),
+      );
+  }
+
   getSubscriptionSummary(): Observable<SubscriptionSummary> {
     return this.http
       .get<ApiResponse<SubscriptionSummary>>(`${this.apiUrl}/billing/subscription/summary`)

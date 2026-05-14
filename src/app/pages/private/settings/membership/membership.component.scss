@@ -3,45 +3,10 @@
 }
 
 .membership-shell {
-  max-width: 56rem;
+  width: 100%;
+  max-width: 64rem;
   margin: 0 auto;
   padding-bottom: 2.5rem;
-}
-
-.membership-toolbar {
-  margin-bottom: 0.35rem;
-}
-
-.membership-toolbar-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  font-size: 0.8125rem;
-  font-weight: 600;
-  color: #64748b;
-  text-decoration: none;
-  transition: color 0.15s ease;
-
-  i {
-    font-size: 0.75rem;
-  }
-
-  &:hover {
-    color: #0f172a;
-  }
-
-  &:focus-visible {
-    outline: 2px solid var(--p-primary-500);
-    outline-offset: 2px;
-    border-radius: 0.35rem;
-  }
-}
-
-.membership-lead {
-  margin: -0.15rem 0 1.35rem;
-  font-size: 0.9375rem;
-  line-height: 1.55;
-  color: #475569;
 }
 
 .membership-cards {
@@ -53,7 +18,7 @@
 
 .membership-card {
   overflow: hidden;
-  border-radius: 1rem;
+  border-radius: 0.5rem;
   border: 1px solid rgb(226 232 240 / 0.95);
   background: linear-gradient(180deg, rgb(255 255 255 / 0.98) 0%, rgb(248 250 252 / 0.96) 100%);
   box-shadow:

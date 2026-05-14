@@ -22,6 +22,7 @@ export class PermissionService {
   has(permission: Permission): boolean {
     if (this.isOwner()) return true;
     const mask = this.userPermissions();
+    if (mask === -1) return true;
     return (mask & permission) === permission;
   }
 

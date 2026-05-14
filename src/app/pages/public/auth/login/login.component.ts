@@ -13,6 +13,13 @@ import { PasswordModule } from 'primeng/password';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { HttpErrorResponse } from '@angular/common/http';
+import { finalize } from 'rxjs';
+import {
+  SESSION_ACCESS_TOKEN,
+  SESSION_COOKIE_PATH,
+  SESSION_REFRESH_TOKEN,
+  SESSION_USER_ID,
+} from '../../../../core/constants/session-cookies';
 
 @Component({
   selector: 'app-login',
@@ -38,6 +45,7 @@ export class LoginComponent implements OnInit {
   private messageService = inject(MessageService);
 
   passwordVisible = false;
+  isSubmitting = false;
   ip: string = '';
 
   ngOnInit(): void {
@@ -55,31 +63,37 @@ export class LoginComponent implements OnInit {
   );
 
   login() {
-    if (this.loginForm.valid) {
+    this.loginForm.markAllAsTouched();
+
+    if (this.loginForm.valid && !this.isSubmitting) {
       const data: LoginInterface = {
         email: this.loginForm.value.email!,
         password: this.loginForm.value.password!,
         ip: this.ip,
       };
 
-      this.authService.login(data).subscribe({
-        next: (response) => {
-          this.cookieService.set('accessToken', response.accessToken);
-          this.cookieService.set('refreshToken', response.refreshToken);
-          this.cookieService.set('userId', response.userId);
+      this.isSubmitting = true;
+      this.authService
+        .login(data)
+        .pipe(finalize(() => (this.isSubmitting = false)))
+        .subscribe({
+          next: (response) => {
+            const cookieOpts = { path: SESSION_COOKIE_PATH };
+            this.cookieService.set(SESSION_ACCESS_TOKEN, response.accessToken, cookieOpts);
+            this.cookieService.set(SESSION_REFRESH_TOKEN, response.refreshToken, cookieOpts);
+            this.cookieService.set(SESSION_USER_ID, response.userId, cookieOpts);
 
-          // redirect to dashboard
-          this.router.navigate([`/${response.userId}/dashboard`]);
-        },
-        error: (error: HttpErrorResponse) => {
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: error.error.message,
-          });
-          this.loginForm.reset();
-        },
-      });
+            this.router.navigate([`/${response.userId}/dashboard`]);
+          },
+          error: (error: HttpErrorResponse) => {
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: error.error?.message ?? 'No se pudo iniciar sesión.',
+            });
+            this.loginForm.reset();
+          },
+        });
     }
   }
 

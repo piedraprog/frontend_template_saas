@@ -1,5 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { CookieService } from 'ngx-cookie-service';
+import { SESSION_ACCESS_TOKEN } from '../../constants/session-cookies';
 
 /** Payload mínimo del access JWT (auth Nest / passport-jwt). */
 export interface AccessTokenPayload {
@@ -16,7 +17,7 @@ export class TokenService {
   private readonly cookieService = inject(CookieService);
 
   getAccessToken(): string {
-    return this.cookieService.get('accessToken') ?? '';
+    return this.cookieService.get(SESSION_ACCESS_TOKEN) ?? '';
   }
 
   private parsePayload(): AccessTokenPayload | null {
