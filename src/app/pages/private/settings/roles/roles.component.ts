@@ -1,4 +1,12 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  input,
+  OnInit,
+  signal,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RolesService } from '../../../../core/services/roles/roles.service';
 import { RoleInterface } from '../../../../core/models/interfaces/role.interface';
@@ -8,6 +16,7 @@ import { PrimengModule } from '../../../../shared/modules/primeng.module';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { UserService } from '../../../../core/services/user.service';
+import { UserInterface } from '../../../../core/models/interfaces/user.interface';
 
 interface PermissionOption {
   key: string;
@@ -29,6 +38,8 @@ export default class RolesComponent implements OnInit {
   private userService = inject(UserService);
 
   roles = signal<RoleInterface[]>([]);
+  users = input<UserInterface[]>([]);
+  embedded = input(false);
   isLoading = signal<boolean>(false);
   showCreateDialog = signal<boolean>(false);
   showEditDialog = signal<boolean>(false);
@@ -38,6 +49,15 @@ export default class RolesComponent implements OnInit {
   newRolePermissions: number = 0;
 
   companyId = '';
+
+  assignedCountByRole = computed(() => {
+    const counts = new Map<string, number>();
+    for (const user of this.users()) {
+      if (!user.customRoleId) continue;
+      counts.set(user.customRoleId, (counts.get(user.customRoleId) ?? 0) + 1);
+    }
+    return counts;
+  });
 
   readonly permissionOptions: PermissionOption[] = [
     { key: 'USERS_VIEW', label: 'Ver usuarios', value: Permission.USERS_VIEW, group: 'Usuarios' },
@@ -108,6 +128,10 @@ export default class RolesComponent implements OnInit {
   permissionCount(mask: number): number {
     if (mask === -1) return this.permissionOptions.length;
     return this.permissionOptions.filter((p) => this.hasPermission(mask, p.value)).length;
+  }
+
+  assignedCount(roleId: string): number {
+    return this.assignedCountByRole().get(roleId) ?? 0;
   }
 
   openCreate(): void {

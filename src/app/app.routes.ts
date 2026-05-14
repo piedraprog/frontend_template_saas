@@ -1,16 +1,44 @@
 import { Routes } from '@angular/router';
-import { authGuard } from './core/guards/auth.guard';
 import { sessionGuard } from './core/guards/session.guard';
 
+/**
+ * Rutas sin `companyId` (ni otro id) en la URL.
+ * El contexto de organización va en JWT + cabecera `X-Company-ID` (ver `auth.interceptor.ts`).
+ */
 export const routes: Routes = [
   {
-    path: '',
-    loadChildren: () => import('./pages/public/public.routes').then((m) => m.PUBLIC_ROUTES),
-    canActivate: [sessionGuard],
+    path: 'terms-conditions',
+    loadComponent: () =>
+      import('./pages/public/terms-conditions/terms-conditions.component').then(
+        (m) => m.TermsConditionsComponent,
+      ),
   },
   {
-    path: ':id',
+    path: 'login',
+    canActivate: [sessionGuard],
+    loadComponent: () =>
+      import('./pages/public/auth/login/login.component').then((m) => m.LoginComponent),
+  },
+  {
+    path: 'register',
+    canActivate: [sessionGuard],
+    loadComponent: () =>
+      import('./pages/public/auth/register/register.component').then((m) => m.RegisterComponent),
+  },
+  {
+    path: 'success',
+    loadComponent: () =>
+      import('./pages/public/auth/success-register/success-register.component').then(
+        (m) => m.SuccessRegisterComponent,
+      ),
+  },
+  {
+    path: '',
+    pathMatch: 'full',
+    redirectTo: 'dashboard',
+  },
+  {
+    path: '',
     loadChildren: () => import('./pages/private/private.routes').then((m) => m.ADMIN_ROUTES),
-    canActivate: [authGuard],
   },
 ];

@@ -83,7 +83,7 @@ export class LoginComponent implements OnInit {
             this.cookieService.set(SESSION_REFRESH_TOKEN, response.refreshToken, cookieOpts);
             this.cookieService.set(SESSION_USER_ID, response.userId, cookieOpts);
 
-            this.router.navigate([`/${response.userId}/dashboard`]);
+            this.router.navigate(['/dashboard']);
           },
           error: (error: HttpErrorResponse) => {
             this.messageService.add({

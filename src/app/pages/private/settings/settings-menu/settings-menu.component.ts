@@ -51,19 +51,11 @@ export default class SettingsMenuComponent {
     },
     {
       id: 'user-admin',
-      title: 'Gestión de Usuarios',
-      description: 'Administrar usuarios de la compañía',
+      title: 'Equipo y permisos',
+      description: 'Usuarios, roles y permisos de acceso',
       icon: 'pi pi-users',
       route: 'user-admin',
       permission: Permission.USERS_VIEW,
-    },
-    {
-      id: 'roles',
-      title: 'Roles y Permisos',
-      description: 'Crear y gestionar roles de usuario',
-      icon: 'pi pi-shield',
-      route: 'roles',
-      permission: Permission.ROLES_MANAGE,
     },
     {
       id: 'membership',

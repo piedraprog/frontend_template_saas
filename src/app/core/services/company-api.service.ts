@@ -30,12 +30,12 @@ export class CompanyApiService {
     );
   }
 
-  updateCompany(
-    companyId: string,
-    body: Pick<CompanyInterface, 'name' | 'logo'>,
-  ): Observable<CompanyInterface> {
+  /**
+   * Actualiza la empresa del usuario autenticado (companyId en JWT; sin id en path).
+   */
+  updateMyCompany(body: Pick<CompanyInterface, 'name' | 'logo'>): Observable<CompanyInterface> {
     return this.http
-      .put<ApiResponse<CompanyServiceEnvelope>>(`${this.baseUrl}/companies/${companyId}`, body)
+      .put<ApiResponse<CompanyServiceEnvelope>>(`${this.baseUrl}/companies/me`, body)
       .pipe(
         map((res) => {
           const envelope = res.data;

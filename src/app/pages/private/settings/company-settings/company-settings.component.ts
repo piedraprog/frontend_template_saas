@@ -60,11 +60,10 @@ export default class CompanySettingsComponent implements OnInit {
   save(): void {
     this.form.markAllAsTouched();
     if (this.form.invalid) return;
-    const id = this.companyId();
-    if (!id) return;
+    if (!this.companyId()) return;
     const { name, logo } = this.form.getRawValue();
     this.saving.set(true);
-    this.companyApi.updateCompany(id, { name: name.trim(), logo: logo.trim() }).subscribe({
+    this.companyApi.updateMyCompany({ name: name.trim(), logo: logo.trim() }).subscribe({
       next: () => {
         this.saving.set(false);
         this.messageService.add({

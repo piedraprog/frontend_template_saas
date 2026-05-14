@@ -26,8 +26,8 @@ export const SETTINGS_ROUTES: Routes = [
       {
         path: 'roles',
         canActivate: [permissionsGuard],
-        data: { permission: Permission.ROLES_MANAGE },
-        loadComponent: () => import('./roles/roles.component'),
+        data: { permission: Permission.ROLES_MANAGE, defaultTab: 'roles' },
+        loadComponent: () => import('./user-admin/user-admin.component'),
       },
       {
         path: 'membership',

@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { authGuard } from '../../core/guards/auth.guard';
 import { userResolver } from '../../core/resolvers/user.resolver';
 import BaseLayoutComponent from '../../shared/components/base-layout/base-layout.component';
 
@@ -6,6 +7,7 @@ export const ADMIN_ROUTES: Routes = [
   {
     path: '',
     component: BaseLayoutComponent,
+    canActivate: [authGuard],
     resolve: { userId: userResolver },
     children: [
       {

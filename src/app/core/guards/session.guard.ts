@@ -11,7 +11,7 @@ export const sessionGuard: CanActivateFn = () => {
   const userId = cookieService.get(SESSION_USER_ID)?.trim();
 
   if (accessToken && userId) {
-    void router.navigateByUrl(`/${userId}/dashboard`, { replaceUrl: true });
+    void router.navigateByUrl('/dashboard', { replaceUrl: true });
     return false;
   }
 

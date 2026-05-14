@@ -1,11 +1,21 @@
-<div class="roles-shell">
-  <app-page-header
-    title="Roles y permisos"
-    icon="pi pi-shield"
-    subtitle="Define conjuntos de permisos reutilizables para asignarlos al equipo."
-  >
-    <p-button label="Nuevo rol" icon="pi pi-plus" (onClick)="openCreate()" id="btn-create-role" />
-  </app-page-header>
+<div class="roles-shell" [class.roles-shell-embedded]="embedded()">
+  @if (!embedded()) {
+    <app-page-header
+      title="Roles y permisos"
+      icon="pi pi-shield"
+      subtitle="Define conjuntos de permisos reutilizables para asignarlos al equipo."
+    >
+      <p-button label="Nuevo rol" icon="pi pi-plus" (onClick)="openCreate()" id="btn-create-role" />
+    </app-page-header>
+  } @else {
+    <div class="roles-embedded-header">
+      <div>
+        <h2>Roles</h2>
+        <p>Define políticas reutilizables y revisa cuántos usuarios están asignados.</p>
+      </div>
+      <p-button label="Nuevo rol" icon="pi pi-plus" (onClick)="openCreate()" id="btn-create-role" />
+    </div>
+  }
 
   @if (isLoading()) {
     <div class="roles-loading">
@@ -35,7 +45,10 @@
               @if (role.isDefault) {
                 <span class="role-chip role-chip-system">Predeterminado</span>
               }
-              <p class="role-card-meta">{{ permissionCount(role.permissions) }} permisos activos</p>
+              <p class="role-card-meta">
+                {{ permissionCount(role.permissions) }} permisos activos ·
+                {{ assignedCount(role.id) }} usuarios asignados
+              </p>
             </div>
           </div>
           <div class="role-card-actions">
@@ -88,7 +101,7 @@
       </div>
 
       <div class="dialog-field">
-        <label>Permisos</label>
+        <span class="dialog-label">Permisos</span>
         <div class="perm-panel">
           @for (perm of permissionOptions; track perm.key) {
             <div class="perm-row">
@@ -144,7 +157,7 @@
       </div>
 
       <div class="dialog-field">
-        <label>Permisos</label>
+        <span class="dialog-label">Permisos</span>
         <div class="perm-panel">
           @for (perm of permissionOptions; track perm.key) {
             <div class="perm-row">

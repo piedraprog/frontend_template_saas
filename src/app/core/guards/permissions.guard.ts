@@ -53,6 +53,6 @@ export const permissionsGuard: CanActivateFn = (route) => {
     requiredPermissionsAny,
     requiredPermissionsAll,
   });
-  router.navigate(['/']);
+  router.navigate(['', 'dashboard']);
   return false;
 };

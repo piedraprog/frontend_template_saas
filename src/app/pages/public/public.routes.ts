@@ -1,6 +1,9 @@
 import { Routes } from '@angular/router';
-import { TermsConditionsComponent } from './terms-conditions/terms-conditions.component';
 
+/**
+ * Agrupación lazy opcional de pantallas públicas.
+ * Las rutas activas del admin están en `app.routes.ts` (sin id de compañía en la URL).
+ */
 export const PUBLIC_ROUTES: Routes = [
   {
     path: '',
@@ -8,6 +11,9 @@ export const PUBLIC_ROUTES: Routes = [
   },
   {
     path: 'terms-conditions',
-    component: TermsConditionsComponent,
+    loadComponent: () =>
+      import('./terms-conditions/terms-conditions.component').then(
+        (m) => m.TermsConditionsComponent,
+      ),
   },
 ];

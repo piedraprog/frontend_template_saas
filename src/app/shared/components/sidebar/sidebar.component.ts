@@ -109,14 +109,9 @@ export class SidebarComponent implements OnInit, OnDestroy {
     this.subscriptions.forEach((sub) => sub.unsubscribe());
   }
 
-  private tenantIdFromUrl(): string | undefined {
-    const path = this.router.url.split('?')[0] ?? '';
-    return path.replace(/^\//, '').split('/').filter(Boolean)[0] || undefined;
-  }
-
-  routeFor(...segments: string[]): unknown[] {
-    const tenantId = this.tenantIdFromUrl();
-    return tenantId ? ['/', tenantId, ...segments] : ['/', ...segments];
+  /** Rutas absolutas desde la raíz (sin `companyId` ni id en la URL; contexto en JWT + `X-Company-ID`). */
+  routeFor(...segments: string[]): string[] {
+    return ['', ...segments];
   }
 
   private can(permission?: Permission): boolean {

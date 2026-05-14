@@ -22,12 +22,12 @@ import { ToastService } from '../../../../shared/services/toast.service';
 import { PrimengModule } from '../../../../shared/modules/primeng.module';
 import { UserInterface } from '../../../../core/models/interfaces/user.interface';
 import { SystemRole } from '../../../../core/models/enums/system-role.enum';
-import { ConfirmationService } from 'primeng/api';
 import { AuthService } from '../../../../core/services/auth.service';
 import { UserService } from '../../../../core/services/user.service';
-import { RouterModule } from '@angular/router';
+import { ActivatedRoute, RouterModule } from '@angular/router';
 import { finalize } from 'rxjs';
 import { PageHeaderComponent } from '../../../../shared/components/page-header/page-header.component';
+import RolesComponent from '../roles/roles.component';
 
 import { PermissionEditorComponent } from './components/permission-editor/permission-editor.component';
 import { UserCreateModalComponent } from './components/user-create-modal/user-create-modal.component';
@@ -44,20 +44,20 @@ import { UserCreateModalComponent } from './components/user-create-modal/user-cr
     PermissionEditorComponent,
     UserCreateModalComponent,
     PageHeaderComponent,
+    RolesComponent,
   ],
   templateUrl: './user-admin.component.html',
   styleUrl: './user-admin.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [ConfirmationService],
 })
 export default class UserAdminComponent implements OnInit {
   // Inyección de servicios
   fb = inject(FormBuilder);
   adminUserService = inject(AdminUserService);
   toastService = inject(ToastService);
-  confirmationService = inject(ConfirmationService);
   tokenService = inject(TokenService);
   rolesService = inject(RolesService);
+  private route = inject(ActivatedRoute);
   private authService = inject(AuthService);
   private userService = inject(UserService);
 
@@ -71,6 +71,7 @@ export default class UserAdminComponent implements OnInit {
   selectedUserForView = signal<UserInterface | null>(null); // For main panel display
   showPermissionEditor = signal<boolean>(false);
   searchQuery = signal<string>('');
+  activeAccessTab = signal<string>('users');
 
   // Getter para two-way binding del diálogo
   get permissionEditorVisible(): boolean {
@@ -81,6 +82,10 @@ export default class UserAdminComponent implements OnInit {
     this.showPermissionEditor.set(value);
   }
 
+  setAccessTab(value: string | number | undefined | null): void {
+    this.activeAccessTab.set(String(value ?? 'users'));
+  }
+
   // Propiedades locales
   userForm!: FormGroup;
   availableRoles = signal<CustomRole[]>([]);
@@ -89,16 +94,6 @@ export default class UserAdminComponent implements OnInit {
   showCreateModal = signal<boolean>(false); // New control for create modal
   editUserDialog: boolean = false;
   deleteUserDialog: boolean = false;
-
-  // Role Management
-  roleDialogVisible = signal(false);
-  selectedRoleForEdit = signal<CustomRole | null>(null);
-  isSavingRole = signal(false);
-  roleForm = this.fb.group({
-    name: ['', [Validators.required, Validators.minLength(3)]],
-    permissions: [0, [Validators.required]],
-    description: [''],
-  });
 
   openPermissionEditor() {
     this.showPermissionEditor.set(true);
@@ -279,6 +274,10 @@ export default class UserAdminComponent implements OnInit {
   }
 
   ngOnInit() {
+    const defaultTab = this.route.snapshot.data['defaultTab'];
+    if (typeof defaultTab === 'string') {
+      this.activeAccessTab.set(defaultTab);
+    }
     this.initForm();
     this.loadRoles();
     this.loadUsers();
@@ -460,138 +459,6 @@ export default class UserAdminComponent implements OnInit {
       collapsed.add(key);
     }
     this.collapsedRoleGroups.set(collapsed);
-  }
-
-  editRole(event: Event, roleId: string) {
-    event.stopPropagation();
-    const role = this.availableRoles().find((r) => r.id === roleId);
-    if (role) {
-      this.selectedRoleForEdit.set(role);
-      this.roleForm.patchValue({
-        name: role.name,
-        permissions: role.permissions,
-        description: role.description || '',
-      });
-      this.roleDialogVisible.set(true);
-    }
-  }
-
-  openCreateRoleDialog() {
-    this.selectedRoleForEdit.set(null);
-    this.roleForm.reset({
-      name: '',
-      permissions: 0,
-      description: '',
-    });
-    this.roleDialogVisible.set(true);
-  }
-
-  convertToRole() {
-    const user = this.selectedUserForView();
-    if (!user) return;
-
-    this.selectedRoleForEdit.set(null);
-    this.roleForm.reset({
-      name: `Rol de ${user.username}`,
-      permissions: user.customPermissions || 0,
-      description: `Rol creado a partir de los permisos de ${user.username}`,
-    });
-    this.roleDialogVisible.set(true);
-  }
-
-  saveRole() {
-    if (this.roleForm.invalid) {
-      this.roleForm.markAllAsTouched();
-      return;
-    }
-
-    this.isSavingRole.set(true);
-    const formValue = this.roleForm.value;
-    const roleData = {
-      name: formValue.name!,
-      permissions: formValue.permissions || 0,
-      description: formValue.description || '',
-    };
-
-    const selectedRole = this.selectedRoleForEdit();
-
-    if (selectedRole) {
-      // Update
-      this.rolesService
-        .updateRole(selectedRole.id, roleData)
-        .pipe(finalize(() => this.isSavingRole.set(false)))
-        .subscribe({
-          next: () => {
-            this.toastService.success('Rol actualizado correctamente');
-            this.closeRoleDialog();
-            this.loadRoles(); // Reload roles to update view
-            this.loadUsers(); // Reload users to reflect changes
-          },
-          error: (err: unknown) => {
-            console.error('Error updating role', err);
-            this.toastService.error('Error al actualizar el rol');
-          },
-        });
-    } else {
-      // Create
-      this.rolesService
-        .createRole(roleData)
-        .pipe(finalize(() => this.isSavingRole.set(false)))
-        .subscribe({
-          next: () => {
-            this.toastService.success('Rol creado correctamente');
-            this.closeRoleDialog();
-            this.loadRoles();
-          },
-          error: (err: unknown) => {
-            console.error('Error creating role', err);
-            this.toastService.error('Error al crear el rol');
-          },
-        });
-    }
-  }
-
-  deleteRole() {
-    const selectedRole = this.selectedRoleForEdit();
-    if (!selectedRole) return;
-
-    this.confirmationService.confirm({
-      message: `¿Está seguro de eliminar el rol "${selectedRole.name}"? Los usuarios asignados pasarán a tener permisos personalizados.`,
-      header: 'Confirmar Eliminación',
-      icon: 'pi pi-exclamation-triangle',
-      acceptLabel: 'Eliminar',
-      rejectLabel: 'Cancelar',
-      acceptButtonStyleClass: 'p-button-danger',
-      accept: () => {
-        this.isSavingRole.set(true);
-        this.rolesService
-          .deleteRole(selectedRole.id)
-          .pipe(finalize(() => this.isSavingRole.set(false)))
-          .subscribe({
-            next: () => {
-              this.toastService.success('Rol eliminado correctamente');
-              this.closeRoleDialog();
-              this.loadRoles();
-              this.loadUsers();
-            },
-            error: (err: unknown) => {
-              console.error('Error deleting role', err);
-              this.toastService.error('Error al eliminar el rol');
-            },
-          });
-      },
-    });
-  }
-
-  closeRoleDialog() {
-    this.roleDialogVisible.set(false);
-    this.isSavingRole.set(false);
-    this.selectedRoleForEdit.set(null);
-    this.roleForm.reset();
-  }
-
-  onRolePermissionsChange(permissions: number) {
-    this.roleForm.patchValue({ permissions });
   }
 
   // Profile editing methods
