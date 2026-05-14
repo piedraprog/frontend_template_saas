@@ -114,18 +114,18 @@ export class RegisterComponent {
         if (isCaptchaValid === true) {
           console.log('Captcha verified successfully');
           this.captchaToken = captchaResponse!;
-          this.disableButton = false;
+          this.disableButton = true;
         } else if (isCaptchaValid === false) {
           console.error('Captcha verification failed');
-          this.disableButton = true;
+          this.disableButton = false;
         } else {
           console.error('Captcha verification result is undefined');
-          this.disableButton = true;
+          this.disableButton = false;
         }
       },
       error: (error: Error) => {
         console.error(error);
-        this.disableButton = true;
+        this.disableButton = false;
       },
     });
   }

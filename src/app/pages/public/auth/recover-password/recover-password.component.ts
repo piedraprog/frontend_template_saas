@@ -1,11 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, Inject } from '@angular/core';
 import { AuthCardComponent } from '../../../../shared/components/auth-card/auth-card.component';
 import { NgIf } from '@angular/common';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { Router, RouterModule } from '@angular/router';
-import { LoaderDialogComponent } from '../../../../shared/components/loader-dialog/loader-dialog.component';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ToastModule } from 'primeng/toast';
@@ -20,7 +19,6 @@ import { ToastModule } from 'primeng/toast';
     ReactiveFormsModule,
     InputTextModule,
     RouterModule,
-    LoaderDialogComponent,
     ConfirmDialogModule,
     ToastModule,
   ],
@@ -32,11 +30,9 @@ export class RecoverPasswordComponent {
     email: new FormControl('', [Validators.required, Validators.email]),
   });
 
-  constructor(
-    private confirmationService: ConfirmationService,
-    private messageService: MessageService,
-    private router: Router,
-  ) {}
+  @Inject(ConfirmationService) private confirmationService!: ConfirmationService;
+  @Inject(MessageService) private messageService!: MessageService;
+  @Inject(Router) private router!: Router;
 
   recoveryPassword() {
     if (this.recoveryForm.valid) {

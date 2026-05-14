@@ -17,6 +17,7 @@ import { retryInterceptor } from './core/interceptors/retry.interceptor';
 import { DIErrorInterceptor } from './core/interceptors/DIerror.interceptor';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { MessageService } from 'primeng/api';
+import AdminTheme from './theme/admin.theme';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -28,6 +29,12 @@ export const appConfig: ApplicationConfig = {
     MessageService,
     providePrimeNG({
       ripple: true,
+      theme: {
+        preset: AdminTheme,
+        options: {
+          darkModeSelector: false,
+        },
+      },
       zIndex: {
         modal: 1100,
         overlay: 1000,

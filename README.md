@@ -32,9 +32,42 @@ bun run start
 
 La app queda disponible en `http://localhost:4200`.
 
-## URLs de API sin tocar código en cada entorno
+## Configuración y entornos (API URL, captcha, etc.)
 
-Lee [.env.example](.env.example): explica `environment.ts` / `environment.development.ts` y el archivo opcional **`assets/runtime-environment.json`** (mismo patrón que suelen usar paneles desplegados con Nginx/Dokploy para no recompilar al pasar de local a prod).
+En el navegador **no hay variables de entorno secretas**: todo lo que incluyas en el front puede verse en el código publicado. Aquí solo deben ir datos **públicos** (URL de la API, site key del captcha). Secretos van en el **backend**.
+
+Este proyecto **no** lee un archivo `.env` para el bundle. Usa tres mecanismos combinados:
+
+### 1. Archivos TypeScript (`src/environments/`)
+
+| Archivo | Cuándo se usa |
+|---------|----------------|
+| `environment.development.ts` | Al hacer `bun run start` / `ng serve`: Angular sustituye `environment.ts` por este (ver `angular.json` → `fileReplacements`). |
+| `environment.ts` | Al hacer `bun run build` / `ng build` **sin** `--configuration development`: es el build por defecto (**production**). Ahí van los valores “de producción” por defecto. |
+
+Edita `apiUrl` y `captcha_key` en el archivo que corresponda antes de compilar si no vas a usar el JSON de runtime.
+
+### 2. JSON en runtime (sin recompilar)
+
+Tras el build, puedes colocar o montar **`assets/runtime-environment.json`** junto al resto de estáticos (por ejemplo volumen en Docker/Dokploy o sustitución en Nginx).
+
+- Si el archivo **no existe**, falla el fetch o está vacío `{}`, se mantienen los valores ya compilados en `environment.ts`.
+- Si incluye claves, **sobrescriben** solo lo que indiques, por ejemplo:
+
+```json
+{
+  "apiUrl": "https://api.tu-dominio.com",
+  "captcha_key": "tu_site_key_publica"
+}
+```
+
+En el repo hay una referencia en `src/assets/runtime-environment.sample.json`; el archivo que lee la app en despliegue es **`assets/runtime-environment.json`** (relativo a la URL de la app). La lógica está en `src/environments/load-runtime-environment.ts` y se ejecuta al arrancar la app (`APP_INITIALIZER` en `app.config.ts`).
+
+### 3. Resumen rápido
+
+- **Solo en tu PC**: `environment.development.ts` (con `ng serve`).
+- **Build listo para un servidor concreto**: ajusta `environment.ts` y compila, **o** deja valores por defecto y define todo en `runtime-environment.json` en el servidor.
+- **Nunca**: API keys secretas, tokens privados o contraseñas en estos archivos.
 
 ## Estructura base
 
