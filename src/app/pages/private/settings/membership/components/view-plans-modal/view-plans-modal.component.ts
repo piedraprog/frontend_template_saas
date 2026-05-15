@@ -92,7 +92,7 @@ export class ViewPlansModalComponent implements OnChanges {
           if (!session.url) {
             this.messageService.add({
               severity: 'error',
-              summary: 'Pago',
+              summary: 'Facturación',
               detail: 'No se recibió URL de checkout. Revisa la configuración Stripe del plan.',
             });
             return;
@@ -102,7 +102,7 @@ export class ViewPlansModalComponent implements OnChanges {
         error: (err: Error) => {
           this.messageService.add({
             severity: 'error',
-            summary: 'Pago',
+            summary: 'Facturación',
             detail: err.message ?? 'No se pudo iniciar el checkout.',
           });
         },

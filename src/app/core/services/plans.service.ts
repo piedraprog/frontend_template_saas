@@ -74,7 +74,7 @@ export class PlansService {
           if (response.status && response.data) {
             return response.data;
           }
-          throw new Error(response.message ?? 'No se pudo iniciar el pago');
+          throw new Error(response.message ?? 'No se pudo iniciar la facturación');
         }),
       );
   }

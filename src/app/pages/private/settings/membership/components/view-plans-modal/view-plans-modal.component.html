@@ -1,7 +1,7 @@
 <p-toast position="top-center" [life]="6000" />
 
 <p-dialog
-  header="Planes y pago"
+  header="Planes y facturación"
   [visible]="visible"
   (visibleChange)="visibleChange.emit($event)"
   (onHide)="onHide()"
@@ -19,7 +19,7 @@
       <p class="text-red-600 m-0">{{ error() }}</p>
     } @else {
       <p class="text-slate-500 mb-3">
-        Elige un plan. Se abrirá Stripe Checkout para completar el pago con tarjeta.
+        Elige un plan. Se abrirá Stripe Checkout para completar la facturación con tarjeta.
       </p>
       <div class="plans-list">
         @for (plan of plans(); track plan.id) {
@@ -43,7 +43,7 @@
             </div>
             <div class="mt-3 flex justify-end">
               <p-button
-                label="Suscribirse con Stripe"
+                label="Facturar con Stripe"
                 icon="pi pi-credit-card"
                 size="small"
                 (onClick)="subscribeToPlan(plan)"

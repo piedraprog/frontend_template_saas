@@ -183,7 +183,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
       },
       {
         id: 'membership',
-        label: 'Mi plan',
+        label: 'Facturación',
         icon: 'pi pi-crown',
         routerLink: this.routeFor('settings', 'membership'),
       },
