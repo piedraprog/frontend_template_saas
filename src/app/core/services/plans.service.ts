@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, map, of, throwError } from 'rxjs';
+import { Observable, map, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { ApiResponse } from '../../shared/interfaces/response.interface';
 import { PlanInterface, AddonInterface } from '../models/interfaces/plan.interface';
@@ -52,29 +52,57 @@ export class PlansService {
 
   /** Addons deshabilitados hasta integrar pasarela. Descomentar cuando esté listo. */
   getAddons(): Observable<AddonInterface[]> {
-    return of([]);
-    // return this.http.get<ApiResponse<AddonInterface[]>>(`${this.apiUrl}/addons`).pipe(...)
+    return this.http.get<ApiResponse<AddonInterface[]>>(`${this.apiUrl}/addons`).pipe(
+      map((response: ApiResponse<AddonInterface[]>) => {
+        if (response.status && response.data) {
+          return response.data;
+        }
+        throw new Error(response.message || 'Error al obtener los addons');
+      }),
+    );
   }
 
   /** Sesión Stripe Checkout para suscribirse a un plan (`gateway`: stripe | nowpayments). */
   createSubscriptionCheckout(
     planId: string,
     gateway: 'stripe' | 'nowpayments' = 'stripe',
+    context: 'settings' | 'onboarding' = 'settings',
   ): Observable<{ id: string; url: string | null }> {
     return this.http
-      .post<ApiResponse<{ id: string; url: string | null }>>(
-        `${this.apiUrl}/subscriptions/checkout`,
-        {
-          planId,
-          gateway,
-        },
-      )
+      .post<ApiResponse<{ id: string; url: string | null }>>(`${this.apiUrl}/plans/checkout`, {
+        planId,
+        gateway,
+        context,
+      })
       .pipe(
         map((response) => {
           if (response.status && response.data) {
             return response.data;
           }
           throw new Error(response.message ?? 'No se pudo iniciar la facturación');
+        }),
+      );
+  }
+
+  createAddonCheckout(
+    addonId: string,
+    gateway: 'stripe' | 'nowpayments' = 'stripe',
+    billingCycle: 'monthly' | 'yearly' = 'monthly',
+    context: 'settings' | 'onboarding' = 'settings',
+  ): Observable<{ id: string; url: string | null }> {
+    return this.http
+      .post<ApiResponse<{ id: string; url: string | null }>>(`${this.apiUrl}/addons/checkout`, {
+        addonId,
+        gateway,
+        billingCycle,
+        context,
+      })
+      .pipe(
+        map((response) => {
+          if (response.status && response.data) {
+            return response.data;
+          }
+          throw new Error(response.message ?? 'No se pudo iniciar la facturación del addon');
         }),
       );
   }
@@ -88,6 +116,19 @@ export class PlansService {
             return response.data;
           }
           throw new Error(response.message || 'Error al obtener el resumen de suscripción');
+        }),
+      );
+  }
+
+  createCustomerPortal(): Observable<{ url: string }> {
+    return this.http
+      .post<ApiResponse<{ url: string }>>(`${this.apiUrl}/billing/customer-portal`, {})
+      .pipe(
+        map((response) => {
+          if (response.status && response.data) {
+            return response.data;
+          }
+          throw new Error(response.message || 'No se pudo abrir el portal de facturación');
         }),
       );
   }

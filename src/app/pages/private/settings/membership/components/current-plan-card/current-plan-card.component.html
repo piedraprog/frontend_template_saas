@@ -152,6 +152,15 @@
           (onClick)="handleUpgrade()"
           styleClass="w-full"
         />
+        @if (sub.status === 'active' || sub.status === 'trialing' || sub.status === 'past_due') {
+          <p-button
+            label="Gestionar Facturación"
+            icon="pi pi-external-link"
+            (onClick)="handleManageBilling()"
+            styleClass="w-full"
+            severity="secondary"
+          />
+        }
       </div>
     } @else {
       <div class="empty-state">

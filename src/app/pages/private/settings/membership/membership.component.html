@@ -19,12 +19,11 @@
           [subscription]="currentSubscription()"
           [usage]="usage()"
           (upgradePlan)="handleUpgradePlan()"
+          (manageBilling)="handleManageBilling()"
         />
       </div>
     </section>
 
-    <!-- T5: Addons ocultos hasta integrar pasarela (Stripe/NOWPayments). Descomentar cuando esté listo. -->
-    <!--
     <section class="membership-card">
       <div class="membership-card-head">
         <div class="membership-card-title">
@@ -40,7 +39,6 @@
         ></app-addon-list>
       </div>
     </section>
-    -->
 
     <app-view-plans-modal
       [visible]="showViewPlansModal()"

@@ -11,6 +11,9 @@ export interface ProfileResponseInterface {
   email: string;
   companyId: string;
   avatar?: string;
+  onboardingVariant?: string;
+  onboardingCurrentStep?: string;
+  onboardingCompletedAt?: string | null;
   permissions: number;
   isOwner: boolean;
   customPermissions?: number | null;

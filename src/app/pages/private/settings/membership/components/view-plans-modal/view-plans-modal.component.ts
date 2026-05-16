@@ -85,7 +85,7 @@ export class ViewPlansModalComponent implements OnChanges {
   subscribeToPlan(plan: Plan): void {
     this.checkoutPlanId.set(plan.id);
     this.plansService
-      .createSubscriptionCheckout(plan.id, 'stripe')
+      .createSubscriptionCheckout(plan.id, 'stripe', 'settings')
       .pipe(finalize(() => this.checkoutPlanId.set(null)))
       .subscribe({
         next: (session) => {

@@ -20,6 +20,11 @@ export interface PlanInterface {
   limits: PlanLimits;
   features: string[]; // slugs de features activas
   isActive: boolean;
+  billingModel?: 'free' | 'trial' | 'paid';
+  trialDays?: number | null;
+  isOnboardingDefault?: boolean;
+  canStartWithoutCheckout?: boolean;
+  allowsDeferredOnboardingChoice?: boolean;
 }
 
 export interface AddonInterface {

@@ -1,0 +1,152 @@
+<p-toast></p-toast>
+
+<section class="onboarding-shell">
+  <div class="hero">
+    <p class="eyebrow">Facturación</p>
+    <h1>Activa tu boiler con el flujo base 0 a 1</h1>
+    <p>
+      Este onboarding usa el preset
+      <strong>LITE_GUIDED_CHECKOUT_TAIL</strong>
+      y termina con la selección del plan.
+    </p>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-state">
+      <p-progressSpinner ariaLabel="Cargando onboarding"></p-progressSpinner>
+    </div>
+  } @else if (error()) {
+    <div class="state-card error-card">
+      <h2>No se pudo cargar el onboarding</h2>
+      <p>{{ error() }}</p>
+      <button pButton type="button" label="Reintentar" (click)="loadViewModel()"></button>
+    </div>
+  } @else {
+    @if (state(); as currentState) {
+      <div class="content-grid">
+        <aside class="steps-panel">
+          <h2>Ruta activa</h2>
+          <div class="steps-list">
+            @for (step of currentState.steps; track step.id) {
+              <article
+                class="step-card"
+                [class.current]="step.isCurrent"
+                [class.done]="step.isCompleted"
+              >
+                <span class="step-badge">{{ step.isCompleted ? 'OK' : '0' + ($index + 1) }}</span>
+                <div>
+                  <h3>{{ step.title }}</h3>
+                  <p>{{ step.description }}</p>
+                </div>
+              </article>
+            }
+          </div>
+        </aside>
+
+        <main class="main-panel">
+          @if (currentStep?.kind !== 'plan-selection') {
+            <section class="state-card">
+              <p class="step-label">Paso actual</p>
+              <h2>{{ currentStep?.title }}</h2>
+              <p>{{ currentStep?.description }}</p>
+              <button
+                pButton
+                type="button"
+                label="Continuar"
+                [loading]="progressing()"
+                (click)="continueStep()"
+              ></button>
+            </section>
+          } @else {
+            <section class="state-card">
+              <p class="step-label">Paso final</p>
+              <h2>Selecciona el plan con el que arrancas</h2>
+              <p>
+                Este listado usa el mismo catálogo de planes que la sección de configuración de
+                membresía.
+              </p>
+
+              @if (canChooseLater && !currentState.hasActiveSubscription) {
+                <div class="defer-box">
+                  <div>
+                    <h3>Puedes decidir después</h3>
+                    <p>
+                      Si existe un plan gratis o trial, el sistema puede activarlo y dejarte entrar
+                      sin pasar por Stripe en este momento.
+                    </p>
+                  </div>
+                  <button
+                    pButton
+                    type="button"
+                    severity="secondary"
+                    label="Decidir después"
+                    [loading]="progressing()"
+                    (click)="chooseLater()"
+                  ></button>
+                </div>
+              }
+
+              @if (currentState.hasActiveSubscription) {
+                <div class="active-subscription-box">
+                  <h3>La compañía ya tiene una suscripción activa</h3>
+                  <p>Puedes cerrar onboarding y entrar al dashboard.</p>
+                  <button
+                    pButton
+                    type="button"
+                    label="Entrar al dashboard"
+                    [loading]="progressing()"
+                    (click)="enterDashboard()"
+                  ></button>
+                </div>
+              } @else {
+                <div class="plan-grid">
+                  @for (plan of plans(); track plan.id) {
+                    <article class="plan-card">
+                      <div>
+                        <p class="plan-slug">{{ plan.slug }}</p>
+                        <h3>{{ plan.name }}</h3>
+                        @if (plan.billingModel && plan.billingModel !== 'paid') {
+                          <span class="plan-badge">
+                            {{ plan.billingModel === 'free' ? 'Gratis' : 'Trial' }}
+                          </span>
+                        }
+                        <p class="plan-description">{{ plan.description }}</p>
+                      </div>
+
+                      <div class="price-block">
+                        <strong>${{ planPrice(plan) }}</strong>
+                        <span>/ mes</span>
+                      </div>
+
+                      <ul class="features-list">
+                        @for (feature of plan.features; track feature) {
+                          <li>{{ feature }}</li>
+                        }
+                      </ul>
+
+                      <button
+                        pButton
+                        type="button"
+                        [label]="planActionLabel(plan)"
+                        [loading]="
+                          plan.billingModel === 'paid'
+                            ? checkoutPlanId() === plan.id
+                            : progressing()
+                        "
+                        (click)="
+                          plan.billingModel === 'paid'
+                            ? startPlanCheckout(plan)
+                            : activateDeferredPlan(plan)
+                        "
+                      ></button>
+                    </article>
+                  }
+                </div>
+              }
+            </section>
+          }
+        </main>
+      </div>
+    }
+  }
+</section>

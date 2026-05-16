@@ -19,9 +19,14 @@ export class CurrentPlanCardComponent {
   subscription = input<SubscriptionStatus | null>(null);
   usage = input<SubscriptionUsage | null>(null);
   @Output() upgradePlan = new EventEmitter<void>();
+  @Output() manageBilling = new EventEmitter<void>();
 
   handleUpgrade() {
     this.upgradePlan.emit();
+  }
+
+  handleManageBilling() {
+    this.manageBilling.emit();
   }
 
   formatFeature(slug: string): string {

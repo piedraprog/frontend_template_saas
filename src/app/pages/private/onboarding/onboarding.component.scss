@@ -1,0 +1,179 @@
+:host {
+  display: block;
+}
+
+.onboarding-shell {
+  min-height: 100vh;
+  padding: 2rem;
+  background:
+    radial-gradient(circle at top left, rgba(255, 201, 107, 0.3), transparent 28%),
+    linear-gradient(135deg, #f7efe1 0%, #f1f5f0 100%);
+}
+
+.hero {
+  max-width: 48rem;
+  margin-bottom: 2rem;
+}
+
+.eyebrow,
+.step-label,
+.plan-slug {
+  margin: 0 0 0.5rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #99621e;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin-top: 0;
+}
+
+.content-grid {
+  display: grid;
+  grid-template-columns: minmax(18rem, 24rem) minmax(0, 1fr);
+  gap: 1.5rem;
+}
+
+.steps-panel,
+.state-card,
+.plan-card {
+  border: 1px solid rgba(28, 37, 44, 0.08);
+  border-radius: 1.5rem;
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: 0 20px 60px rgba(28, 37, 44, 0.08);
+}
+
+.steps-panel,
+.state-card {
+  padding: 1.5rem;
+}
+
+.steps-list {
+  display: grid;
+  gap: 1rem;
+}
+
+.step-card {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: 1rem;
+  background: #fffaf1;
+}
+
+.step-card.current {
+  outline: 2px solid #d9782c;
+}
+
+.step-card.done {
+  background: #eef9ef;
+}
+
+.step-badge {
+  width: 2rem;
+  height: 2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: #1c252c;
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.main-panel {
+  min-width: 0;
+}
+
+.loading-state {
+  display: grid;
+  place-items: center;
+  min-height: 18rem;
+}
+
+.error-card {
+  max-width: 32rem;
+}
+
+.active-subscription-box {
+  padding: 1rem;
+  border-radius: 1rem;
+  background: #eef9ef;
+}
+
+.defer-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 1rem 0 0;
+  padding: 1rem;
+  border-radius: 1rem;
+  background: #fff4df;
+}
+
+.plan-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.plan-card {
+  display: grid;
+  gap: 1rem;
+  padding: 1.25rem;
+}
+
+.plan-description {
+  min-height: 3rem;
+}
+
+.plan-badge {
+  display: inline-flex;
+  margin-bottom: 0.75rem;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  background: #1c252c;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.price-block {
+  display: flex;
+  align-items: baseline;
+  gap: 0.35rem;
+}
+
+.price-block strong {
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.features-list {
+  margin: 0;
+  padding-left: 1rem;
+}
+
+@media (max-width: 960px) {
+  .onboarding-shell {
+    padding: 1rem;
+  }
+
+  .content-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .defer-box {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

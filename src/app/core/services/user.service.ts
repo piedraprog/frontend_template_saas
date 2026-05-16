@@ -16,6 +16,9 @@ export class UserService {
     role: SystemRole.MEMBER,
     companyId: '',
     isOwner: false,
+    onboardingVariant: undefined,
+    onboardingCurrentStep: undefined,
+    onboardingCompletedAt: null,
     permissions: 0,
     active: false,
   });
@@ -35,6 +38,9 @@ export class UserService {
       role: SystemRole.MEMBER,
       companyId: '',
       isOwner: false,
+      onboardingVariant: undefined,
+      onboardingCurrentStep: undefined,
+      onboardingCompletedAt: null,
       permissions: 0,
       active: false,
     });
