@@ -94,6 +94,7 @@ export default class UserAdminComponent implements OnInit {
   showCreateModal = signal<boolean>(false); // New control for create modal
   editUserDialog: boolean = false;
   deleteUserDialog: boolean = false;
+  resettingPasswordUserId = signal<string | null>(null);
 
   openPermissionEditor() {
     this.showPermissionEditor.set(true);
@@ -350,6 +351,31 @@ export default class UserAdminComponent implements OnInit {
     if (!user) return;
     this.selectedUser.set(user);
     this.deleteUserDialog = true;
+  }
+
+  confirmAdminResetPassword(user: UserInterface) {
+    if (!user?.id) {
+      return;
+    }
+
+    const userId = user.id.toString();
+    this.resettingPasswordUserId.set(userId);
+
+    this.adminUserService
+      .adminResetPassword(userId)
+      .pipe(finalize(() => this.resettingPasswordUserId.set(null)))
+      .subscribe({
+        next: (response) => {
+          this.toastService.success(
+            'Contraseña restablecida',
+            response.message ?? 'Se enviaron las nuevas credenciales por correo.',
+          );
+        },
+        error: (error: unknown) => {
+          console.error('Error al restablecer contraseña', error);
+          this.toastService.error('No se pudo restablecer la contraseña del usuario');
+        },
+      });
   }
 
   // Updated to only handle Edit User

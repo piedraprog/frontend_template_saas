@@ -1,6 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  AbstractControl,
+  FormControl,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
@@ -45,6 +51,7 @@ export class RegisterComponent {
 
   disableButton = false;
   isSubmitting = false;
+  submitAttempted = false;
   passwordVisible = false;
   confirmPasswordVisible = false;
 
@@ -114,6 +121,18 @@ export class RegisterComponent {
     return this.registerForm.get('termsCondition');
   }
 
+  showControlError(control: AbstractControl | null): boolean {
+    return Boolean(
+      !this.isSubmitting && control?.invalid && (control.touched || this.submitAttempted),
+    );
+  }
+
+  showMismatchError(): boolean {
+    return Boolean(
+      !this.isSubmitting && this.registerForm.errors?.['misMatch'] && this.submitAttempted,
+    );
+  }
+
   confirmCaptcha(captchaResponse: string | null) {
     this.captchaService.confirmCaptcha(captchaResponse).subscribe({
       next: (isCaptchaValid: boolean | undefined) => {
@@ -137,6 +156,7 @@ export class RegisterComponent {
   }
 
   register() {
+    this.submitAttempted = true;
     this.registerForm.markAllAsTouched();
 
     if (this.registerForm.valid && this.disableButton && !this.isSubmitting) {
@@ -154,6 +174,7 @@ export class RegisterComponent {
         .pipe(finalize(() => (this.isSubmitting = false)))
         .subscribe({
           next: () => {
+            this.submitAttempted = false;
             this.router.navigate(['/success']);
           },
           error: (error) => {

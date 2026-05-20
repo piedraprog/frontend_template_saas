@@ -33,6 +33,22 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'forgot-password',
+    canActivate: [sessionGuard],
+    loadComponent: () =>
+      import('./pages/public/auth/forgot-password/forgot-password.component').then(
+        (m) => m.ForgotPasswordComponent,
+      ),
+  },
+  {
+    path: 'reset-password',
+    canActivate: [sessionGuard],
+    loadComponent: () =>
+      import('./pages/public/auth/reset-password/reset-password.component').then(
+        (m) => m.ResetPasswordComponent,
+      ),
+  },
+  {
     path: '',
     pathMatch: 'full',
     redirectTo: 'dashboard',

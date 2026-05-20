@@ -1,6 +1,11 @@
-import { NgIf } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  AbstractControl,
+  FormControl,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { AuthCardComponent } from '../../../../shared/components/auth-card/auth-card.component';
@@ -28,7 +33,6 @@ import {
     ButtonModule,
     InputTextModule,
     ReactiveFormsModule,
-    NgIf,
     AuthCardComponent,
     RouterModule,
     PasswordModule,
@@ -46,6 +50,7 @@ export class LoginComponent implements OnInit {
 
   passwordVisible = false;
   isSubmitting = false;
+  submitAttempted = false;
   ip: string = '';
 
   ngOnInit(): void {
@@ -62,7 +67,32 @@ export class LoginComponent implements OnInit {
     },
   );
 
+  get emailControl(): AbstractControl | null {
+    return this.loginForm.get('email');
+  }
+
+  get passwordControl(): AbstractControl | null {
+    return this.loginForm.get('password');
+  }
+
+  showEmailError(): boolean {
+    return Boolean(
+      !this.isSubmitting &&
+        this.emailControl?.invalid &&
+        (this.emailControl.touched || this.submitAttempted),
+    );
+  }
+
+  showPasswordError(): boolean {
+    return Boolean(
+      !this.isSubmitting &&
+        this.passwordControl?.invalid &&
+        (this.passwordControl.touched || this.submitAttempted),
+    );
+  }
+
   login() {
+    this.submitAttempted = true;
     this.loginForm.markAllAsTouched();
 
     if (this.loginForm.valid && !this.isSubmitting) {
@@ -78,6 +108,7 @@ export class LoginComponent implements OnInit {
         .pipe(finalize(() => (this.isSubmitting = false)))
         .subscribe({
           next: (response) => {
+            this.submitAttempted = false;
             const cookieOpts = { path: SESSION_COOKIE_PATH };
             this.cookieService.set(SESSION_ACCESS_TOKEN, response.accessToken, cookieOpts);
             this.cookieService.set(SESSION_REFRESH_TOKEN, response.refreshToken, cookieOpts);
@@ -86,6 +117,7 @@ export class LoginComponent implements OnInit {
             this.router.navigate(['/dashboard']);
           },
           error: (error: HttpErrorResponse) => {
+            this.submitAttempted = false;
             this.messageService.add({
               severity: 'error',
               summary: 'Error',

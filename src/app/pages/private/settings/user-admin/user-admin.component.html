@@ -153,6 +153,15 @@
                     }
                     @if (user.id.toString() !== tokenService.getUserId()) {
                       <p-button
+                        label="Restablecer contraseña"
+                        icon="pi pi-key"
+                        [outlined]="true"
+                        severity="warn"
+                        (click)="confirmAdminResetPassword(user)"
+                        [loading]="resettingPasswordUserId() === user.id.toString()"
+                        [disabled]="resettingPasswordUserId() !== null"
+                      />
+                      <p-button
                         icon="pi pi-trash"
                         [outlined]="false"
                         (click)="confirmDeleteUser(user)"

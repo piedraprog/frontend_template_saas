@@ -4,7 +4,7 @@
   [title]="'Crear cuenta'"
   [subheader]="'Registra tu empresa y prepara el acceso inicial al panel administrativo.'"
 >
-  <form [formGroup]="registerForm" (ngSubmit)="register()" class="space-y-5" #form="ngForm">
+  <form [formGroup]="registerForm" class="space-y-5" [attr.aria-busy]="isSubmitting">
     <div class="grid gap-4 sm:grid-cols-2">
       <div class="space-y-2">
         <label for="corporation" class="text-sm font-bold text-slate-800">Empresa</label>
@@ -15,27 +15,31 @@
           formControlName="corporation"
           placeholder="Mi Empresa"
           class="auth-input"
-          [invalid]="
-            !!corporationFormField?.invalid && (corporationFormField?.touched || form.submitted)
-          "
+          [disabled]="isSubmitting"
+          [invalid]="showControlError(corporationFormField)"
         />
-        <small
-          *ngIf="(corporationFormField?.invalid && corporationFormField?.touched) || form.submitted"
-          class="block text-xs font-semibold text-red-600"
-        >
-          <span *ngIf="corporationFormField?.errors?.['required']">La empresa es obligatoria.</span>
-          <span *ngIf="corporationFormField?.errors?.['maxlength']">
-            Máximo {{ corporationFormField?.errors?.['maxlength']['requiredLength'] | json }}
-            caracteres.
-          </span>
-          <span *ngIf="corporationFormField?.errors?.['minlength']">
-            Mínimo {{ corporationFormField?.errors?.['minlength']['requiredLength'] | json }}
-            caracteres.
-          </span>
-          <span *ngIf="corporationFormField?.errors?.['pattern']">
-            Usa solo caracteres alfanuméricos.
-          </span>
-        </small>
+        @if (showControlError(corporationFormField)) {
+          <small class="block text-xs font-semibold text-red-600">
+            @if (corporationFormField?.errors?.['required']) {
+              <span>La empresa es obligatoria.</span>
+            }
+            @if (corporationFormField?.errors?.['maxlength']) {
+              <span>
+                Máximo {{ corporationFormField?.errors?.['maxlength']['requiredLength'] | json }}
+                caracteres.
+              </span>
+            }
+            @if (corporationFormField?.errors?.['minlength']) {
+              <span>
+                Mínimo {{ corporationFormField?.errors?.['minlength']['requiredLength'] | json }}
+                caracteres.
+              </span>
+            }
+            @if (corporationFormField?.errors?.['pattern']) {
+              <span>Usa solo caracteres alfanuméricos.</span>
+            }
+          </small>
+        }
       </div>
 
       <div class="space-y-2">
@@ -47,25 +51,31 @@
           formControlName="username"
           placeholder="usuario"
           class="auth-input"
-          [invalid]="!!usernameFormField?.invalid && (usernameFormField?.touched || form.submitted)"
+          [disabled]="isSubmitting"
+          [invalid]="showControlError(usernameFormField)"
         />
-        <small
-          *ngIf="(usernameFormField?.invalid && usernameFormField?.touched) || form.submitted"
-          class="block text-xs font-semibold text-red-600"
-        >
-          <span *ngIf="usernameFormField?.errors?.['required']">El usuario es obligatorio.</span>
-          <span *ngIf="usernameFormField?.errors?.['maxlength']">
-            Máximo {{ usernameFormField?.errors?.['maxlength']['requiredLength'] | json }}
-            caracteres.
-          </span>
-          <span *ngIf="usernameFormField?.errors?.['minlength']">
-            Mínimo {{ usernameFormField?.errors?.['minlength']['requiredLength'] | json }}
-            caracteres.
-          </span>
-          <span *ngIf="usernameFormField?.errors?.['pattern']">
-            Usa solo caracteres alfanuméricos.
-          </span>
-        </small>
+        @if (showControlError(usernameFormField)) {
+          <small class="block text-xs font-semibold text-red-600">
+            @if (usernameFormField?.errors?.['required']) {
+              <span>El usuario es obligatorio.</span>
+            }
+            @if (usernameFormField?.errors?.['maxlength']) {
+              <span>
+                Máximo {{ usernameFormField?.errors?.['maxlength']['requiredLength'] | json }}
+                caracteres.
+              </span>
+            }
+            @if (usernameFormField?.errors?.['minlength']) {
+              <span>
+                Mínimo {{ usernameFormField?.errors?.['minlength']['requiredLength'] | json }}
+                caracteres.
+              </span>
+            }
+            @if (usernameFormField?.errors?.['pattern']) {
+              <span>Usa solo caracteres alfanuméricos.</span>
+            }
+          </small>
+        }
       </div>
     </div>
 
@@ -78,15 +88,19 @@
         formControlName="email"
         placeholder="correo@empresa.com"
         class="auth-input"
-        [invalid]="!!emailFormField?.invalid && (emailFormField?.touched || form.submitted)"
+        [disabled]="isSubmitting"
+        [invalid]="showControlError(emailFormField)"
       />
-      <small
-        *ngIf="(emailFormField?.invalid && emailFormField?.touched) || form.submitted"
-        class="block text-xs font-semibold text-red-600"
-      >
-        <span *ngIf="emailFormField?.errors?.['required']">El correo es obligatorio.</span>
-        <span *ngIf="emailFormField?.errors?.['email']">Ingresa un correo válido.</span>
-      </small>
+      @if (showControlError(emailFormField)) {
+        <small class="block text-xs font-semibold text-red-600">
+          @if (emailFormField?.errors?.['required']) {
+            <span>El correo es obligatorio.</span>
+          }
+          @if (emailFormField?.errors?.['email']) {
+            <span>Ingresa un correo válido.</span>
+          }
+        </small>
+      }
     </div>
 
     <div class="grid gap-4 sm:grid-cols-2">
@@ -101,9 +115,8 @@
             [type]="passwordVisible ? 'text' : 'password'"
             placeholder="Contraseña"
             class="auth-input"
-            [invalid]="
-              !!passwordFormField?.invalid && (passwordFormField?.touched || form.submitted)
-            "
+            [disabled]="isSubmitting"
+            [invalid]="showControlError(passwordFormField)"
           />
           <p-button
             [icon]="passwordVisible ? 'pi pi-eye-slash' : 'pi pi-eye'"
@@ -129,11 +142,8 @@
             placeholder="Repite la contraseña"
             [type]="confirmPasswordVisible ? 'text' : 'password'"
             class="auth-input"
-            [invalid]="
-              (!!confirmPasswordFormField?.invalid &&
-                (confirmPasswordFormField?.touched || form.submitted)) ||
-              !!registerForm.errors?.['misMatch']
-            "
+            [disabled]="isSubmitting"
+            [invalid]="showControlError(confirmPasswordFormField) || showMismatchError()"
           />
           <p-button
             [icon]="confirmPasswordVisible ? 'pi pi-eye-slash' : 'pi pi-eye'"
@@ -147,51 +157,54 @@
       </div>
     </div>
 
-    <div
-      class="rounded-lg border border-slate-200 bg-slate-50 p-4 text-xs font-semibold leading-5 text-slate-600"
-      *ngIf="(passwordFormField?.dirty && passwordErrors) || registerForm.errors?.['misMatch']"
-    >
-      <span class="block text-red-600" *ngIf="passwordFormField?.errors?.['required']">
-        La contraseña es obligatoria.
-      </span>
-      <span class="block" *ngIf="passwordErrors && !passwordErrors.hasMinLength">
-        Debe contener al menos 8 caracteres.
-      </span>
-      <span class="block" *ngIf="passwordErrors && !passwordErrors.hasUpperCase">
-        Debe contener al menos una letra mayúscula.
-      </span>
-      <span class="block" *ngIf="passwordErrors && !passwordErrors.hasLowerCase">
-        Debe contener al menos una letra minúscula.
-      </span>
-      <span class="block" *ngIf="passwordErrors && !passwordErrors.hasNumeric">
-        Debe contener al menos un número.
-      </span>
-      <span class="block" *ngIf="passwordErrors && !passwordErrors.hasSpecialCharacter">
-        Debe contener al menos un carácter especial.
-      </span>
-      <span class="block text-red-600" *ngIf="registerForm.errors?.['misMatch']">
-        Las contraseñas deben coincidir.
-      </span>
-    </div>
+    @if ((passwordFormField?.dirty && passwordErrors) || registerForm.errors?.['misMatch']) {
+      <div
+        class="rounded-lg border border-slate-200 bg-slate-50 p-4 text-xs font-semibold leading-5 text-slate-600"
+      >
+        @if (passwordFormField?.errors?.['required']) {
+          <span class="block text-red-600">La contraseña es obligatoria.</span>
+        }
+        @if (passwordErrors && !passwordErrors.hasMinLength) {
+          <span class="block">Debe contener al menos 8 caracteres.</span>
+        }
+        @if (passwordErrors && !passwordErrors.hasUpperCase) {
+          <span class="block">Debe contener al menos una letra mayúscula.</span>
+        }
+        @if (passwordErrors && !passwordErrors.hasLowerCase) {
+          <span class="block">Debe contener al menos una letra minúscula.</span>
+        }
+        @if (passwordErrors && !passwordErrors.hasNumeric) {
+          <span class="block">Debe contener al menos un número.</span>
+        }
+        @if (passwordErrors && !passwordErrors.hasSpecialCharacter) {
+          <span class="block">Debe contener al menos un carácter especial.</span>
+        }
+        @if (showMismatchError()) {
+          <span class="block text-red-600">Las contraseñas deben coincidir.</span>
+        }
+      </div>
+    }
 
     <div class="space-y-3 rounded-lg border border-slate-200 p-4">
       <div class="flex items-start gap-3">
-        <p-checkbox formControlName="termsCondition" [binary]="true" inputId="termsCondition" />
+        <p-checkbox
+          formControlName="termsCondition"
+          [binary]="true"
+          inputId="termsCondition"
+          [disabled]="isSubmitting"
+        />
         <label for="termsCondition" class="text-sm leading-6 text-slate-600">
           Acepto los
           <a routerLink="/terms-conditions" class="auth-link">términos y condiciones</a>
         </label>
       </div>
-      <small
-        *ngIf="
-          (termsConditionFormField?.dirty && termsConditionFormField?.touched) || form.submitted
-        "
-        class="block text-xs font-semibold text-red-600"
-      >
-        <span *ngIf="termsConditionFormField?.errors?.['required']">
-          Debes aceptar los términos y condiciones.
-        </span>
-      </small>
+      @if (showControlError(termsConditionFormField)) {
+        <small class="block text-xs font-semibold text-red-600">
+          @if (termsConditionFormField?.errors?.['required']) {
+            <span>Debes aceptar los términos y condiciones.</span>
+          }
+        </small>
+      }
     </div>
 
     <div
@@ -205,19 +218,36 @@
       ></ngx-turnstile>
     </div>
 
-    <p-button
-      type="submit"
-      label="Crear cuenta"
-      severity="contrast"
-      styleClass="auth-button text-sm"
-      class="block w-full"
-      [loading]="isSubmitting"
+    @if (isSubmitting) {
+      <div class="rounded-lg border border-sky-200 bg-sky-50/80 p-4 text-sm leading-6 text-sky-900">
+        Creando la cuenta y validando los datos iniciales.
+      </div>
+    }
+
+    <button
+      type="button"
+      class="auth-button inline-flex w-full items-center justify-center text-sm font-bold"
       [disabled]="!disableButton || isSubmitting"
-    />
+      (click)="register()"
+    >
+      @if (isSubmitting) {
+        Creando cuenta...
+      } @else {
+        Crear cuenta
+      }
+    </button>
 
     <p class="text-center text-sm text-slate-500">
       ¿Ya tienes una cuenta?
-      <a routerLink="/login" class="auth-link">Iniciar sesión</a>
+      <a
+        routerLink="/login"
+        class="auth-link"
+        [class.pointer-events-none]="isSubmitting"
+        [class.opacity-60]="isSubmitting"
+        [attr.aria-disabled]="isSubmitting"
+      >
+        Iniciar sesión
+      </a>
     </p>
   </form>
 </app-auth-card>

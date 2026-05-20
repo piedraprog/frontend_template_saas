@@ -79,6 +79,40 @@ export class AuthService {
       );
   }
 
+  requestPasswordReset(email: string): Observable<{ message: string }> {
+    const url = `${this.baseUrl}/auth/forgot-password`;
+
+    return this.http
+      .post<
+        ApiResponse<{ message: string }>
+      >(url, { email }, { context: new HttpContext().set(BYPASS_JW_TOKEN, true) })
+      .pipe(
+        map((response: ApiResponse<{ message: string }>) => {
+          if (response.status && response.data) {
+            return response.data;
+          }
+          throw new Error(response.message || 'No se pudo procesar la solicitud');
+        }),
+      );
+  }
+
+  resetPassword(payload: { token: string; password: string }): Observable<{ message: string }> {
+    const url = `${this.baseUrl}/auth/reset-password`;
+
+    return this.http
+      .post<
+        ApiResponse<{ message: string }>
+      >(url, payload, { context: new HttpContext().set(BYPASS_JW_TOKEN, true) })
+      .pipe(
+        map((response: ApiResponse<{ message: string }>) => {
+          if (response.status && response.data) {
+            return response.data;
+          }
+          throw new Error(response.message || 'No se pudo restablecer la contraseña');
+        }),
+      );
+  }
+
   register({
     email,
     username,

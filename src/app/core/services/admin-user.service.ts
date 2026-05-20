@@ -158,6 +158,26 @@ export class AdminUserService {
     );
   }
 
+  adminResetPassword(id: string): Observable<{ message: string }> {
+    const url = `${this.baseUrl}/users/${id}/reset-password`;
+    this.loadingSignal.set(true);
+
+    return this.http.post<ApiResponse<{ message: string }>>(url, {}).pipe(
+      map((response: ApiResponse<{ message: string }>) => {
+        if (response.status) {
+          return {
+            message:
+              response.data?.message ??
+              response.message ??
+              'Contraseña restablecida y credenciales enviadas por correo',
+          };
+        }
+        throw new Error(response.message || 'Error al restablecer la contraseña');
+      }),
+      finalize(() => this.loadingSignal.set(false)),
+    );
+  }
+
   deleteUser(id: string): Observable<boolean> {
     const url = `${this.baseUrl}/users/${id}`;
     this.loadingSignal.set(true);

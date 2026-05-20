@@ -25,6 +25,8 @@ export class DIErrorInterceptor implements HttpInterceptor {
   private readonly excludedUrls = [
     '/auth/login',
     '/auth/register',
+    '/auth/forgot-password',
+    '/auth/reset-password',
     '/auth/logout',
     '/auth/refresh',
   ];
