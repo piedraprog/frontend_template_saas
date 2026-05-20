@@ -255,6 +255,8 @@
 .main-content {
   flex: 1;
   min-width: 0;
+  container-type: inline-size;
+  container-name: user-detail;
   background: var(--u-surface);
   overflow: hidden;
   display: flex;
@@ -299,6 +301,7 @@
 
   .profile-header {
     display: flex;
+    flex-wrap: wrap;
     justify-content: space-between;
     align-items: flex-start;
     gap: 1rem;
@@ -307,7 +310,7 @@
     border-bottom: 1px solid var(--u-border);
 
     .profile-info {
-      flex: 1;
+      flex: 1 1 12rem;
       min-width: 0;
 
       .profile-title {
@@ -330,14 +333,16 @@
       display: flex;
       flex-wrap: wrap;
       gap: 0.5rem;
-      flex-shrink: 0;
+      flex: 1 1 auto;
       justify-content: flex-end;
+      min-width: 0;
     }
   }
 
   .permissions-notice {
     display: flex;
-    align-items: center;
+    flex-wrap: wrap;
+    align-items: flex-start;
     justify-content: space-between;
     gap: 1rem;
     margin-bottom: 1rem;
@@ -465,6 +470,37 @@
   }
 }
 
+@container user-detail (max-width: 36rem) {
+  .main-content .profile-header {
+    flex-direction: column;
+
+    .profile-actions {
+      width: 100%;
+      justify-content: flex-start;
+    }
+  }
+}
+
+@media (max-width: 1080px) {
+  .main-content .profile-header {
+    flex-direction: column;
+
+    .profile-actions {
+      width: 100%;
+      justify-content: flex-start;
+    }
+  }
+
+  .permissions-notice {
+    flex-direction: column;
+    align-items: stretch;
+
+    .permissions-notice-copy {
+      width: 100%;
+    }
+  }
+}
+
 @media (max-width: 768px) {
   .content-wrapper {
     flex-direction: column;
@@ -477,16 +513,11 @@
     border-bottom: 1px solid var(--u-border);
   }
 
-  .main-content .profile-header {
-    flex-direction: column;
+  .main-content .profile-header .profile-actions {
+    justify-content: stretch;
 
-    .profile-actions {
-      width: 100%;
-      justify-content: stretch;
-
-      ::ng-deep .p-button {
-        flex: 1;
-      }
+    ::ng-deep .p-button {
+      flex: 1 1 auto;
     }
   }
 

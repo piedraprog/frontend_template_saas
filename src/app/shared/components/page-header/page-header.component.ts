@@ -47,7 +47,8 @@ import { ButtonModule } from 'primeng/button';
     }
     .page-header {
       display: flex;
-      align-items: center;
+      flex-wrap: wrap;
+      align-items: flex-start;
       justify-content: space-between;
       gap: 1rem;
       padding: 1rem 1.25rem;
@@ -64,6 +65,7 @@ import { ButtonModule } from 'primeng/button';
       align-items: center;
       gap: 0.75rem;
       min-width: 0;
+      flex: 1 1 16rem;
     }
     .back-button {
       display: flex;
@@ -137,19 +139,34 @@ import { ButtonModule } from 'primeng/button';
     }
     .header-actions {
       display: flex;
+      flex-wrap: wrap;
       align-items: center;
+      justify-content: flex-end;
       gap: 0.5rem;
-      flex-shrink: 0;
+      flex: 1 1 auto;
+      min-width: 0;
     }
-    @media (max-width: 639px) {
+    @media (max-width: 1080px) {
       .page-header {
-        flex-wrap: wrap;
         padding: 0.875rem 1rem;
-        margin-bottom: 1rem;
+      }
+      .header-left {
+        flex: 1 1 100%;
       }
       .header-actions {
         width: 100%;
-        justify-content: flex-end;
+        justify-content: flex-start;
+      }
+    }
+    @media (max-width: 639px) {
+      .page-header {
+        margin-bottom: 1rem;
+      }
+      .header-actions {
+        justify-content: stretch;
+      }
+      .header-actions ::ng-deep .p-button {
+        flex: 1 1 auto;
       }
       .back-button {
         width: 2.875rem;
