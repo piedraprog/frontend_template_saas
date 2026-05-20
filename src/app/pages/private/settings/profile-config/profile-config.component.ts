@@ -46,6 +46,7 @@ export default class ProfileConfigComponent implements OnInit {
 
   readonly saving = signal(false);
   readonly uploadingAvatar = signal(false);
+  readonly editing = signal(false);
   readonly user = computed(() => this.userService.userData());
 
   readonly form = new FormGroup({
@@ -60,14 +61,52 @@ export default class ProfileConfigComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    const u = this.userService.userData();
-    this.form.patchValue({
-      username: u.username,
-      email: u.email,
-    });
+    this.resetFormToCurrentUser();
+    this.form.disable({ emitEvent: false });
+  }
+
+  private resetFormToCurrentUser(): void {
+    const currentUser = this.userService.userData();
+    this.form.reset(
+      {
+        username: currentUser.username,
+        email: currentUser.email,
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: '',
+      },
+      { emitEvent: false },
+    );
+  }
+
+  enableEditing(): void {
+    if (this.saving() || this.uploadingAvatar()) {
+      return;
+    }
+
+    this.editing.set(true);
+    this.resetFormToCurrentUser();
+    this.form.enable({ emitEvent: false });
+  }
+
+  cancelEditing(): void {
+    this.editing.set(false);
+    this.resetFormToCurrentUser();
+    this.form.disable({ emitEvent: false });
+    this.form.markAsPristine();
+    this.form.markAsUntouched();
   }
 
   onAvatarChange(event: Event): void {
+    if (!this.editing()) {
+      this.messageService.add({
+        severity: 'info',
+        summary: 'Perfil',
+        detail: 'Activa la edición para cambiar la foto o tus datos.',
+      });
+      return;
+    }
+
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
     input.value = '';
@@ -103,6 +142,10 @@ export default class ProfileConfigComponent implements OnInit {
   }
 
   save(): void {
+    if (!this.editing()) {
+      return;
+    }
+
     this.form.markAllAsTouched();
     if (this.form.controls.username.invalid || this.form.controls.email.invalid) {
       return;
@@ -147,19 +190,32 @@ export default class ProfileConfigComponent implements OnInit {
     }
 
     this.saving.set(true);
+    this.form.disable({ emitEvent: false });
     this.profileApi.updateProfile(body).subscribe({
       next: () => {
         this.saving.set(false);
+        this.editing.set(false);
         this.messageService.add({
           severity: 'success',
           summary: 'Perfil',
           detail: 'Cambios guardados.',
         });
-        this.form.patchValue({ currentPassword: '', newPassword: '', confirmPassword: '' });
+        this.form.reset(
+          {
+            username: body.username ?? '',
+            email: body.email ?? '',
+            currentPassword: '',
+            newPassword: '',
+            confirmPassword: '',
+          },
+          { emitEvent: false },
+        );
+        this.form.disable({ emitEvent: false });
         void this.authService.getProfile().subscribe();
       },
       error: (err: Error) => {
         this.saving.set(false);
+        this.form.enable({ emitEvent: false });
         this.messageService.add({
           severity: 'error',
           summary: 'Perfil',

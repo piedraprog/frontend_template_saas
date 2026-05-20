@@ -14,7 +14,6 @@ export interface RoleInterface {
 export interface CreateRoleDto {
   name: string;
   permissions: number;
-  companyId: string;
 }
 
 export interface UpdateRoleDto {

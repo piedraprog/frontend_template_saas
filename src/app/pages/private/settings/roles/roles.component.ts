@@ -15,7 +15,6 @@ import { PageHeaderComponent } from '../../../../shared/components/page-header/p
 import { PrimengModule } from '../../../../shared/modules/primeng.module';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import { UserService } from '../../../../core/services/user.service';
 import { UserInterface } from '../../../../core/models/interfaces/user.interface';
 
 interface PermissionOption {
@@ -35,7 +34,6 @@ interface PermissionOption {
 })
 export default class RolesComponent implements OnInit {
   private rolesService = inject(RolesService);
-  private userService = inject(UserService);
 
   roles = signal<RoleInterface[]>([]);
   users = input<UserInterface[]>([]);
@@ -47,8 +45,6 @@ export default class RolesComponent implements OnInit {
 
   newRoleName = '';
   newRolePermissions: number = 0;
-
-  companyId = '';
 
   assignedCountByRole = computed(() => {
     const counts = new Map<string, number>();
@@ -100,8 +96,6 @@ export default class RolesComponent implements OnInit {
   ];
 
   ngOnInit(): void {
-    const user = this.userService.userData();
-    this.companyId = user?.companyId ?? '';
     this.loadRoles();
   }
 
@@ -146,7 +140,6 @@ export default class RolesComponent implements OnInit {
       .create({
         name: this.newRoleName,
         permissions: this.newRolePermissions,
-        companyId: this.companyId,
       })
       .subscribe({
         next: (role) => {

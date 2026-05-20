@@ -8,7 +8,6 @@ import {
   CreateRoleDto,
   UpdateRoleDto,
 } from '../../models/interfaces/role.interface';
-import { TokenService } from '../auth/token.service';
 
 /** Alias usado en vistas de administración de equipo. */
 export type CustomRole = RoleInterface;
@@ -24,7 +23,6 @@ export interface RoleFormPayload {
 })
 export class RolesService {
   private http = inject(HttpClient);
-  private tokenService = inject(TokenService);
   private baseUrl = `${environment.apiUrl}/roles`;
 
   list(): Observable<RoleInterface[]> {
@@ -98,11 +96,9 @@ export class RolesService {
   }
 
   createRole(payload: RoleFormPayload): Observable<RoleInterface> {
-    const companyId = this.tokenService.getCompanyId() ?? '';
     return this.create({
       name: payload.name,
       permissions: payload.permissions,
-      companyId,
     });
   }
 

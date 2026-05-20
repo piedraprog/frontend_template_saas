@@ -10,13 +10,7 @@ import {
   SimpleChanges,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {
-  FormBuilder,
-  FormGroup,
-  ReactiveFormsModule,
-  Validators,
-  FormsModule,
-} from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { PrimengModule } from '../../../../../../shared/modules/primeng.module';
 import { CustomRole } from '../../../../../../core/services/roles/roles.service';
 import { AdminUserService } from '../../../../../../core/services/admin-user.service';
@@ -31,7 +25,7 @@ import { finalize } from 'rxjs/operators';
 @Component({
   selector: 'app-user-create-modal',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, PrimengModule],
+  imports: [CommonModule, ReactiveFormsModule, PrimengModule],
   templateUrl: './user-create-modal.component.html',
   styles: [],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -49,9 +43,13 @@ export class UserCreateModalComponent implements OnChanges {
 
   loading = signal(false);
   membersLimitExceeded = signal(false);
+  submitAttempted = signal(false);
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['visible']?.currentValue === true) {
+      this.submitAttempted.set(false);
+      this.createForm.reset();
+      this.createForm.enable({ emitEvent: false });
       this.plansService.getSubscriptionSummary().subscribe({
         next: (res) => this.membersLimitExceeded.set(res.usage?.max_members?.exceeded === true),
         error: () => this.membersLimitExceeded.set(false),
@@ -69,13 +67,48 @@ export class UserCreateModalComponent implements OnChanges {
     customRoleId: [null, [Validators.required]],
   });
 
-  onHide() {
-    this.visible = false;
+  private setSubmittingState(isSubmitting: boolean): void {
+    this.loading.set(isSubmitting);
+
+    if (isSubmitting) {
+      this.createForm.disable({ emitEvent: false });
+      return;
+    }
+
+    this.createForm.enable({ emitEvent: false });
+  }
+
+  shouldShowError(controlName: 'username' | 'email' | 'customRoleId'): boolean {
+    const control = this.createForm.get(controlName);
+    return Boolean(control?.invalid && (control.touched || this.submitAttempted()));
+  }
+
+  onDialogVisibleChange(isVisible: boolean): void {
+    if (isVisible) {
+      return;
+    }
+
+    this.dismissModal();
+  }
+
+  dismissModal(): void {
+    if (this.loading()) {
+      return;
+    }
+
+    this.closeModal();
+  }
+
+  private closeModal(): void {
     this.visibleChange.emit(false);
     this.createForm.reset();
+    this.submitAttempted.set(false);
+    this.createForm.enable({ emitEvent: false });
   }
 
   onSubmit() {
+    this.submitAttempted.set(true);
+
     if (this.membersLimitExceeded()) {
       this.toastService.warn(
         'Límite de miembros alcanzado',
@@ -88,21 +121,27 @@ export class UserCreateModalComponent implements OnChanges {
       return;
     }
 
-    this.loading.set(true);
     const formValue = this.createForm.value;
+    const username = String(formValue.username ?? '').trim();
+    const email = String(formValue.email ?? '')
+      .trim()
+      .toLowerCase();
+    const customRoleId = formValue.customRoleId ?? undefined;
+
+    this.setSubmittingState(true);
 
     this.adminUserService
       .createUser({
-        username: formValue.username,
-        email: formValue.email,
-        customRoleId: formValue.customRoleId,
+        username,
+        email,
+        customRoleId,
       })
-      .pipe(finalize(() => this.loading.set(false)))
+      .pipe(finalize(() => this.setSubmittingState(false)))
       .subscribe({
         next: () => {
           this.toastService.success('Usuario creado correctamente');
           this.userCreated.emit();
-          this.onHide();
+          this.closeModal();
         },
         error: (error) => {
           console.error('Error al crear usuario', error);
@@ -111,6 +150,7 @@ export class UserCreateModalComponent implements OnChanges {
             isLimitError ? 'Límite del plan alcanzado' : 'No se pudo crear el usuario',
             isLimitError ? 'Actualiza tu plan para invitar más miembros.' : undefined,
           );
+          this.closeModal();
         },
       });
   }

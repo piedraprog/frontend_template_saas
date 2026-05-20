@@ -1,7 +1,7 @@
 <p-dialog
   header="Crear Nuevo Usuario"
   [visible]="visible"
-  (visibleChange)="onHide()"
+  (visibleChange)="onDialogVisibleChange($event)"
   [modal]="true"
   [style]="{ width: '450px' }"
   [draggable]="false"
@@ -16,7 +16,6 @@
       </div>
     }
     <form [formGroup]="createForm" class="flex flex-col gap-3 pt-2">
-      <!-- Username Field -->
       <div class="field">
         <label for="username" class="font-medium mb-2 block">Nombre Completo</label>
         <input
@@ -24,20 +23,16 @@
           id="username"
           formControlName="username"
           class="w-full"
-          [class.ng-invalid]="
-            createForm.get('username')?.invalid && createForm.get('username')?.touched
-          "
+          [class.ng-invalid]="shouldShowError('username')"
           placeholder="Ej: Juan Pérez"
         />
-        <small
-          class="p-error block mt-1"
-          *ngIf="createForm.get('username')?.invalid && createForm.get('username')?.touched"
-        >
-          {{ getErrorMessage(createForm.get('username')) }}
-        </small>
+        @if (shouldShowError('username')) {
+          <small class="p-error block mt-1">
+            {{ getErrorMessage(createForm.get('username')) }}
+          </small>
+        }
       </div>
 
-      <!-- Email Field -->
       <div class="field">
         <label for="email" class="font-medium mb-2 block">Correo Electrónico</label>
         <input
@@ -46,21 +41,19 @@
           formControlName="email"
           type="email"
           class="w-full"
-          [class.ng-invalid]="createForm.get('email')?.invalid && createForm.get('email')?.touched"
+          [class.ng-invalid]="shouldShowError('email')"
           placeholder="juan@ejemplo.com"
         />
-        <small
-          class="p-error block mt-1"
-          *ngIf="createForm.get('email')?.invalid && createForm.get('email')?.touched"
-        >
-          {{ getErrorMessage(createForm.get('email')) }}
-        </small>
+        @if (shouldShowError('email')) {
+          <small class="p-error block mt-1">
+            {{ getErrorMessage(createForm.get('email')) }}
+          </small>
+        }
         <small class="text-slate-500 block mt-2">
           El usuario recibirá un correo con instrucciones para iniciar sesión.
         </small>
       </div>
 
-      <!-- Role Field -->
       <div class="field">
         <label for="role" class="font-medium mb-2 block">Rol</label>
         <p-select
@@ -85,13 +78,16 @@
             </div>
           </ng-template>
         </p-select>
-        <small
-          class="p-error block mt-1"
-          *ngIf="createForm.get('customRoleId')?.invalid && createForm.get('customRoleId')?.touched"
-        >
-          El rol es requerido
-        </small>
+        @if (shouldShowError('customRoleId')) {
+          <small class="p-error block mt-1">El rol es requerido</small>
+        }
       </div>
+
+      @if (loading()) {
+        <div class="rounded-md border border-sky-200 bg-sky-50 px-3 py-2 text-sm text-sky-900">
+          Creando usuario e invitando por correo.
+        </div>
+      }
     </form>
   </ng-template>
 
@@ -101,7 +97,7 @@
         label="Cancelar"
         [outlined]="true"
         icon="pi pi-times"
-        (click)="onHide()"
+        (click)="dismissModal()"
         [disabled]="loading()"
         severity="secondary"
       />
@@ -110,7 +106,7 @@
         icon="pi pi-check"
         (click)="onSubmit()"
         [loading]="loading()"
-        [disabled]="createForm.invalid || membersLimitExceeded()"
+        [disabled]="loading() || membersLimitExceeded()"
       />
     </div>
   </ng-template>
