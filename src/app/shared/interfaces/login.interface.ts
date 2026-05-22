@@ -6,6 +6,10 @@ export interface LoginInterface {
 
 export interface LoginResponseInterface {
   userId: string;
-  accessToken: string;
-  refreshToken: string;
+  companyId: string;
+  previousSessionClosed?: {
+    device: string;
+    platform: string;
+    ip: string;
+  } | null;
 }

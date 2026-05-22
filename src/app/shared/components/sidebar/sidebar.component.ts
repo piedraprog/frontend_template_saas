@@ -207,9 +207,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
 
   private initNotifications(): void {
     const userId =
-      typeof sessionStorage !== 'undefined'
-        ? sessionStorage.getItem(SESSION_USER_ID)?.trim()
-        : '';
+      typeof sessionStorage !== 'undefined' ? sessionStorage.getItem(SESSION_USER_ID)?.trim() : '';
     if (userId) {
       this.notificationsService.initWebSocket();
     }

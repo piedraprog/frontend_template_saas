@@ -15,10 +15,14 @@ export class CaptchaService {
   confirmCaptcha(captchaResponse: string | null): Observable<boolean> {
     const url = `${this.apiUrl}/auth/captcha`;
     return this.http
-      .post<ApiResponse<{ success: boolean }>>(url, { token: captchaResponse }, {
-        context: new HttpContext().set(BYPASS_JW_TOKEN, true),
-        withCredentials: true,
-      })
+      .post<ApiResponse<{ success: boolean }>>(
+        url,
+        { token: captchaResponse },
+        {
+          context: new HttpContext().set(BYPASS_JW_TOKEN, true),
+          withCredentials: true,
+        },
+      )
       .pipe(map((response) => response.data?.success === true));
   }
 }

@@ -90,9 +90,7 @@ export class RegisterComponent {
 
   get isRegisterDisabled(): boolean {
     return (
-      this.registerForm.invalid ||
-      this.isSubmitting ||
-      (this.captchaEnabled && !this.captchaReady)
+      this.registerForm.invalid || this.isSubmitting || (this.captchaEnabled && !this.captchaReady)
     );
   }
 
@@ -175,7 +173,11 @@ export class RegisterComponent {
     this.submitAttempted = true;
     this.registerForm.markAllAsTouched();
 
-    if (!this.registerForm.valid || this.isSubmitting || (this.captchaEnabled && !this.captchaReady)) {
+    if (
+      !this.registerForm.valid ||
+      this.isSubmitting ||
+      (this.captchaEnabled && !this.captchaReady)
+    ) {
       return;
     }
 
