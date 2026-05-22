@@ -82,12 +82,6 @@ export default class RolesComponent implements OnInit {
       group: 'Roles',
     },
     {
-      key: 'AUDITS_VIEW',
-      label: 'Ver auditoría',
-      value: Permission.AUDITS_VIEW,
-      group: 'Auditoría',
-    },
-    {
       key: 'NOTIFICATIONS_VIEW',
       label: 'Ver notificaciones',
       value: Permission.NOTIFICATIONS_VIEW,

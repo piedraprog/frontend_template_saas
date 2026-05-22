@@ -89,18 +89,6 @@ export class PermissionEditorComponent implements OnInit {
       ],
     },
     {
-      name: 'Auditoría',
-      description: 'Acceso a logs de auditoría',
-      icon: 'pi pi-history',
-      permissions: [
-        {
-          label: 'Ver auditoría',
-          value: Permission.AUDITS_VIEW,
-          description: 'Ver logs de auditoría',
-        },
-      ],
-    },
-    {
       name: 'Notificaciones',
       description: 'Panel de notificaciones del equipo',
       icon: 'pi pi-bell',

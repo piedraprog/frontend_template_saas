@@ -12,19 +12,12 @@ import { AuthCardComponent } from '../../../../shared/components/auth-card/auth-
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../../../core/services/auth.service';
 import { LoginInterface } from '../../../../shared/interfaces/login.interface';
-import { CookieService } from 'ngx-cookie-service';
 import { IPService } from '../../../../core/services/ip.service';
 import { PasswordModule } from 'primeng/password';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { HttpErrorResponse } from '@angular/common/http';
-import { finalize } from 'rxjs';
-import {
-  SESSION_ACCESS_TOKEN,
-  SESSION_COOKIE_PATH,
-  SESSION_REFRESH_TOKEN,
-  SESSION_USER_ID,
-} from '../../../../core/constants/session-cookies';
+import { finalize, switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-login',
@@ -43,7 +36,6 @@ import {
 })
 export class LoginComponent implements OnInit {
   private authService = inject(AuthService);
-  private cookieService = inject(CookieService);
   private router = inject(Router);
   private ipService = inject(IPService);
   private messageService = inject(MessageService);
@@ -106,15 +98,19 @@ export class LoginComponent implements OnInit {
       this.authService
         .login(data)
         .pipe(finalize(() => (this.isSubmitting = false)))
-        .subscribe({
-          next: (response) => {
+        .pipe(
+          switchMap((response) => {
             this.submitAttempted = false;
-            const cookieOpts = { path: SESSION_COOKIE_PATH };
-            this.cookieService.set(SESSION_ACCESS_TOKEN, response.accessToken, cookieOpts);
-            this.cookieService.set(SESSION_REFRESH_TOKEN, response.refreshToken, cookieOpts);
-            this.cookieService.set(SESSION_USER_ID, response.userId, cookieOpts);
+            this.authService.persistSessionMetadata(response.userId);
+            return this.authService.getProfile();
+          }),
+        )
+        .subscribe({
+          next: (profile) => {
+            const onboardingCompletedAt = profile.onboardingCompletedAt ?? null;
+            const targetUrl = onboardingCompletedAt ? '/dashboard' : '/onboarding';
 
-            this.router.navigate(['/dashboard']);
+            void this.router.navigateByUrl(targetUrl);
           },
           error: (error: HttpErrorResponse) => {
             this.submitAttempted = false;

@@ -99,4 +99,19 @@ export class OnboardingService {
         }),
       );
   }
+
+  confirmStripeSession(sessionId: string): Observable<OnboardingStateInterface> {
+    return this.http
+      .post<
+        ApiResponse<OnboardingStateInterface>
+      >(`${this.apiUrl}/billing/onboarding/confirm-stripe-session`, { sessionId })
+      .pipe(
+        map((response) => {
+          if (response.status && response.data) {
+            return response.data;
+          }
+          throw new Error(response.message || 'No se pudo confirmar la sesión de Stripe');
+        }),
+      );
+  }
 }

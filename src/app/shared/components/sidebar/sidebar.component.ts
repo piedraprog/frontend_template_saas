@@ -20,8 +20,7 @@ import { ButtonModule } from 'primeng/button';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { RippleModule } from 'primeng/ripple';
 import { Subscription, finalize } from 'rxjs';
-import { CookieService } from 'ngx-cookie-service';
-import { SESSION_ACCESS_TOKEN } from '../../../core/constants/session-cookies';
+import { SESSION_USER_ID } from '../../../core/constants/session-cookies';
 import { AuthService } from '../../../core/services/auth.service';
 import { NotificationsService } from '../../../core/services/notifications/notifications.service';
 import { PermissionService } from '../../../core/services/permission.service';
@@ -70,7 +69,6 @@ export class SidebarComponent implements OnInit, OnDestroy {
   notificationsPanelContainer?: ElementRef<HTMLElement>;
 
   private authService = inject(AuthService);
-  private cookieService = inject(CookieService);
   private notificationsService = inject(NotificationsService);
   private permissionService = inject(PermissionService);
   private userService = inject(UserService);
@@ -208,9 +206,12 @@ export class SidebarComponent implements OnInit, OnDestroy {
   }
 
   private initNotifications(): void {
-    const token = this.cookieService.get(SESSION_ACCESS_TOKEN)?.trim();
-    if (token) {
-      this.notificationsService.initWebSocket(token);
+    const userId =
+      typeof sessionStorage !== 'undefined'
+        ? sessionStorage.getItem(SESSION_USER_ID)?.trim()
+        : '';
+    if (userId) {
+      this.notificationsService.initWebSocket();
     }
   }
 

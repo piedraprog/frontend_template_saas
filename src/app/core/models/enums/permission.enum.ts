@@ -12,6 +12,8 @@ export enum Permission {
   ROLES_MANAGE = 1 << 5,
   AUDITS_VIEW = 1 << 6,
   NOTIFICATIONS_VIEW = 1 << 7,
+  /** Solo operadores de plataforma; no asignar en roles de tenant vía UI */
+  ADMIN_GLOBAL = 1 << 8,
 }
 
 export function hasPermission(mask: number, perm: Permission): boolean {

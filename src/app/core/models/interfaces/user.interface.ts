@@ -9,6 +9,7 @@ export interface UserInterface {
   roleName?: string;
   companyId: string;
   isOwner: boolean;
+  isPlatformOperator?: boolean;
   onboardingVariant?: string;
   onboardingCurrentStep?: string;
   onboardingCompletedAt?: string | Date | null;

@@ -27,6 +27,8 @@ export interface SubscriptionStatus {
   currentPeriodStart: Date;
   currentPeriodEnd: Date;
   cancelAtPeriodEnd: boolean;
+  gatewayProvider?: string | null;
+  customerPortalAvailable?: boolean;
 }
 
 export interface SubscriptionSummary {

@@ -36,7 +36,7 @@
               </span>
             }
             @if (corporationFormField?.errors?.['pattern']) {
-              <span>Usa solo caracteres alfanuméricos.</span>
+              <span>Usa letras, números, espacios o símbolos básicos.</span>
             }
           </small>
         }
@@ -72,7 +72,7 @@
               </span>
             }
             @if (usernameFormField?.errors?.['pattern']) {
-              <span>Usa solo caracteres alfanuméricos.</span>
+              <span>Usa solo letras, números, punto, guion o guion bajo.</span>
             }
           </small>
         }
@@ -207,16 +207,15 @@
       }
     </div>
 
-    <div
-      class="flex justify-center overflow-hidden rounded-lg border border-slate-200 bg-slate-50 p-3"
-    >
-      <ngx-turnstile
-        [siteKey]="siteKey"
-        (resolved)="confirmCaptcha($event)"
-        theme="auto"
-        [tabIndex]="0"
-      ></ngx-turnstile>
-    </div>
+    @if (captchaEnabled) {
+      <div class="flex justify-center">
+        <ngx-turnstile
+          [siteKey]="siteKey"
+          (resolved)="onCaptchaResolved($event)"
+          theme="auto"
+        ></ngx-turnstile>
+      </div>
+    }
 
     @if (isSubmitting) {
       <div class="rounded-lg border border-sky-200 bg-sky-50/80 p-4 text-sm leading-6 text-sky-900">
@@ -227,7 +226,7 @@
     <button
       type="button"
       class="auth-button inline-flex w-full items-center justify-center text-sm font-bold"
-      [disabled]="!disableButton || isSubmitting"
+      [disabled]="isRegisterDisabled"
       (click)="register()"
     >
       @if (isSubmitting) {

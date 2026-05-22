@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { finalize } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
@@ -28,6 +28,7 @@ export default class OnboardingComponent implements OnInit {
   private readonly plansService = inject(PlansService);
   private readonly messageService = inject(MessageService);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
 
   loading = signal(true);
   progressing = signal(false);
@@ -35,6 +36,7 @@ export default class OnboardingComponent implements OnInit {
   error = signal<string | null>(null);
   state = signal<OnboardingStateInterface | null>(null);
   plans = signal<PlanInterface[]>([]);
+  processingBillingReturn = signal(false);
 
   get currentStep(): OnboardingStepInterface | null {
     const currentStepId = this.state()?.currentStepId;
@@ -47,6 +49,7 @@ export default class OnboardingComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadViewModel();
+    this.handleBillingReturn();
   }
 
   loadViewModel(): void {
@@ -65,6 +68,100 @@ export default class OnboardingComponent implements OnInit {
           this.error.set(err.message ?? 'No se pudo cargar el onboarding');
         },
       });
+  }
+
+  handleBillingReturn(): void {
+    this.route.queryParamMap.subscribe((params) => {
+      const billingStatus = params.get('billing');
+      const sessionId = params.get('session_id');
+
+      if (billingStatus === 'cancelled') {
+        this.messageService.add({
+          severity: 'warn',
+          summary: 'Facturación',
+          detail: 'El checkout fue cancelado. Puedes elegir otro plan o intentarlo de nuevo.',
+        });
+        return;
+      }
+
+      if (billingStatus === 'success' && sessionId) {
+        void this.waitForBillingActivation(sessionId);
+      }
+    });
+  }
+
+  async waitForBillingActivation(sessionId: string): Promise<void> {
+    if (this.processingBillingReturn()) {
+      return;
+    }
+
+    this.processingBillingReturn.set(true);
+    this.loading.set(true);
+    this.error.set(null);
+
+    const confirmed = await this.tryConfirmStripeSession(sessionId);
+    if (confirmed) {
+      this.processingBillingReturn.set(false);
+      this.loading.set(false);
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Facturación',
+        detail: 'La suscripción se activó correctamente. Entrando al dashboard.',
+      });
+      void this.router.navigate(['/dashboard']);
+      return;
+    }
+
+    for (let attempt = 0; attempt < 8; attempt += 1) {
+      const activated = await this.tryRefreshAfterBilling();
+      if (activated) {
+        this.processingBillingReturn.set(false);
+        this.loading.set(false);
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Facturación',
+          detail: 'La suscripción se activó correctamente. Entrando al dashboard.',
+        });
+        void this.router.navigate(['/dashboard']);
+        return;
+      }
+
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+    }
+
+    this.processingBillingReturn.set(false);
+    this.loading.set(false);
+    this.messageService.add({
+      severity: 'info',
+      summary: 'Facturación',
+      detail:
+        'El pago volvió correctamente, pero la activación aún no aparece. Verifica que Stripe CLI esté reenviando webhooks al backend local.',
+    });
+  }
+
+  async tryConfirmStripeSession(sessionId: string): Promise<boolean> {
+    return new Promise<boolean>((resolve) => {
+      this.onboardingService.confirmStripeSession(sessionId).subscribe({
+        next: (state) => {
+          this.state.set(state);
+          resolve(Boolean(state.isCompleted || state.hasActiveSubscription));
+        },
+        error: () => resolve(false),
+      });
+    });
+  }
+
+  async tryRefreshAfterBilling(): Promise<boolean> {
+    return new Promise<boolean>((resolve) => {
+      this.onboardingService.loadViewModel().subscribe({
+        next: ({ state, plans }) => {
+          this.state.set(state);
+          this.plans.set(plans);
+          resolve(Boolean(state.isCompleted || state.hasActiveSubscription));
+        },
+        error: () => resolve(false),
+      });
+    });
   }
 
   continueStep(): void {

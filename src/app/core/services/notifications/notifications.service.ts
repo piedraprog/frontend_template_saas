@@ -30,13 +30,14 @@ export class NotificationsService {
 
   private http = inject(HttpClient);
 
-  initWebSocket(token: string): void {
+  initWebSocket(token?: string): void {
     if (!this.socket) {
       const wsUrl = environment.apiUrl
         ? `${environment.apiUrl}/notifications`
         : `${window.location.origin}/notifications`;
       this.socket = io(wsUrl, {
-        query: { token },
+        ...(token ? { query: { token } } : {}),
+        withCredentials: true,
         transports: ['websocket'],
       });
       this.setupSocketListeners();

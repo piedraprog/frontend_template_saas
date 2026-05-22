@@ -1,43 +1,27 @@
 import { Injectable, inject } from '@angular/core';
-import { CookieService } from 'ngx-cookie-service';
-import { SESSION_ACCESS_TOKEN } from '../../constants/session-cookies';
-
-/** Payload mínimo del access JWT (auth Nest / passport-jwt). */
-export interface AccessTokenPayload {
-  sub: string;
-  email?: string;
-  companyId?: string;
-  roles?: unknown;
-}
+import { UserService } from '../user.service';
+import { SESSION_COMPANY_ID_STORAGE } from '../../constants/session-cookies';
 
 @Injectable({
   providedIn: 'root',
 })
 export class TokenService {
-  private readonly cookieService = inject(CookieService);
-
-  getAccessToken(): string {
-    return this.cookieService.get(SESSION_ACCESS_TOKEN) ?? '';
-  }
-
-  private parsePayload(): AccessTokenPayload | null {
-    const token = this.getAccessToken();
-    if (!token) return null;
-    const parts = token.split('.');
-    if (parts.length !== 3) return null;
-    try {
-      const json = globalThis.atob(parts[1].replace(/-/g, '+').replace(/_/g, '/'));
-      return JSON.parse(json) as AccessTokenPayload;
-    } catch {
-      return null;
-    }
-  }
+  private readonly userService = inject(UserService);
 
   getUserId(): string | undefined {
-    return this.parsePayload()?.sub;
+    const id = this.userService.userData().id;
+    return id && id.length > 0 ? id : undefined;
   }
 
   getCompanyId(): string | undefined {
-    return this.parsePayload()?.companyId;
+    const fromProfile = this.userService.userData().companyId;
+    if (fromProfile && fromProfile.length > 0) {
+      return fromProfile;
+    }
+    if (typeof sessionStorage === 'undefined') {
+      return undefined;
+    }
+    const stored = sessionStorage.getItem(SESSION_COMPANY_ID_STORAGE);
+    return stored && stored.length > 0 ? stored : undefined;
   }
 }

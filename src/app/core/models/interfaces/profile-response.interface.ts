@@ -16,6 +16,7 @@ export interface ProfileResponseInterface {
   onboardingCompletedAt?: string | null;
   permissions: number;
   isOwner: boolean;
+  isPlatformOperator?: boolean;
   customPermissions?: number | null;
   customRoleId?: string;
   customRole?: ProfileCustomRole | null;

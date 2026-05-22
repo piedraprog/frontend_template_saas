@@ -11,7 +11,6 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, RouterOutlet } from '@angular/router';
-import { CookieService } from 'ngx-cookie-service';
 import { ToastModule } from 'primeng/toast';
 import { Subscription } from 'rxjs';
 import { NotificationsService } from '../../../core/services/notifications/notifications.service';
@@ -59,7 +58,6 @@ const MOBILE_BREAKPOINT = 768;
 export default class BaseLayoutComponent implements OnInit, OnDestroy {
   @ViewChild(SidebarComponent) sidebarComponent?: SidebarComponent;
 
-  private cookieService = inject(CookieService);
   private notificationsService = inject(NotificationsService);
   private permissionService = inject(PermissionService);
   private toastService = inject(ToastService);
@@ -148,9 +146,6 @@ export default class BaseLayoutComponent implements OnInit, OnDestroy {
   }
 
   private initNotifications(): void {
-    const token = this.cookieService.get('accessToken');
-    if (token) {
-      this.notificationsService.initWebSocket(token);
-    }
+    this.notificationsService.initWebSocket();
   }
 }

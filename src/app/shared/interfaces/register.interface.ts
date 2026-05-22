@@ -2,9 +2,8 @@ export interface RegisterInterface {
   username: string;
   email: string;
   password: string;
-  captchaToken: string;
   company: string;
-  termsCondition: boolean;
+  captchaToken?: string;
 }
 
 export interface RegisterResponseInterface {

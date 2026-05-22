@@ -1,15 +1,14 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
-import { CookieService } from 'ngx-cookie-service';
-import { SESSION_ACCESS_TOKEN } from '../constants/session-cookies';
+import { SESSION_USER_ID } from '../constants/session-cookies';
 
 export const authGuard: CanActivateFn = () => {
-  const cookieService = inject(CookieService);
   const router = inject(Router);
 
-  const accessToken = cookieService.get(SESSION_ACCESS_TOKEN)?.trim();
+  const userId =
+    typeof sessionStorage !== 'undefined' ? sessionStorage.getItem(SESSION_USER_ID)?.trim() : '';
 
-  if (!accessToken) {
+  if (!userId) {
     void router.navigateByUrl('/login', { replaceUrl: true });
     return false;
   }

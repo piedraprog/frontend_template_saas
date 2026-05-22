@@ -14,9 +14,6 @@ import { AuthCardComponent } from '../../../../shared/components/auth-card/auth-
 import { passwordMatcherValidator } from '../../../../shared/validators/password-matcher';
 import { RegexUtils } from '../../../../shared/utils/regex.utils';
 import { passwordValidator } from '../../../../shared/validators/password-validator';
-import { CaptchaService } from '../../../../shared/services/captcha.service';
-import { NgxTurnstileModule } from 'ngx-turnstile';
-import { environment } from '../../../../../environments/environment';
 import { AuthService } from '../../../../core/services/auth.service';
 import { RegisterInterface } from '../../../../shared/interfaces/register.interface';
 import { PasswordModule } from 'primeng/password';
@@ -24,6 +21,9 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { finalize } from 'rxjs';
+import { environment } from '../../../../../environments/environment';
+import { NgxTurnstileModule } from 'ngx-turnstile';
+import { CaptchaService } from '../../../../shared/services/captcha.service';
 
 @Component({
   selector: 'app-register',
@@ -35,42 +35,43 @@ import { finalize } from 'rxjs';
     ReactiveFormsModule,
     AuthCardComponent,
     RouterModule,
-    NgxTurnstileModule,
     PasswordModule,
     CheckboxModule,
     ToastModule,
+    NgxTurnstileModule,
   ],
   providers: [MessageService],
   templateUrl: './register.component.html',
 })
 export class RegisterComponent {
-  private captchaService = inject(CaptchaService);
   private authService = inject(AuthService);
+  private captchaService = inject(CaptchaService);
   private router = inject(Router);
   private messageService = inject(MessageService);
 
-  disableButton = false;
+  readonly captchaEnabled = Boolean(environment.captcha_key?.trim());
+  readonly siteKey = environment.captcha_key ?? '';
+
   isSubmitting = false;
   submitAttempted = false;
   passwordVisible = false;
   confirmPasswordVisible = false;
-
-  public siteKey = environment.captcha_key;
-  captchaToken: string = '';
+  captchaToken = '';
+  captchaReady = !this.captchaEnabled;
 
   public registerForm = new FormGroup(
     {
       corporation: new FormControl<string>('', [
-        Validators.pattern(RegexUtils.OnlyLettersRegx),
-        Validators.minLength(5),
-        Validators.maxLength(15),
+        Validators.pattern(RegexUtils.CompanyNameRegx),
+        Validators.minLength(2),
+        Validators.maxLength(80),
         Validators.required,
       ]),
       username: new FormControl<string>('', [
         Validators.required,
-        Validators.minLength(5),
-        Validators.maxLength(10),
-        Validators.pattern(RegexUtils.OnlyLettersRegx),
+        Validators.minLength(3),
+        Validators.maxLength(30),
+        Validators.pattern(RegexUtils.UsernameRegx),
       ]),
       email: new FormControl<string>('', [Validators.required, Validators.email]),
       password: new FormControl<string>('', [
@@ -86,6 +87,14 @@ export class RegisterComponent {
       validators: [passwordMatcherValidator],
     },
   );
+
+  get isRegisterDisabled(): boolean {
+    return (
+      this.registerForm.invalid ||
+      this.isSubmitting ||
+      (this.captchaEnabled && !this.captchaReady)
+    );
+  }
 
   get corporationFormField() {
     return this.registerForm.get('corporation');
@@ -133,24 +142,31 @@ export class RegisterComponent {
     );
   }
 
-  confirmCaptcha(captchaResponse: string | null) {
+  onCaptchaResolved(captchaResponse: string | null): void {
+    if (!this.captchaEnabled) {
+      this.captchaReady = true;
+      return;
+    }
+
+    if (!captchaResponse) {
+      this.captchaToken = '';
+      this.captchaReady = false;
+      return;
+    }
+
     this.captchaService.confirmCaptcha(captchaResponse).subscribe({
-      next: (isCaptchaValid: boolean | undefined) => {
-        if (isCaptchaValid === true) {
-          console.log('Captcha verified successfully');
-          this.captchaToken = captchaResponse!;
-          this.disableButton = true;
-        } else if (isCaptchaValid === false) {
-          console.error('Captcha verification failed');
-          this.disableButton = false;
+      next: (isValid) => {
+        if (isValid) {
+          this.captchaToken = captchaResponse;
+          this.captchaReady = true;
         } else {
-          console.error('Captcha verification result is undefined');
-          this.disableButton = false;
+          this.captchaToken = '';
+          this.captchaReady = false;
         }
       },
-      error: (error: Error) => {
-        console.error(error);
-        this.disableButton = false;
+      error: () => {
+        this.captchaToken = '';
+        this.captchaReady = false;
       },
     });
   }
@@ -159,33 +175,34 @@ export class RegisterComponent {
     this.submitAttempted = true;
     this.registerForm.markAllAsTouched();
 
-    if (this.registerForm.valid && this.disableButton && !this.isSubmitting) {
-      const data: RegisterInterface = {
-        username: this.registerForm.value.username!,
-        email: this.registerForm.value.email!,
-        password: this.registerForm.value.confirmPassword!,
-        captchaToken: this.captchaToken,
-        company: this.registerForm.value.corporation!,
-        termsCondition: this.registerForm.value.termsCondition!,
-      };
-      this.isSubmitting = true;
-      this.authService
-        .register(data)
-        .pipe(finalize(() => (this.isSubmitting = false)))
-        .subscribe({
-          next: () => {
-            this.submitAttempted = false;
-            this.router.navigate(['/success']);
-          },
-          error: (error) => {
-            this.messageService.add({
-              severity: 'error',
-              summary: 'No se pudo crear la cuenta',
-              detail: error?.error?.message ?? error?.message ?? 'Intenta nuevamente.',
-            });
-          },
-        });
+    if (!this.registerForm.valid || this.isSubmitting || (this.captchaEnabled && !this.captchaReady)) {
+      return;
     }
+
+    const data: RegisterInterface = {
+      username: this.registerForm.value.username!.trim(),
+      email: this.registerForm.value.email!.trim(),
+      password: this.registerForm.value.password!,
+      company: this.registerForm.value.corporation!.trim(),
+      ...(this.captchaEnabled && this.captchaToken ? { captchaToken: this.captchaToken } : {}),
+    };
+    this.isSubmitting = true;
+    this.authService
+      .register(data)
+      .pipe(finalize(() => (this.isSubmitting = false)))
+      .subscribe({
+        next: () => {
+          this.submitAttempted = false;
+          this.router.navigate(['/success']);
+        },
+        error: (error) => {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'No se pudo crear la cuenta',
+            detail: error?.error?.message ?? error?.message ?? 'Intenta nuevamente.',
+          });
+        },
+      });
   }
 
   passwordToggle() {

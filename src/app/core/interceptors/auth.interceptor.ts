@@ -6,10 +6,9 @@ import {
   HttpRequest,
 } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { CookieService } from 'ngx-cookie-service';
 import { Observable } from 'rxjs';
-import { SESSION_ACCESS_TOKEN } from '../constants/session-cookies';
 import { TokenService } from '../services/auth/token.service';
+import { SESSION_COMPANY_ID_STORAGE } from '../constants/session-cookies';
 
 export const BYPASS_JW_TOKEN = new HttpContextToken(() => false);
 
@@ -17,24 +16,26 @@ export const authInterceptor: HttpInterceptorFn = (
   req: HttpRequest<unknown>,
   next: HttpHandlerFn,
 ): Observable<HttpEvent<unknown>> => {
-  const cookieService = inject(CookieService);
   const tokenService = inject(TokenService);
 
-  let headers = req.headers
-    .set('Platform', 'web')
-    .set('Authorization', `Bearer ${cookieService.get(SESSION_ACCESS_TOKEN)}`);
+  let headers = req.headers.set('Platform', 'web');
 
-  const companyId = tokenService.getCompanyId();
+  const companyId =
+    tokenService.getCompanyId() ??
+    (typeof sessionStorage !== 'undefined'
+      ? (sessionStorage.getItem(SESSION_COMPANY_ID_STORAGE) ?? undefined)
+      : undefined);
   if (companyId) {
     headers = headers.set('X-Company-ID', companyId);
   }
 
   const newReq = req.clone({
     headers,
+    withCredentials: true,
   });
 
   if (req.context.get(BYPASS_JW_TOKEN) === true) {
-    return next(req);
+    return next(req.clone({ withCredentials: true }));
   }
 
   return next(newReq);
