@@ -13,6 +13,8 @@ import { PageHeaderComponent } from '../../../../shared/components/page-header/p
 import { ViewPlansModalComponent } from './components/view-plans-modal/view-plans-modal.component';
 import { RouterModule } from '@angular/router';
 import { forkJoin } from 'rxjs';
+import { ToastService } from '../../../../shared/services/toast.service';
+import { mapHttpErrorToUserMessage } from '../../../../core/utils/map-http-error-to-user-message';
 
 @Component({
   selector: 'app-membership',
@@ -30,6 +32,7 @@ import { forkJoin } from 'rxjs';
 })
 export class MembershipComponent implements OnInit {
   private plansService = inject(PlansService);
+  private toastService = inject(ToastService);
 
   currentPlan = signal<PlanSummary | null>(null);
   currentSubscription = signal<SubscriptionStatus | null>(null);
@@ -54,7 +57,11 @@ export class MembershipComponent implements OnInit {
         this.usage.set(summary.usage);
         this.availableAddons.set((allAddons ?? []).filter((addon) => addon.isActive !== false));
       },
-      error: (err) => console.error('Error loading membership data', err),
+      error: (err: unknown) => {
+        this.toastService.error(
+          mapHttpErrorToUserMessage(err, 'No se pudo cargar la información de membresía'),
+        );
+      },
     });
   }
 
@@ -66,15 +73,16 @@ export class MembershipComponent implements OnInit {
     this.plansService.createCustomerPortal().subscribe({
       next: (portal) => {
         if (!portal.url) {
-          alert('No se recibió URL del portal de facturación.');
+          this.toastService.error('No se recibió URL del portal de facturación.');
           return;
         }
 
         globalThis.location.href = portal.url;
       },
-      error: (err) => {
-        console.error('Error opening customer portal', err);
-        alert(err?.message ?? 'No se pudo abrir el portal de facturación.');
+      error: (err: unknown) => {
+        this.toastService.error(
+          mapHttpErrorToUserMessage(err, 'No se pudo abrir el portal de facturación.'),
+        );
       },
     });
   }
@@ -83,15 +91,16 @@ export class MembershipComponent implements OnInit {
     this.plansService.createAddonCheckout(addon.id, 'stripe', 'monthly', 'settings').subscribe({
       next: (session) => {
         if (!session.url) {
-          alert('No se recibió URL de checkout para el addon.');
+          this.toastService.error('No se recibió URL de checkout para el addon.');
           return;
         }
 
         globalThis.location.href = session.url;
       },
-      error: (err) => {
-        console.error('Error starting addon checkout', err);
-        alert(err?.message ?? 'Error al iniciar el checkout del addon.');
+      error: (err: unknown) => {
+        this.toastService.error(
+          mapHttpErrorToUserMessage(err, 'Error al iniciar el checkout del addon.'),
+        );
       },
     });
   }

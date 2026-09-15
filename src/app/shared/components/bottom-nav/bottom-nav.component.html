@@ -22,7 +22,7 @@
       <button
         class="nav-item"
         [class.active]="isActive(item)"
-        [class.nav-item-quick-action]="item.id.includes('quick-action') || item.id === 'new-raffle'"
+        [class.nav-item-quick-action]="item.id.includes('quick-action')"
         (click)="onItemClick(item, $event)"
         pRipple
         type="button"

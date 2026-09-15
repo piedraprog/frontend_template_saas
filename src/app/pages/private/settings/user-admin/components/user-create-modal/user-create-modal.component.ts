@@ -20,6 +20,8 @@ import {
   getErrorMessage,
   VALIDATION_MESSAGES,
 } from '../../../../../../core/utils/validation-messages';
+import { mapHttpErrorToUserMessage } from '../../../../../../core/utils/map-http-error-to-user-message';
+import { HttpErrorResponse } from '@angular/common/http';
 import { finalize } from 'rxjs/operators';
 
 @Component({
@@ -52,6 +54,7 @@ export class UserCreateModalComponent implements OnChanges {
       this.createForm.enable({ emitEvent: false });
       this.plansService.getSubscriptionSummary().subscribe({
         next: (res) => this.membersLimitExceeded.set(res.usage?.max_members?.exceeded === true),
+        // secondary refresh — silent
         error: () => this.membersLimitExceeded.set(false),
       });
     }
@@ -111,8 +114,8 @@ export class UserCreateModalComponent implements OnChanges {
 
     if (this.membersLimitExceeded()) {
       this.toastService.warn(
-        'Límite de miembros alcanzado',
         'Actualiza tu plan para invitar más usuarios.',
+        'Límite de miembros alcanzado',
       );
       return;
     }
@@ -139,18 +142,21 @@ export class UserCreateModalComponent implements OnChanges {
       .pipe(finalize(() => this.setSubmittingState(false)))
       .subscribe({
         next: () => {
-          this.toastService.success('Usuario creado correctamente');
+          this.toastService.success('El usuario fue creado y ya puede acceder con su invitación.');
           this.userCreated.emit();
           this.closeModal();
         },
-        error: (error) => {
-          console.error('Error al crear usuario', error);
-          const isLimitError = error?.status === 403 && error?.error?.error === 'LimitExceeded';
+        error: (error: unknown) => {
+          const isLimitError =
+            error instanceof HttpErrorResponse &&
+            error.status === 403 &&
+            (error.error as { error?: string } | null)?.error === 'LimitExceeded';
           this.toastService.error(
-            isLimitError ? 'Límite del plan alcanzado' : 'No se pudo crear el usuario',
-            isLimitError ? 'Actualiza tu plan para invitar más miembros.' : undefined,
+            isLimitError
+              ? 'Actualiza tu plan para invitar más miembros.'
+              : mapHttpErrorToUserMessage(error, 'No se pudo crear el usuario'),
+            isLimitError ? 'Límite del plan alcanzado' : undefined,
           );
-          this.closeModal();
         },
       });
   }

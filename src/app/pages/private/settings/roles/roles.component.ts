@@ -12,10 +12,15 @@ import { RolesService } from '../../../../core/services/roles/roles.service';
 import { RoleInterface } from '../../../../core/models/interfaces/role.interface';
 import { Permission } from '../../../../core/models/enums/permission.enum';
 import { PageHeaderComponent } from '../../../../shared/components/page-header/page-header.component';
+import { PageLoadingSkeletonComponent } from '../../../../shared/components/page-loading-skeleton/page-loading-skeleton.component';
 import { PrimengModule } from '../../../../shared/modules/primeng.module';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { UserInterface } from '../../../../core/models/interfaces/user.interface';
+import { ConfirmationService } from 'primeng/api';
+import { ToastService } from '../../../../shared/services/toast.service';
+import { mapHttpErrorToUserMessage } from '../../../../core/utils/map-http-error-to-user-message';
+import { finalize } from 'rxjs';
 
 interface PermissionOption {
   key: string;
@@ -27,18 +32,29 @@ interface PermissionOption {
 @Component({
   selector: 'app-roles',
   standalone: true,
-  imports: [CommonModule, PrimengModule, FormsModule, RouterModule, PageHeaderComponent],
+  imports: [
+    CommonModule,
+    PrimengModule,
+    FormsModule,
+    RouterModule,
+    PageHeaderComponent,
+    PageLoadingSkeletonComponent,
+  ],
+  providers: [ConfirmationService],
   templateUrl: './roles.component.html',
   styleUrl: './roles.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export default class RolesComponent implements OnInit {
   private rolesService = inject(RolesService);
+  private confirmationService = inject(ConfirmationService);
+  private toastService = inject(ToastService);
 
   roles = signal<RoleInterface[]>([]);
   users = input<UserInterface[]>([]);
   embedded = input(false);
   isLoading = signal<boolean>(false);
+  mutating = signal(false);
   showCreateDialog = signal<boolean>(false);
   showEditDialog = signal<boolean>(false);
   selectedRole = signal<RoleInterface | null>(null);
@@ -95,13 +111,19 @@ export default class RolesComponent implements OnInit {
 
   loadRoles(): void {
     this.isLoading.set(true);
-    this.rolesService.list().subscribe({
-      next: (roles) => {
-        this.roles.set(roles);
-        this.isLoading.set(false);
-      },
-      error: () => this.isLoading.set(false),
-    });
+    this.rolesService
+      .list()
+      .pipe(finalize(() => this.isLoading.set(false)))
+      .subscribe({
+        next: (roles) => {
+          this.roles.set(roles);
+        },
+        error: (error: unknown) => {
+          this.toastService.error(
+            mapHttpErrorToUserMessage(error, 'No se pudieron cargar los roles'),
+          );
+        },
+      });
   }
 
   hasPermission(mask: number, perm: Permission): boolean {
@@ -129,16 +151,22 @@ export default class RolesComponent implements OnInit {
   }
 
   createRole(): void {
-    if (!this.newRoleName.trim()) return;
+    if (!this.newRoleName.trim() || this.mutating()) return;
+    this.mutating.set(true);
     this.rolesService
       .create({
         name: this.newRoleName,
         permissions: this.newRolePermissions,
       })
+      .pipe(finalize(() => this.mutating.set(false)))
       .subscribe({
         next: (role) => {
           this.roles.update((r) => [...r, role]);
           this.showCreateDialog.set(false);
+          this.toastService.success(`El rol "${role.name}" quedó disponible para asignarlo.`);
+        },
+        error: (error: unknown) => {
+          this.toastService.error(mapHttpErrorToUserMessage(error, 'No se pudo crear el rol'));
         },
       });
   }
@@ -152,22 +180,55 @@ export default class RolesComponent implements OnInit {
 
   updateRole(): void {
     const role = this.selectedRole();
-    if (!role) return;
+    if (!role || this.mutating()) return;
+    this.mutating.set(true);
     this.rolesService
       .update(role.id, { name: this.newRoleName, permissions: this.newRolePermissions })
+      .pipe(finalize(() => this.mutating.set(false)))
       .subscribe({
         next: (updated) => {
           this.roles.update((roles) => roles.map((r) => (r.id === updated.id ? updated : r)));
           this.showEditDialog.set(false);
+          this.toastService.success(`Los cambios del rol "${updated.name}" quedaron guardados.`);
+        },
+        error: (error: unknown) => {
+          this.toastService.error(
+            mapHttpErrorToUserMessage(error, 'No se pudo actualizar el rol'),
+          );
         },
       });
   }
 
-  deleteRole(role: RoleInterface): void {
-    this.rolesService.delete(role.id).subscribe({
-      next: () => {
-        this.roles.update((r) => r.filter((x) => x.id !== role.id));
-      },
+  confirmDeleteRole(role: RoleInterface, event?: Event): void {
+    this.confirmationService.confirm({
+      target: event?.target as EventTarget,
+      message: `¿Eliminar permanentemente el rol "${role.name}"? Los usuarios asignados quedarán sin ese rol.`,
+      header: 'Eliminar rol',
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Eliminar',
+      rejectLabel: 'Cancelar',
+      acceptButtonStyleClass: 'p-button-danger',
+      rejectButtonStyleClass: 'p-button-text',
+      accept: () => this.deleteRole(role),
     });
+  }
+
+  deleteRole(role: RoleInterface): void {
+    if (this.mutating()) return;
+    this.mutating.set(true);
+    this.rolesService
+      .delete(role.id)
+      .pipe(finalize(() => this.mutating.set(false)))
+      .subscribe({
+        next: () => {
+          this.roles.update((r) => r.filter((x) => x.id !== role.id));
+          this.toastService.success(`El rol "${role.name}" fue eliminado.`);
+        },
+        error: (error: unknown) => {
+          this.toastService.error(
+            mapHttpErrorToUserMessage(error, 'No se pudo eliminar el rol'),
+          );
+        },
+      });
   }
 }

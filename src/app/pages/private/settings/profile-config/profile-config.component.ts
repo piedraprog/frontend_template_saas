@@ -21,6 +21,8 @@ import {
   UpdateProfilePayload,
 } from '../../../../core/services/user-profile-api.service';
 import { PageHeaderComponent } from '../../../../shared/components/page-header/page-header.component';
+import { mapHttpErrorToUserMessage } from '../../../../core/utils/map-http-error-to-user-message';
+import { ToastService } from '../../../../shared/services/toast.service';
 
 @Component({
   selector: 'app-profile-config',
@@ -43,6 +45,7 @@ export default class ProfileConfigComponent implements OnInit {
   private readonly authService = inject(AuthService);
   private readonly userService = inject(UserService);
   private readonly messageService = inject(MessageService);
+  private readonly toastService = inject(ToastService);
 
   readonly saving = signal(false);
   readonly uploadingAvatar = signal(false);
@@ -130,13 +133,12 @@ export default class ProfileConfigComponent implements OnInit {
         });
         void this.authService.getProfile().subscribe();
       },
-      error: (err: Error) => {
+      error: (err: unknown) => {
         this.uploadingAvatar.set(false);
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Avatar',
-          detail: err.message ?? 'No se pudo subir la imagen.',
-        });
+        this.toastService.error(
+          mapHttpErrorToUserMessage(err, 'No se pudo subir la imagen.'),
+          'Avatar',
+        );
       },
     });
   }
@@ -213,14 +215,10 @@ export default class ProfileConfigComponent implements OnInit {
         this.form.disable({ emitEvent: false });
         void this.authService.getProfile().subscribe();
       },
-      error: (err: Error) => {
+      error: (err: unknown) => {
         this.saving.set(false);
         this.form.enable({ emitEvent: false });
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Perfil',
-          detail: err.message ?? 'No se pudo guardar.',
-        });
+        this.toastService.error(mapHttpErrorToUserMessage(err, 'No se pudo guardar.'), 'Perfil');
       },
     });
   }

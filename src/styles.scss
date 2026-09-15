@@ -286,6 +286,12 @@ body {
 
     min-height: 100vh;
 
+    height: 100dvh;
+
+    max-height: 100dvh;
+
+    overflow: hidden;
+
     background: var(--p-surface-100);
 
     color: var(--p-text-color);
@@ -296,11 +302,45 @@ body {
 
 .admin-desktop-content {
 
+    display: flex;
+
+    flex-direction: column;
+
     min-width: 0;
 
     flex: 1;
 
-    min-height: 100vh;
+    height: 100dvh;
+
+    max-height: 100dvh;
+
+    overflow: hidden;
+
+    background: var(--p-surface-100);
+
+}
+
+
+
+.admin-desktop-content > router-outlet {
+
+    display: none;
+
+}
+
+
+
+.admin-desktop-content > *:not(router-outlet) {
+
+    display: flex;
+
+    flex: 1 1 auto;
+
+    flex-direction: column;
+
+    min-height: 0;
+
+    min-width: 0;
 
     overflow: auto;
 
@@ -311,6 +351,8 @@ body {
 .admin-mobile-shell {
 
     min-height: 100vh;
+
+    min-height: 100dvh;
 
     background: var(--p-surface-100);
 
@@ -323,6 +365,8 @@ body {
 .admin-mobile-content {
 
     min-height: 100vh;
+
+    min-height: 100dvh;
 
     padding-bottom: calc(4.5rem + env(safe-area-inset-bottom, 0px));
 
@@ -347,6 +391,8 @@ body {
     width: 16rem;
 
     height: 100vh;
+
+    height: 100dvh;
 
     border-right: 1px solid var(--p-surface-200);
 
@@ -807,7 +853,7 @@ body {
 
     width: min(25rem, calc(100vw - 18rem));
 
-    max-height: calc(100vh - 1.5rem);
+    max-height: calc(100dvh - 1.5rem);
 
     overflow: hidden;
 
@@ -1140,6 +1186,89 @@ body {
 @keyframes app-loading-spin {
     to {
         transform: rotate(360deg);
+    }
+}
+
+.admin-page-loading {
+    min-height: 18rem;
+}
+
+.admin-page-loading__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+}
+
+.admin-page-loading__stack {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.admin-page-loading--stack {
+    min-height: 16rem;
+}
+
+.admin-page-loading__detail {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.admin-page-loading--detail {
+    min-height: 20rem;
+}
+
+@media (min-width: 1024px) {
+    .admin-page-loading__grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+.admin-skeleton-pulse .p-skeleton {
+    animation: admin-skeleton-pulse 1.15s ease-in-out infinite;
+}
+
+@keyframes admin-skeleton-pulse {
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.55;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+    }
+
+    .admin-sidebar {
+        transition: none !important;
+    }
+
+    .p-toast.app-toast-stack .p-toast-message,
+    .p-toast .p-toast-message,
+    .p-dialog,
+    .p-drawer,
+    .p-overlay,
+    .p-tooltip {
+        animation: none !important;
+        transition: none !important;
+    }
+
+    .app-loading-blocker__spinner,
+    .app-loading-bar .p-progressbar-value,
+    .admin-skeleton-pulse .p-skeleton,
+    .p-progressspinner,
+    .p-progressspinner svg,
+    .p-progressspinner-circle {
+        animation: none !important;
     }
 }
 

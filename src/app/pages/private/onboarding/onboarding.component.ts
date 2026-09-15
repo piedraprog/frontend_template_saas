@@ -13,6 +13,7 @@ import {
   OnboardingStepInterface,
 } from '../../../core/models/interfaces/onboarding.interface';
 import { PlanInterface } from '../../../core/models/interfaces/plan.interface';
+import { mapHttpErrorToUserMessage } from '../../../core/utils/map-http-error-to-user-message';
 
 @Component({
   selector: 'app-onboarding',
@@ -64,8 +65,8 @@ export default class OnboardingComponent implements OnInit {
           this.state.set(state);
           this.plans.set(plans);
         },
-        error: (err: Error) => {
-          this.error.set(err.message ?? 'No se pudo cargar el onboarding');
+        error: (err: unknown) => {
+          this.error.set(mapHttpErrorToUserMessage(err, 'No se pudo cargar el onboarding'));
         },
       });
   }
@@ -179,11 +180,11 @@ export default class OnboardingComponent implements OnInit {
       .pipe(finalize(() => this.progressing.set(false)))
       .subscribe({
         next: (state) => this.state.set(state),
-        error: (err: Error) => {
+        error: (err: unknown) => {
           this.messageService.add({
             severity: 'error',
             summary: 'Facturación',
-            detail: err.message ?? 'No se pudo avanzar el onboarding.',
+            detail: mapHttpErrorToUserMessage(err, 'No se pudo avanzar el onboarding.'),
           });
         },
       });
@@ -198,11 +199,11 @@ export default class OnboardingComponent implements OnInit {
         next: () => {
           void this.router.navigateByUrl('/dashboard');
         },
-        error: (err: Error) => {
+        error: (err: unknown) => {
           this.messageService.add({
             severity: 'error',
             summary: 'Facturación',
-            detail: err.message ?? 'No se pudo finalizar el onboarding.',
+            detail: mapHttpErrorToUserMessage(err, 'No se pudo finalizar el onboarding.'),
           });
         },
       });
@@ -217,11 +218,14 @@ export default class OnboardingComponent implements OnInit {
         next: () => {
           void this.router.navigateByUrl('/dashboard');
         },
-        error: (err: Error) => {
+        error: (err: unknown) => {
           this.messageService.add({
             severity: 'error',
             summary: 'Facturación',
-            detail: err.message ?? 'No se pudo activar la opción de decidir después.',
+            detail: mapHttpErrorToUserMessage(
+              err,
+              'No se pudo activar la opción de decidir después.',
+            ),
           });
         },
       });
@@ -245,11 +249,11 @@ export default class OnboardingComponent implements OnInit {
 
           globalThis.location.href = session.url;
         },
-        error: (err: Error) => {
+        error: (err: unknown) => {
           this.messageService.add({
             severity: 'error',
             summary: 'Facturación',
-            detail: err.message ?? 'No se pudo iniciar el checkout.',
+            detail: mapHttpErrorToUserMessage(err, 'No se pudo iniciar el checkout.'),
           });
         },
       });
@@ -286,11 +290,11 @@ export default class OnboardingComponent implements OnInit {
         next: () => {
           void this.router.navigateByUrl('/dashboard');
         },
-        error: (err: Error) => {
+        error: (err: unknown) => {
           this.messageService.add({
             severity: 'error',
             summary: 'Facturación',
-            detail: err.message ?? 'No se pudo activar el plan seleccionado.',
+            detail: mapHttpErrorToUserMessage(err, 'No se pudo activar el plan seleccionado.'),
           });
         },
       });

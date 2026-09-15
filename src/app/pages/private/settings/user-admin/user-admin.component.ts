@@ -28,6 +28,7 @@ import { ActivatedRoute, RouterModule } from '@angular/router';
 import { finalize } from 'rxjs';
 import { PageHeaderComponent } from '../../../../shared/components/page-header/page-header.component';
 import RolesComponent from '../roles/roles.component';
+import { mapHttpErrorToUserMessage } from '../../../../core/utils/map-http-error-to-user-message';
 
 import { PermissionEditorComponent } from './components/permission-editor/permission-editor.component';
 import { UserCreateModalComponent } from './components/user-create-modal/user-create-modal.component';
@@ -129,6 +130,7 @@ export default class UserAdminComponent implements OnInit {
                 'Tus permisos han sido actualizados. Recarga la página si es necesario.',
               );
             },
+            // secondary refresh — silent
             error: (error: unknown) => {
               console.error('Error al refrescar permisos del usuario actual:', error);
             },
@@ -136,8 +138,9 @@ export default class UserAdminComponent implements OnInit {
         }
       },
       error: (error: unknown) => {
-        console.error('Error al actualizar permisos', error);
-        this.toastService.error('Error al actualizar los permisos');
+        this.toastService.error(
+          mapHttpErrorToUserMessage(error, 'No se pudieron actualizar los permisos'),
+        );
       },
     });
   }
@@ -299,8 +302,7 @@ export default class UserAdminComponent implements OnInit {
         this.availableRoles.set(roles);
       },
       error: (error: unknown) => {
-        console.error('Error al cargar roles', error);
-        this.toastService.error('No se pudieron cargar los roles');
+        this.toastService.error(mapHttpErrorToUserMessage(error, 'No se pudieron cargar los roles'));
       },
     });
   }
@@ -315,8 +317,9 @@ export default class UserAdminComponent implements OnInit {
     this.adminUserService.getTeamMembers(params).subscribe({
       next: () => {},
       error: (error: unknown) => {
-        console.error('Error al cargar usuarios', error);
-        this.toastService.error('No se pudieron cargar los usuarios');
+        this.toastService.error(
+          mapHttpErrorToUserMessage(error, 'No se pudieron cargar los usuarios'),
+        );
       },
     });
   }
@@ -367,13 +370,15 @@ export default class UserAdminComponent implements OnInit {
       .subscribe({
         next: (response) => {
           this.toastService.success(
+            response.message ??
+              'Se enviaron las nuevas credenciales por correo. El usuario deberá usar la nueva contraseña.',
             'Contraseña restablecida',
-            response.message ?? 'Se enviaron las nuevas credenciales por correo.',
           );
         },
         error: (error: unknown) => {
-          console.error('Error al restablecer contraseña', error);
-          this.toastService.error('No se pudo restablecer la contraseña del usuario');
+          this.toastService.error(
+            mapHttpErrorToUserMessage(error, 'No se pudo restablecer la contraseña del usuario'),
+          );
         },
       });
   }
@@ -397,14 +402,15 @@ export default class UserAdminComponent implements OnInit {
         } as Partial<UserInterface>)
         .subscribe({
           next: () => {
-            this.toastService.success('Usuario actualizado correctamente');
+            this.toastService.success('Los cambios del usuario quedaron guardados.');
             this.editUserDialog = false;
             this.userForm.reset(this.getEmptyUser());
             this.loadUsers();
           },
           error: (error: unknown) => {
-            console.error('Error al actualizar usuario', error);
-            this.toastService.error('No se pudo actualizar el usuario');
+            this.toastService.error(
+              mapHttpErrorToUserMessage(error, 'No se pudo actualizar el usuario'),
+            );
           },
         });
     }
@@ -422,19 +428,17 @@ export default class UserAdminComponent implements OnInit {
 
     this.adminUserService.deleteUser(selectedUser.id.toString()).subscribe({
       next: () => {
-        this.toastService.success('Usuario eliminado correctamente');
+        this.toastService.success(
+          `${selectedUser.username} fue eliminado y ya no podrá iniciar sesión.`,
+        );
         this.deleteUserDialog = false;
         this.selectedUser.set(this.getEmptyUser());
+        this.loadUsers();
       },
       error: (error: unknown) => {
-        console.error('Error al eliminar usuario', error);
-        const message =
-          error !== null && typeof error === 'object' && ('error' in error || 'message' in error)
-            ? ((error as { error?: { message?: string }; message?: string }).error?.message ??
-              (error as { message?: string }).message ??
-              'No se pudo eliminar el usuario')
-            : 'No se pudo eliminar el usuario';
-        this.toastService.error(message);
+        this.toastService.error(
+          mapHttpErrorToUserMessage(error, 'No se pudo eliminar el usuario'),
+        );
       },
     });
   }
@@ -531,11 +535,10 @@ export default class UserAdminComponent implements OnInit {
       .pipe(finalize(() => this.isSavingProfile.set(false)))
       .subscribe({
         next: (updatedUser: UserInterface) => {
-          console.log('Updated User from backend:', updatedUser);
           this.profileSaveSuccess.set(true);
           this.isEditingProfile.set(false);
           setTimeout(() => this.profileSaveSuccess.set(false), 2000);
-          this.toastService.success('Perfil actualizado correctamente');
+          this.toastService.success('El perfil del usuario quedó actualizado.');
 
           // Update the local view with the new user data to prevent stale state
           if (this.selectedUserForView()?.id === updatedUser.id) {
@@ -549,8 +552,9 @@ export default class UserAdminComponent implements OnInit {
           this.loadUsers();
         },
         error: (error: unknown) => {
-          this.profileSaveError.set('Error al actualizar el perfil');
-          console.error('Error updating user profile:', error);
+          const message = mapHttpErrorToUserMessage(error, 'Error al actualizar el perfil');
+          this.profileSaveError.set(message);
+          this.toastService.error(message);
         },
       });
   }

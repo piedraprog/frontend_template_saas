@@ -406,12 +406,16 @@
 <p-dialog
   [(visible)]="deleteUserDialog"
   [style]="{ width: '450px' }"
-  header="Confirmar Eliminación"
+  header="Eliminar usuario"
   [modal]="true"
 >
   <div class="confirmation-content flex items-center gap-3">
     <i class="pi pi-exclamation-triangle text-warning" style="font-size: 2rem"></i>
-    <span>¿Está seguro de que desea eliminar este usuario?</span>
+    <span>
+      ¿Eliminar permanentemente a
+      <strong>{{ selectedUser()?.username }}</strong
+      >? Perderá el acceso y no podrá iniciar sesión.
+    </span>
   </div>
   <ng-template pTemplate="footer">
     <p-button

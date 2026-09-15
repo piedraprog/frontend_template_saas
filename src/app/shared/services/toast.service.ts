@@ -2,7 +2,12 @@ import { inject, Injectable } from '@angular/core';
 import { MessageService } from 'primeng/api';
 
 const DEFAULT_TOAST_OPTIONS = {
-  life: 5200,
+  life: 4800,
+  closable: true,
+} as const;
+
+const ATTENTION_TOAST_OPTIONS = {
+  life: 7200,
   closable: true,
 } as const;
 
@@ -12,6 +17,7 @@ const DEFAULT_TOAST_OPTIONS = {
 export class ToastService {
   private readonly messageService = inject(MessageService);
 
+  /** Signature: (detail, summary?) — same order for success / error / info / warn. */
   success(detail: string, summary: string | undefined = 'Éxito'): void {
     this.messageService.add({
       severity: 'success',
@@ -21,21 +27,21 @@ export class ToastService {
     });
   }
 
-  warn(summary: string, detail?: string): void {
+  warn(detail: string, summary: string | undefined = 'Atención'): void {
     this.messageService.add({
       severity: 'warn',
       summary,
-      detail: detail ?? '',
-      ...DEFAULT_TOAST_OPTIONS,
+      detail,
+      ...ATTENTION_TOAST_OPTIONS,
     });
   }
 
-  error(detail: string, summary?: string): void {
+  error(detail: string, summary: string | undefined = 'Error'): void {
     this.messageService.add({
       severity: 'error',
-      summary: summary ?? 'Error',
+      summary,
       detail,
-      ...DEFAULT_TOAST_OPTIONS,
+      ...ATTENTION_TOAST_OPTIONS,
     });
   }
 

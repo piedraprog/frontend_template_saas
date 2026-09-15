@@ -9,6 +9,8 @@ import { ToastModule } from 'primeng/toast';
 import { TextareaModule } from 'primeng/textarea';
 import { CompanyApiService } from '../../../../core/services/company-api.service';
 import { PageHeaderComponent } from '../../../../shared/components/page-header/page-header.component';
+import { mapHttpErrorToUserMessage } from '../../../../core/utils/map-http-error-to-user-message';
+import { ToastService } from '../../../../shared/services/toast.service';
 
 @Component({
   selector: 'app-company-settings',
@@ -29,6 +31,7 @@ import { PageHeaderComponent } from '../../../../shared/components/page-header/p
 export default class CompanySettingsComponent implements OnInit {
   private readonly companyApi = inject(CompanyApiService);
   private readonly messageService = inject(MessageService);
+  private readonly toastService = inject(ToastService);
 
   readonly loading = signal(true);
   readonly saving = signal(false);
@@ -46,13 +49,12 @@ export default class CompanySettingsComponent implements OnInit {
         this.form.patchValue({ name: c.name, logo: c.logo ?? '' });
         this.loading.set(false);
       },
-      error: (err: Error) => {
+      error: (err: unknown) => {
         this.loading.set(false);
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Empresa',
-          detail: err.message ?? 'No se pudo cargar la información.',
-        });
+        this.toastService.error(
+          mapHttpErrorToUserMessage(err, 'No se pudo cargar la información.'),
+          'Empresa',
+        );
       },
     });
   }
@@ -72,13 +74,9 @@ export default class CompanySettingsComponent implements OnInit {
           detail: 'Datos actualizados.',
         });
       },
-      error: (err: Error) => {
+      error: (err: unknown) => {
         this.saving.set(false);
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Empresa',
-          detail: err.message ?? 'No se pudo guardar.',
-        });
+        this.toastService.error(mapHttpErrorToUserMessage(err, 'No se pudo guardar.'), 'Empresa');
       },
     });
   }

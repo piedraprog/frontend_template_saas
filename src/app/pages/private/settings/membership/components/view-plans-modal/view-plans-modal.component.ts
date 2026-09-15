@@ -18,6 +18,7 @@ import { ToastModule } from 'primeng/toast';
 import { PlansService } from '../../../../../../core/services/plans.service';
 import { Plan } from '../../../../../../core/models/plan.model';
 import { finalize } from 'rxjs';
+import { mapHttpErrorToUserMessage } from '../../../../../../core/utils/map-http-error-to-user-message';
 
 @Component({
   selector: 'app-view-plans-modal',
@@ -57,8 +58,8 @@ export class ViewPlansModalComponent implements OnChanges {
           const activeOnly = (list ?? []).filter((p) => p.isActive !== false);
           this.plans.set(activeOnly);
         },
-        error: (err) => {
-          this.error.set(err?.message ?? 'Error al cargar los planes');
+        error: (err: unknown) => {
+          this.error.set(mapHttpErrorToUserMessage(err, 'Error al cargar los planes'));
           this.plans.set([]);
         },
       });
@@ -99,11 +100,11 @@ export class ViewPlansModalComponent implements OnChanges {
           }
           globalThis.location.href = session.url;
         },
-        error: (err: Error) => {
+        error: (err: unknown) => {
           this.messageService.add({
             severity: 'error',
             summary: 'Facturación',
-            detail: err.message ?? 'No se pudo iniciar el checkout.',
+            detail: mapHttpErrorToUserMessage(err, 'No se pudo iniciar el checkout.'),
           });
         },
       });

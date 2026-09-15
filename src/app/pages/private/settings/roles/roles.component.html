@@ -18,11 +18,7 @@
   }
 
   @if (isLoading()) {
-    <div class="roles-loading">
-      @for (i of [1, 2, 3]; track i) {
-        <p-skeleton height="5.25rem" styleClass="roles-skel" />
-      }
-    </div>
+    <app-page-loading-skeleton layout="stack" [rows]="3" itemHeight="5.25rem" ariaLabel="Cargando roles" />
   } @else if (roles().length === 0) {
     <div class="roles-empty">
       <div class="roles-empty-icon" aria-hidden="true">
@@ -66,7 +62,7 @@
                 [rounded]="true"
                 [text]="true"
                 severity="danger"
-                (onClick)="deleteRole(role)"
+                (onClick)="confirmDeleteRole(role, $event)"
                 [attr.aria-label]="'Eliminar ' + role.name"
               />
             }
@@ -130,6 +126,7 @@
       icon="pi pi-check"
       (onClick)="createRole()"
       [disabled]="!newRoleName.trim()"
+      [loading]="mutating()"
     />
   </ng-template>
 </p-dialog>
@@ -186,6 +183,9 @@
       icon="pi pi-check"
       (onClick)="updateRole()"
       [disabled]="!newRoleName.trim()"
+      [loading]="mutating()"
     />
   </ng-template>
 </p-dialog>
+
+<p-confirmDialog />

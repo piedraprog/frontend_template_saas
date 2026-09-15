@@ -5,8 +5,8 @@ import { Component, Input } from '@angular/core';
   standalone: true,
   imports: [],
   template: `
-    <div class="auth-shell min-h-screen px-4 py-6 text-slate-950 sm:px-6 lg:px-8">
-      <div class="mx-auto flex min-h-[calc(100vh-3rem)] w-full max-w-5xl items-center">
+    <div class="auth-shell min-h-[100dvh] px-4 py-6 text-slate-950 sm:px-6 lg:px-8">
+      <div class="mx-auto flex min-h-[calc(100dvh-3rem)] w-full max-w-5xl items-center">
         <section class="auth-frame grid w-full overflow-hidden lg:grid-cols-[0.9fr_1.1fr]">
           <aside class="auth-panel hidden min-h-[560px] p-8 lg:block">
             <div class="flex h-full flex-col justify-between">

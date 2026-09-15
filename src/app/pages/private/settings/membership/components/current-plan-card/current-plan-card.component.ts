@@ -6,11 +6,12 @@ import {
   SubscriptionStatus,
 } from '../../../../../../core/models/interfaces/subscription.interface';
 import { ButtonModule } from 'primeng/button';
+import { PageLoadingSkeletonComponent } from '../../../../../../shared/components/page-loading-skeleton/page-loading-skeleton.component';
 
 @Component({
   selector: 'app-current-plan-card',
   standalone: true,
-  imports: [CommonModule, ButtonModule],
+  imports: [CommonModule, ButtonModule, PageLoadingSkeletonComponent],
   templateUrl: './current-plan-card.component.html',
   styleUrls: ['./current-plan-card.component.scss'],
 })

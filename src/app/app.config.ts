@@ -51,7 +51,6 @@ export const appConfig: ApplicationConfig = {
         loaderInterceptor,
         authInterceptor,
         retryInterceptor,
-        // errorInterceptor,
       ]),
       withInterceptorsFromDi(),
       withFetch(),

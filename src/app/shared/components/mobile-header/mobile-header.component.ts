@@ -36,7 +36,7 @@ export class MobileHeaderComponent {
   private userService = inject(UserService);
 
   /** Título de la página actual */
-  pageTitle = input<string>('RifaExpress');
+  pageTitle = input<string>('Admin');
 
   /** Contador de notificaciones */
   notificationCount = input<number>(0);

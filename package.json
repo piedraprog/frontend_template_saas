@@ -8,6 +8,7 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "lint": "ng lint",
+    "test": "ng test --no-watch --browsers=ChromeHeadless",
     "prepare": "husky",
     "e2e": "playwright test",
     "e2e:headed": "playwright test --headed",

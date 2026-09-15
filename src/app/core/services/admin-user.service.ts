@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { Observable, finalize, map, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
@@ -14,6 +13,21 @@ interface PaginatedResponse<T> {
   totalPages: number;
   hasNext: boolean;
   hasPrev: boolean;
+}
+
+export interface TeamMembersQueryParams {
+  page?: number;
+  limit?: number;
+  sortField?: string;
+  sortOrder?: number;
+  search?: string;
+}
+
+export interface CreateAdminUserPayload {
+  username: string;
+  email: string;
+  customRoleId?: string;
+  password?: string;
 }
 
 @Injectable({
@@ -49,21 +63,42 @@ export class AdminUserService {
   });
   public pagination = this.#paginationSignal.asReadonly();
 
+  private buildTeamParams(params?: TeamMembersQueryParams): HttpParams {
+    let httpParams = new HttpParams();
+    if (!params) {
+      return httpParams;
+    }
+
+    if (params.page != null) {
+      httpParams = httpParams.set('page', String(params.page));
+    }
+    if (params.limit != null) {
+      httpParams = httpParams.set('limit', String(params.limit));
+    }
+    if (params.sortField) {
+      httpParams = httpParams.set('sortField', params.sortField);
+    }
+    if (params.sortOrder != null) {
+      httpParams = httpParams.set('sortOrder', String(params.sortOrder));
+    }
+    if (params.search) {
+      httpParams = httpParams.set('search', params.search);
+    }
+
+    return httpParams;
+  }
+
   /**
    * Miembros de la compañía del JWT (`GET /users/team`); no envía UUID en URL.
    */
-  getTeamMembers(params?: {
-    page?: number;
-    limit?: number;
-    sortField?: string;
-    sortOrder?: number;
-    search?: string;
-  }): Observable<PaginatedResponse<UserInterface>> {
+  getTeamMembers(params?: TeamMembersQueryParams): Observable<PaginatedResponse<UserInterface>> {
     const url = `${this.baseUrl}/users/team`;
     this.loadingSignal.set(true);
 
     return this.http
-      .get<ApiResponse<PaginatedResponse<UserInterface>>>(url, { params: params as any })
+      .get<ApiResponse<PaginatedResponse<UserInterface>>>(url, {
+        params: this.buildTeamParams(params),
+      })
       .pipe(
         map((response: ApiResponse<PaginatedResponse<UserInterface>>) => {
           if (response.status && response.data) {
@@ -87,12 +122,7 @@ export class AdminUserService {
       );
   }
 
-  createUser(userData: {
-    username: string;
-    email: string;
-    customRoleId?: string;
-    password?: string;
-  }): Observable<UserInterface> {
+  createUser(userData: CreateAdminUserPayload): Observable<UserInterface> {
     const url = `${this.baseUrl}/users`;
     this.loadingSignal.set(true);
 
@@ -182,8 +212,8 @@ export class AdminUserService {
     const url = `${this.baseUrl}/users/${id}`;
     this.loadingSignal.set(true);
 
-    return this.http.delete<ApiResponse<any>>(url).pipe(
-      map((response: ApiResponse<any>) => {
+    return this.http.delete<ApiResponse<null>>(url).pipe(
+      map((response: ApiResponse<null>) => {
         if (response.status) {
           return true;
         } else {
