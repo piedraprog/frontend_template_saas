@@ -1,0 +1,102 @@
+<section
+  #panel
+  class="flex max-h-[calc(100vh-2rem)] w-full flex-col overflow-y-auto bg-white"
+  role="dialog"
+  aria-modal="true"
+  [attr.aria-label]="mode() === 'whats-new' ? 'Novedades' : 'Ayuda'"
+  tabindex="-1"
+>
+  <header class="flex items-start justify-between gap-3 border-b border-slate-200 px-5 py-4">
+    <div>
+      <h2 class="m-0 text-lg font-semibold text-slate-900">
+        {{ mode() === 'whats-new' ? 'Novedades' : 'Ayuda' }}
+      </h2>
+      @if (mode() === 'whats-new' && progress()?.latest?.publishedAt; as publishedAt) {
+        <p class="mt-1 m-0 text-xs text-slate-500">{{ publishedDate(publishedAt) }}</p>
+      }
+    </div>
+    <button
+      type="button"
+      class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-transparent bg-transparent text-slate-500 hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400/40"
+      aria-label="Cerrar"
+      (click)="closePanel()"
+    >
+      <i class="pi pi-times" aria-hidden="true"></i>
+    </button>
+  </header>
+
+  @if (mode() === 'whats-new') {
+    <div class="flex flex-col gap-4 p-5">
+      @if (progress()?.latest; as latest) {
+        <div>
+          <h3 class="m-0 text-base font-semibold text-slate-900">{{ latest.title }}</h3>
+          @if (latest.summary) {
+            <p class="mt-2 m-0 text-sm leading-relaxed text-slate-600">{{ latest.summary }}</p>
+          }
+        </div>
+
+        <ul class="m-0 flex list-none flex-col gap-3 p-0">
+          @for (item of latest.items; track item.text) {
+            <li class="flex gap-2 text-sm leading-relaxed text-slate-800">
+              <span
+                class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-slate-400"
+                aria-hidden="true"
+              ></span>
+              <span>{{ item.text }}</span>
+            </li>
+          }
+        </ul>
+
+        <div class="flex flex-wrap items-center gap-2 pt-1">
+          @if (progress()?.hasUnseen) {
+            <p-button
+              label="Entendido"
+              [loading]="acknowledging()"
+              (onClick)="acknowledge.emit()"
+            />
+          }
+          <p-button
+            label="Ver historial"
+            icon="pi pi-list"
+            severity="secondary"
+            [outlined]="true"
+            (onClick)="viewHistory.emit()"
+          />
+          <p-button label="Cerrar" severity="secondary" [text]="true" (onClick)="closePanel()" />
+        </div>
+      } @else {
+        <p class="m-0 text-sm text-slate-600">Todavía no hay novedades.</p>
+      }
+    </div>
+  } @else {
+    <div class="flex flex-col gap-4 p-5">
+      <p class="m-0 text-sm leading-relaxed text-slate-600">
+        Las guías están aquí cuando las necesites. Elige recorrer el panel completo o solo esta
+        pantalla; no se abren solas al navegar.
+      </p>
+      <div class="flex flex-wrap items-center gap-2">
+        <p-button
+          label="Recorrer el panel"
+          [disabled]="!canStartPlatformMap()"
+          (onClick)="startPlatformMap.emit()"
+        />
+        <p-button
+          label="Recorrer esta pantalla"
+          [disabled]="!canStartScreenTour()"
+          severity="secondary"
+          [outlined]="true"
+          (onClick)="startScreenTour.emit()"
+        />
+        <p-button label="Cerrar" severity="secondary" [text]="true" (onClick)="closePanel()" />
+      </div>
+      @if (!canStartScreenTour()) {
+        <p class="m-0 text-xs text-slate-500">No hay guía en esta pantalla.</p>
+      }
+      @if (!canStartPlatformMap()) {
+        <p class="m-0 text-xs text-slate-500">
+          El recorrido del panel no está disponible ahora (animación reducida o guías desactivadas).
+        </p>
+      }
+    </div>
+  }
+</section>

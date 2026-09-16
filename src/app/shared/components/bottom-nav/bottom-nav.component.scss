@@ -100,6 +100,11 @@
   flex: 0 0 3.5rem;
 }
 
+.nav-profile-avatar-wrap {
+  position: relative;
+  display: inline-flex;
+}
+
 :host ::ng-deep .profile-avatar {
   background: var(--p-primary-color) !important;
   color: var(--p-primary-contrast-color) !important;

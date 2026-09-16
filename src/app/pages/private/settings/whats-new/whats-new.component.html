@@ -1,0 +1,128 @@
+<div class="admin-page flex min-h-0 flex-1 flex-col gap-4">
+  <app-page-header title="Novedades" [showBack]="true" (back)="goBack()" />
+
+  <section
+    class="flex items-center justify-between gap-4 rounded-lg border border-slate-200 bg-white p-4 shadow-admin-card md:p-5"
+  >
+    <div>
+      <h2 class="m-0 text-base font-semibold text-slate-900">
+        Abrir Novedades al iniciar sesión
+      </h2>
+      <p class="mt-1 m-0 text-sm text-slate-600">
+        Abre el anuncio una vez cuando haya una novedad nueva.
+      </p>
+    </div>
+    <p-checkbox
+      [binary]="true"
+      [formControl]="autoOpenControl"
+      [disabled]="savingPreference()"
+      inputId="auto-open-whats-new"
+    />
+  </section>
+
+  <section
+    class="flex items-center justify-between gap-4 rounded-lg border border-slate-200 bg-white p-4 shadow-admin-card md:p-5"
+  >
+    <div>
+      <h2 class="m-0 text-base font-semibold text-slate-900">
+        Mostrar guía al entrar a una pantalla nueva
+      </h2>
+      <p class="mt-1 m-0 text-sm text-slate-600">
+        Opcional: puede interrumpir el trabajo. Por defecto las guías de pantalla solo se abren desde
+        Ayuda.
+      </p>
+    </div>
+    <p-checkbox
+      [binary]="true"
+      [formControl]="autoStartScreenGuidesControl"
+      [disabled]="savingPreference()"
+      inputId="auto-start-screen-guides"
+    />
+  </section>
+
+  <section
+    class="flex items-center justify-between gap-4 rounded-lg border border-slate-200 bg-white p-4 shadow-admin-card md:p-5"
+  >
+    <div>
+      <h2 class="m-0 text-base font-semibold text-slate-900">Pausar guías automáticas</h2>
+      <p class="mt-1 m-0 text-sm text-slate-600">
+        Detiene el mapa post-inicio y cualquier guía automática. Puedes seguir iniciándolas desde
+        Ayuda.
+      </p>
+    </div>
+    <p-checkbox
+      [binary]="true"
+      [formControl]="guidedHelpPausedControl"
+      [disabled]="savingPreference()"
+      inputId="guided-help-paused"
+    />
+  </section>
+
+  @if (loading()) {
+    <app-page-loading-skeleton layout="detail" ariaLabel="Cargando novedades" />
+  } @else if (error()) {
+    <section
+      class="flex flex-col items-start gap-4 rounded-lg border border-slate-200 bg-white p-6 shadow-admin-card"
+      aria-live="assertive"
+    >
+      <div>
+        <h2 class="m-0 text-lg font-semibold text-slate-900">No se pudieron cargar.</h2>
+        <p class="mt-1 m-0 text-sm text-slate-600">Intenta de nuevo para ver las novedades.</p>
+      </div>
+      <button
+        type="button"
+        class="rounded-md bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400/40"
+        (click)="load()"
+      >
+        Reintentar
+      </button>
+    </section>
+  } @else if (notes().length === 0) {
+    <section
+      class="rounded-lg border border-slate-200 bg-white p-6 shadow-admin-card"
+      aria-live="polite"
+    >
+      <p class="m-0 text-sm text-slate-600">Todavía no hay novedades.</p>
+    </section>
+  } @else {
+    @if (notes()[0]; as latest) {
+      <section class="rounded-lg border border-slate-200 bg-white p-5 shadow-admin-card md:p-6">
+        <p class="m-0 text-xs font-bold uppercase tracking-wide text-slate-500">
+          {{ publishedDate(latest.publishedAt) }}
+        </p>
+        <h2 class="mt-2 m-0 text-xl font-semibold text-slate-900">{{ latest.title }}</h2>
+        @if (latest.summary) {
+          <p class="mt-3 m-0 max-w-3xl text-sm leading-relaxed text-slate-600">
+            {{ latest.summary }}
+          </p>
+        }
+        <ul class="mt-5 mb-0 flex list-none flex-col gap-3 p-0">
+          @for (item of latest.items; track item.text) {
+            <li class="flex gap-2 text-sm leading-relaxed text-slate-800">
+              <span
+                class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-slate-400"
+                aria-hidden="true"
+              ></span>
+              <span>{{ item.text }}</span>
+            </li>
+          }
+        </ul>
+      </section>
+    }
+
+    <section class="rounded-lg border border-slate-200 bg-white p-5 shadow-admin-card md:p-6">
+      <h2 class="m-0 text-base font-semibold text-slate-900">Historial</h2>
+      <div class="mt-4 flex flex-col divide-y divide-slate-200">
+        @for (note of notes().slice(1); track note.id) {
+          <article class="py-4 first:pt-0">
+            <p class="m-0 text-xs text-slate-500">{{ publishedDate(note.publishedAt) }}</p>
+            <h3 class="mt-1 m-0 text-sm font-semibold text-slate-900">{{ note.title }}</h3>
+            @if (note.summary) {
+              <p class="mt-1 m-0 text-sm leading-relaxed text-slate-600">{{ note.summary }}</p>
+            }
+          </article>
+        }
+      </div>
+    </section>
+  }
+</div>

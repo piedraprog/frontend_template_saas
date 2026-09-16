@@ -1,5 +1,4 @@
 <nav class="bottom-nav">
-  <!-- Items de navegación -->
   @for (item of navItems(); track item.id) {
     @if (item.route) {
       <a
@@ -7,6 +6,7 @@
         [routerLink]="item.route"
         routerLinkActive="active"
         [routerLinkActiveOptions]="{ exact: false }"
+        [attr.data-tour]="'mobile-navigation-' + item.id"
         pRipple
       >
         <span class="nav-icon-wrapper">
@@ -23,6 +23,7 @@
         class="nav-item"
         [class.active]="isActive(item)"
         [class.nav-item-quick-action]="item.id.includes('quick-action')"
+        [attr.data-tour]="'mobile-navigation-' + item.id"
         (click)="onItemClick(item, $event)"
         pRipple
         type="button"
@@ -39,24 +40,27 @@
     }
   }
 
-  <!-- Avatar del usuario -->
   <button
     class="nav-profile"
     (click)="toggleProfile($event)"
     type="button"
     pRipple
-    aria-label="Perfil de usuario"
+    [attr.aria-label]="hasUnseenHelp() ? 'Perfil, 1 nueva' : 'Perfil de usuario'"
   >
-    <p-avatar
-      [label]="(userData().username.charAt(0) || 'U').toUpperCase()"
-      shape="circle"
-      size="normal"
-      styleClass="profile-avatar"
-    />
+    <span class="nav-profile-avatar-wrap">
+      <p-avatar
+        [label]="(userData().username.charAt(0) || 'U').toUpperCase()"
+        shape="circle"
+        size="normal"
+        styleClass="profile-avatar"
+      />
+      @if (hasUnseenHelp()) {
+        <span class="admin-help-unseen-dot admin-help-unseen-dot--profile" aria-hidden="true"></span>
+      }
+    </span>
   </button>
 </nav>
 
-<!-- Popover de notificaciones -->
 <p-popover #notificationsPopover styleClass="notifications-popover" [appendTo]="'body'">
   <app-notifications-panel
     [visible]="showNotificationsPanel()"
@@ -64,7 +68,6 @@
   />
 </p-popover>
 
-<!-- Popover de perfil -->
 <p-popover #profilePopover styleClass="profile-popover" [appendTo]="'body'">
   <div class="profile-menu">
     <div class="profile-header">
@@ -80,6 +83,28 @@
       </div>
     </div>
     <div class="profile-actions">
+      <button
+        type="button"
+        class="profile-action-item"
+        data-tour="mobile-navigation-whats-new"
+        (click)="openWhatsNew($event)"
+      >
+        <i class="pi pi-sparkles" aria-hidden="true"></i>
+        <span>Novedades</span>
+        @if (hasUnseenHelp()) {
+          <span class="admin-help-unseen-dot" aria-hidden="true"></span>
+          <span class="sr-only">Nuevo</span>
+        }
+      </button>
+      <button
+        type="button"
+        class="profile-action-item"
+        data-tour="mobile-navigation-help"
+        (click)="openHelp($event)"
+      >
+        <i class="pi pi-question-circle" aria-hidden="true"></i>
+        <span>Ayuda</span>
+      </button>
       <a
         [routerLink]="['settings', 'profile']"
         class="profile-action-item"
@@ -88,7 +113,12 @@
         <i class="pi pi-user"></i>
         <span>Mi Perfil</span>
       </a>
-      <a routerLink="settings" class="profile-action-item" (click)="closeProfile()">
+      <a
+        routerLink="settings"
+        class="profile-action-item"
+        data-tour="mobile-navigation-settings"
+        (click)="closeProfile()"
+      >
         <i class="pi pi-cog"></i>
         <span>Ajustes</span>
       </a>

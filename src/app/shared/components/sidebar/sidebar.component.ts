@@ -24,6 +24,7 @@ import { SESSION_USER_ID } from '../../../core/constants/session-cookies';
 import { AuthService } from '../../../core/services/auth.service';
 import { NotificationsService } from '../../../core/services/notifications/notifications.service';
 import { PermissionService } from '../../../core/services/permission.service';
+import { HelpStateService } from '../../../core/services/state/help/help-state.service';
 import { UserService } from '../../../core/services/user.service';
 import { Permission } from '../../../core/models/enums/permission.enum';
 import { NotificationsPanelComponent } from '../notifications-panel/notifications-panel.component';
@@ -74,12 +75,17 @@ export class SidebarComponent implements OnInit, OnDestroy {
   private userService = inject(UserService);
   private router = inject(Router);
   private confirmationService = inject(ConfirmationService);
+  private helpState = inject(HelpStateService);
   private subscriptions: Subscription[] = [];
+  private helpTrigger: HTMLElement | null = null;
 
   profileData = computed(() => this.userService.userData());
   isFullDisplay = signal(true);
   notificationCount = signal(0);
   showNotificationsPanel = signal(false);
+  helpPanel = this.helpState.panel;
+  helpProgress = this.helpState.progress;
+  hasUnseenHelp = computed(() => this.helpProgress()?.hasUnseen === true);
 
   mainMenuItems = signal<SidebarMenuItem[]>([]);
   quickActionsItems = signal<SidebarMenuItem[]>([]);
@@ -220,11 +226,24 @@ export class SidebarComponent implements OnInit, OnDestroy {
   toggleNotificationsPanel(event?: Event): void {
     event?.preventDefault();
     event?.stopPropagation();
+    this.helpState.closePanel();
     this.showNotificationsPanel.update((value) => !value);
   }
 
   closeNotificationsPanel(): void {
     this.showNotificationsPanel.set(false);
+  }
+
+  openWhatsNew(event: Event): void {
+    this.helpTrigger = event.currentTarget instanceof HTMLElement ? event.currentTarget : null;
+    this.closeNotificationsPanel();
+    this.helpState.openPanel('whats-new', this.helpTrigger ?? undefined);
+  }
+
+  openHelp(event: Event): void {
+    this.helpTrigger = event.currentTarget instanceof HTMLElement ? event.currentTarget : null;
+    this.closeNotificationsPanel();
+    this.helpState.openPanel('help', this.helpTrigger ?? undefined);
   }
 
   isActiveRoute(routerLink: unknown[] | string | undefined): boolean {

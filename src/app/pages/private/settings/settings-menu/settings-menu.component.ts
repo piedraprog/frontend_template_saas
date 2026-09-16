@@ -50,6 +50,13 @@ export default class SettingsMenuComponent {
       route: 'notification',
     },
     {
+      id: 'novedades',
+      title: 'Novedades',
+      description: 'Cambios del producto y preferencias de ayuda guiada',
+      icon: 'pi pi-sparkles',
+      route: 'novedades',
+    },
+    {
       id: 'user-admin',
       title: 'Equipo y permisos',
       description: 'Usuarios, roles y permisos de acceso',

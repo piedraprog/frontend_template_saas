@@ -19,6 +19,7 @@ import { UserService } from '../../../core/services/user.service';
 import { NotificationsPanelComponent } from '../notifications-panel/notifications-panel.component';
 import { AuthService } from '../../../core/services/auth.service';
 import { NotificationsService } from '../../../core/services/notifications/notifications.service';
+import { HelpStateService } from '../../../core/services/state/help/help-state.service';
 
 export interface BottomNavItem {
   id: string;
@@ -53,12 +54,16 @@ export class BottomNavComponent {
   private userService = inject(UserService);
   private authService = inject(AuthService);
   private notificationsService = inject(NotificationsService);
+  private helpState = inject(HelpStateService);
+  private helpTrigger: HTMLElement | null = null;
 
   items = input.required<BottomNavItem[]>();
   notificationCount = input<number>(0);
   notificationClick = output<void>();
 
   userData = computed(() => this.userService.userData());
+  helpProgress = this.helpState.progress;
+  hasUnseenHelp = computed(() => this.helpProgress()?.hasUnseen === true);
 
   notificationBadge = computed(() => {
     const count = this.notificationCount();
@@ -109,6 +114,18 @@ export class BottomNavComponent {
 
   closeProfile(): void {
     this.profilePopover.hide();
+  }
+
+  openWhatsNew(event: Event): void {
+    this.helpTrigger = event.currentTarget instanceof HTMLElement ? event.currentTarget : null;
+    this.closeProfile();
+    this.helpState.openPanel('whats-new', this.helpTrigger ?? undefined);
+  }
+
+  openHelp(event: Event): void {
+    this.helpTrigger = event.currentTarget instanceof HTMLElement ? event.currentTarget : null;
+    this.closeProfile();
+    this.helpState.openPanel('help', this.helpTrigger ?? undefined);
   }
 
   isActive(item: BottomNavItem): boolean {

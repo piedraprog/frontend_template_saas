@@ -44,6 +44,10 @@ export const SETTINGS_ROUTES: Routes = [
         path: 'notification',
         loadComponent: () => import('./notification-config/notification-config.component'),
       },
+      {
+        path: 'novedades',
+        loadComponent: () => import('./whats-new/whats-new.component'),
+      },
     ],
   },
 ];

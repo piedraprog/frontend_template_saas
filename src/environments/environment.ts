@@ -7,4 +7,5 @@ export const environment = {
   production: true,
   apiUrl: 'https://api.example.com',
   captcha_key: '',
+  contextualHelpToursEnabled: true,
 };
